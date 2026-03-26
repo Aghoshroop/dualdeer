@@ -1,0 +1,81 @@
+.section {
+  padding: 4rem 2rem;
+  background: transparent;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.iconItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.iconCircle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--color-background);
+  border: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+[data-theme='dark'] .iconCircle {
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.activeCircle {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 20px rgba(90, 15, 200, 0.4);
+}
+
+.activeCircle .svgIcon {
+  color: white;
+}
+
+.iconItem:hover .iconCircle {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 8px 20px rgba(90, 15, 200, 0.4);
+}
+
+.svgIcon {
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.iconItem:hover .svgIcon {
+  transform: scale(1.1);
+  color: white;
+}
+
+.name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+@media (max-width: 600px) {
+  .container {
+    justify-content: center;
+  }
+}

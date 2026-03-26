@@ -1,0 +1,253 @@
+/* =============================================
+   DEER AI x DUALDEER  — Violet Energy Quantity Selector
+   Signature interaction. Not a toy. Not a game.
+   A premium, intentional energy-fill system.
+   ============================================= */
+
+.selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  user-select: none;
+}
+
+/* The main interactive bar body */
+.energyBar {
+  position: relative;
+  height: 48px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  overflow: visible; /* Allow orb to float above the bar edge */
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Hovering reveals the interaction */
+.energyBar:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 18px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* The fill layer — constrained with clip within a clipping wrapper */
+.fillLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(109, 40, 217, 0.75) 0%,
+    rgba(139, 92, 246, 0.85) 55%,
+    rgba(167, 139, 250, 0.65) 100%
+  );
+  will-change: width;
+  z-index: 0;
+  border-radius: 0;
+  /* Clip fill so it doesn't overflow the bar boundary */
+  clip-path: inset(0 round 0);
+}
+
+/* The fill edge indicator line */
+.fillLayer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background: rgba(200, 180, 255, 0.5);
+  filter: blur(1px);
+}
+
+/* ========================
+   THE ORB — rides the fill's leading edge
+======================== */
+.orb {
+  position: absolute;
+  top: 50%;
+  margin-top: -11px; /* half of 22px — avoids overriding Framer transform on left */
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(220, 200, 255, 0.95),
+    rgba(139, 92, 246, 0.85) 60%,
+    rgba(109, 40, 217, 0.7) 100%
+  );
+  box-shadow:
+    0 0 6px rgba(139, 92, 246, 0.8),
+    0 0 14px rgba(139, 92, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  z-index: 3;
+  pointer-events: none;
+  will-change: left;
+}
+
+.orb.orbFull {
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(240, 230, 255, 1),
+    rgba(167, 139, 250, 0.95) 60%,
+    rgba(139, 92, 246, 0.85) 100%
+  );
+  box-shadow:
+    0 0 8px rgba(167, 139, 250, 1),
+    0 0 20px rgba(139, 92, 246, 0.6),
+    0 0 35px rgba(109, 40, 217, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* The single-pulse ripple ring on each tap */
+.orbRing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(167, 139, 250, 0.7);
+  pointer-events: none;
+}
+
+/* Water splash ring — fires on hover dip, wide ellipse like surface ripple */
+.splashRing {
+  position: absolute;
+  top: 60%; /* Slightly below center — water surface */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 10px; /* Flat ellipse = water ripple, not bubble */
+  border-radius: 50%;
+  border: 1.5px solid rgba(167, 139, 250, 0.6);
+  pointer-events: none;
+}
+
+/* Max quantity: stable saturated state — no animation, just depth */
+.energyBar.isFull {
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow:
+    0 0 20px rgba(139, 92, 246, 0.2),
+    0 0 40px rgba(139, 92, 246, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.energyBar.isFull .fillLayer {
+  filter: brightness(1.1) saturate(1.2);
+}
+
+/* The two control buttons */
+.decrementBtn,
+.incrementBtn {
+  position: relative;
+  z-index: 2;
+  width: 40px;
+  height: 100%;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.2rem;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.decrementBtn:hover,
+.incrementBtn:hover {
+  color: #fff;
+}
+
+.decrementBtn:disabled,
+.incrementBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* The quantity number displayed in the center */
+.valueDisplay {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  /* The transition makes the number feel intentional, not instant */
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+/* Pulse the number briefly on each change */
+.valuePulse {
+  animation: valuePulse 0.3s ease forwards;
+}
+
+@keyframes valuePulse {
+  0%   { opacity: 0.4; transform: scale(0.95); }
+  100% { opacity: 1;   transform: scale(1); }
+}
+
+/* The label line below the bar */
+.label {
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(139, 92, 246, 0.7);
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.label.maxReached {
+  color: rgba(167, 139, 250, 0.9);
+}
+
+/* Vertical separator lines between button and quantity */
+.divider {
+  position: relative;
+  z-index: 2;
+  width: 1px;
+  height: 60%;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .energyBar {
+    height: 44px;
+  }
+  .decrementBtn,
+  .incrementBtn {
+    width: 36px;
+    font-size: 1rem;
+  }
+  .valueDisplay {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .energyBar {
+    height: 40px;
+  }
+  .decrementBtn,
+  .incrementBtn {
+    width: 32px;
+  }
+}

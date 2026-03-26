@@ -1,0 +1,612 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
+  background-color: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+
+.transparentHeader {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+.transparentHeader .link,
+.transparentHeader .iconBtn {
+  color: #ffffff;
+}
+
+.transparentHeader .link::after {
+  background-color: #ffffff;
+}
+
+.promoBar {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.mainNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  padding: 0 3rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.leftLinks {
+  display: flex;
+  gap: 2.5rem;
+  flex: 1;
+}
+
+.navItem {
+  height: 100%;
+}
+
+.link {
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  color: var(--color-text);
+  position: relative;
+  text-transform: uppercase;
+  padding: 1rem 0;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-foreground);
+  transition: width 0.3s ease;
+}
+
+.navItem:hover .link::after {
+  width: 100%;
+}
+
+.logoPlaceholder {
+  width: 300px; /* Same width as expected logo to hold space */
+}
+
+.brandContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-origin: center center;
+}
+
+.animatedLogo {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 40px; /* offset exactly by the 40px promoBar */
+  height: 80px; /* match exactly the mainNav 80px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Allows clicking hero elements underneath until docked */
+  z-index: 150;
+}
+
+.animatedLogo a {
+  pointer-events: auto;
+}
+
+.brand {
+  font-family: var(--font-logo), 'Inter', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 400; 
+  letter-spacing: 4px; 
+  font-style: normal;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 0.3s ease;
+  display: flex;
+  gap: 0.8rem; /* space between dual and deer */
+  justify-content: center;
+  align-items: center;
+}
+
+.brandAccent {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  /* Soft glow so it stays readable over dark images */
+  filter: drop-shadow(0 0 8px rgba(157, 78, 221, 0.4)); 
+}
+
+/* Color toggle for logo: White when floating over dark hero, normal when docked */
+.animatedLogo.floating .brand span:first-child {
+  color: #ffffff;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.5); /* contrast against hero */
+}
+
+.animatedLogo.docked .brand span:first-child {
+  color: var(--color-text);
+  text-shadow: none;
+}
+
+.brandContainer:not(.animatedLogo) .brand span:first-child {
+  color: var(--color-text);
+}
+
+.rightIcons {
+  display: flex;
+  gap: 1.5rem;
+  flex: 1;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.iconBtn {
+  color: var(--color-text);
+  transition: opacity 0.3s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.iconBtn:hover {
+  opacity: 0.5;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Search Bar Styles */
+.searchContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 40px; 
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 0 1rem;
+  overflow: hidden;
+  height: 40px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.transparentHeader .searchBar {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+.searchBar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  margin: 0 0.5rem;
+  font-family: var(--font-inter), sans-serif;
+  color: var(--color-text);
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.transparentHeader .searchBar input {
+  color: #ffffff;
+}
+
+.transparentHeader .searchBar input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.searchBar .closeBtn, .searchBarIcon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  padding: 0;
+}
+
+.transparentHeader .searchBar .closeBtn,
+.transparentHeader .searchBar .searchBarIcon {
+  color: #ffffff;
+}
+
+/* Search Dropdown */
+.searchDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 320px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  padding: 1rem;
+  z-index: 200;
+}
+
+.transparentHeader .searchDropdown {
+  background: rgba(15, 15, 20, 0.95);
+  backdrop-filter: blur(20px);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.searchDropdownHeader {
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+[data-theme='light'] .searchDropdown {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0,0,0,0.1);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.searchResultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.searchResultItem {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  text-decoration: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.searchResultItem:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+[data-theme='light'] .searchResultItem:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.searchResultItem img {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.searchResultInfo h4 {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  margin: 0 0 0.2rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.searchResultInfo span {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.noResults {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* Mega Menu Styles */
+.megaMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  /* Extreme Watery Glassmorphism Base */
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(64px) saturate(200%);
+  -webkit-backdrop-filter: blur(64px) saturate(200%);
+  /* Water surface tension border */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  /* Heavy liquid drop shadow */
+  box-shadow: 
+    0 40px 80px rgba(0, 50, 150, 0.1),
+    inset 0 -4px 15px rgba(255, 255, 255, 0.5),
+    0 10px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  z-index: 200; /* Overlap the animated logo */
+}
+
+[data-theme='dark'] .megaMenu {
+  background: rgba(15, 15, 20, 0.65);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 40px 80px rgba(0, 0, 0, 0.6),
+    inset 0 -4px 15px rgba(255, 255, 255, 0.08);
+}
+
+.megaMenuContainer {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 4rem 3rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.menuLinks {
+  display: flex;
+  gap: 6rem;
+}
+
+.menuCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.menuCol h4 {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.menuCol a {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+[data-theme='dark'] .menuCol a {
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.8), 0px 2px 4px rgba(0,0,0,0.5);
+}
+
+.menuCol a:hover {
+  color: var(--color-primary);
+  transform: translateX(4px);
+}
+
+.menuImage {
+  width: 400px;
+  height: 250px;
+  position: relative;
+  background-color: var(--color-surface);
+  overflow: hidden;
+}
+
+.menuImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .promoBar {
+    height: 25px;
+    font-size: 0.5rem;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mainNav {
+    padding: 0 1rem;
+    justify-content: space-between;
+    height: 60px; /* Sharply condensed */
+  }
+  .header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Extra separation */
+  }
+  .leftLinks {
+    display: none;
+  }
+  .brandContainer {
+    justify-content: flex-start;
+    transform: none;
+    flex: 1; 
+  }
+  .brand {
+    font-size: 1.2rem;
+    justify-content: flex-start;
+  }
+  .animatedLogo {
+    top: 25px; /* Locks flush against the compressed 25px promo bar */
+    height: 60px;
+    justify-content: flex-start;
+    padding-left: 1rem;
+  }
+  .megaMenu {
+    display: none; 
+  }
+  .iconBtn[aria-label="Account"],
+  .iconBtn[aria-label="Cart"] {
+    display: none !important;
+  }
+  .rightIcons a[href="/cart"],
+  .rightIcons a[href="/auth"] {
+    display: none;
+  }
+  .rightIcons {
+    gap: 0.5rem;
+    flex: 0 0 auto;
+  }
+  .searchContainer {
+    position: static; /* Allows fixed/absolute children to escape cleanly */
+  }
+  .searchBar {
+    position: fixed;
+    top: 85px; /* 25px Promo + 60px Nav = precisely flush underneath header */
+    left: 0;
+    width: 100vw !important; /* Force override Framer Motion's inline React width animations */
+    height: 50px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    background: var(--color-background);
+    z-index: 100;
+  }
+  .searchBar input {
+    font-size: 0.85rem;
+    padding-left: 10px;
+  }
+  .searchDropdown {
+    position: fixed;
+    top: 135px; /* Immediately follows the 50px search bar */
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 135px); /* Massive fullscreen product map like Amazon App */
+    border-radius: 0;
+    border: none;
+    overflow-y: auto;
+    background: var(--color-background);
+  }
+}
+
+/* Extreme downscaling below 400px */
+@media (max-width: 400px) {
+  .promoBar {
+    height: 20px;
+    font-size: 0.4rem;
+    letter-spacing: 0;
+  }
+  .mainNav {
+    height: 50px;
+  }
+  .animatedLogo {
+    top: 20px;
+    height: 50px;
+  }
+  .searchBar {
+    top: 70px;
+    height: 45px;
+  }
+  .searchDropdown {
+    top: 115px;
+    height: calc(100vh - 115px);
+  }
+  .brand {
+    font-size: 1rem;
+    letter-spacing: 2px;
+  }
+}
+
+@media (max-width: 250px) {
+  .promoBar {
+    height: 18px;
+    font-size: 0.35rem;
+  }
+  .mainNav {
+    height: 40px;
+    padding: 0 0.5rem;
+  }
+  .animatedLogo {
+    top: 18px;
+    height: 40px;
+  }
+  .brand {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    gap: 0.4rem;
+  }
+  .searchBar {
+    top: 58px;
+    height: 35px;
+  }
+  .searchBar input {
+    font-size: 0.7rem;
+    padding-left: 5px;
+  }
+  .searchDropdown {
+    top: 93px;
+    height: calc(100vh - 93px);
+  }
+  .iconBtn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 200px) {
+  .promoBar {
+    height: 15px;
+    font-size: 0.3rem;
+  }
+  .mainNav {
+    height: 35px;
+    padding: 0 0.25rem;
+  }
+  .animatedLogo {
+    top: 15px;
+    height: 35px;
+  }
+  .brand {
+    font-size: 0.65rem;
+    letter-spacing: 0px;
+    gap: 0.2rem;
+  }
+  .searchBar {
+    top: 50px;
+    height: 30px;
+  }
+  .searchBar input {
+    font-size: 0.6rem;
+  }
+  .searchDropdown {
+    top: 80px;
+    height: calc(100vh - 80px);
+  }
+  .iconBtn svg {
+    width: 14px;
+    height: 14px;
+  }
+}

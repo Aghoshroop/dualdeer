@@ -1,0 +1,84 @@
+.bottomNav {
+  display: none; /* Hidden on desktop */
+}
+
+@media (max-width: 768px) {
+  .bottomNav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom, 0px); /* iPhone notch buffer */
+  }
+
+  [data-theme='light'] .bottomNav {
+    background: rgba(255, 255, 255, 0.95);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .navItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-family: var(--font-inter), sans-serif;
+    gap: 4px;
+    flex: 1;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  .navItem span {
+    font-size: 0.6rem;
+    font-weight: 500;
+  }
+
+  .navItem.active {
+    color: var(--color-primary);
+  }
+
+  .cartTab {
+    position: relative;
+  }
+
+  .cartBadge {
+    position: absolute;
+    top: -5px;
+    right: 50%;
+    transform: translateX(18px);
+    background: #ff4b4b;
+    color: #fff;
+    font-size: 0.55rem;
+    font-weight: 800;
+    border-radius: 10px;
+    padding: 2px 5px;
+    min-width: 16px;
+    text-align: center;
+    border: 2px solid #141414;
+  }
+  
+  [data-theme='light'] .cartBadge {
+    border-color: #ffffff;
+  }
+}
+
+/* Extreme downscaling below 250px */
+@media (max-width: 250px) {
+  .bottomNav {
+    height: 50px;
+  }
+  .navItem span {
+    font-size: 0.5rem;
+  }
+}

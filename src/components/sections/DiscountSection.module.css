@@ -1,0 +1,126 @@
+.section {
+  width: 100%;
+  height: 600px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end; /* Align content to the right */
+}
+
+.bgImageContainer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.bgImage {
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(20, 10, 35, 0.2) 0%, rgba(20, 10, 35, 0.95) 100%);
+  z-index: 1;
+}
+
+.content {
+  color: white;
+  max-width: 500px;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 2.5rem;
+}
+
+.timer {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.timeBox {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+.btn {
+  display: inline-block;
+  padding: 1rem 3rem;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(90, 15, 200, 0.4);
+}
+
+.btn:hover {
+  background: var(--color-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(90, 15, 200, 0.6);
+}
+
+@media (max-width: 768px) {
+  .container {
+    justify-content: center;
+    text-align: center;
+  }
+  .content {
+    align-items: center;
+  }
+  .overlay {
+    background: linear-gradient(to top, rgba(20, 10, 35, 0.95) 0%, rgba(20, 10, 35, 0.4) 100%);
+  }
+}

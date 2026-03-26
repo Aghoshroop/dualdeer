@@ -1,0 +1,100 @@
+.container {
+  padding: 2rem;
+  max-width: 1400px;
+}
+.header {
+  margin-bottom: 3rem;
+}
+.header h1 {
+  font-family: var(--font-logo), 'Inter', sans-serif;
+  font-size: 2.5rem;
+  letter-spacing: 4px;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+.header p {
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+}
+.cardContainer {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+}
+.emptyState {
+  padding: 6rem 2rem;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+.icon {
+  margin-bottom: 1rem;
+  opacity: 0.2;
+}
+.emptyState h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th, .table td {
+  padding: 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+.table th {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  background: rgba(0,0,0,0.02);
+}
+[data-theme='dark'] .table th {
+  background: rgba(255,255,255,0.02);
+}
+.row {
+  transition: background-color 0.2s ease;
+}
+.row:hover {
+  background-color: rgba(157, 78, 221, 0.03);
+}
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.avatar {
+  background: rgba(157, 78, 221, 0.1);
+  color: var(--color-primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.idCell {
+  font-family: monospace;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+.subCell {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+.badge {
+  background: var(--color-foreground);
+  color: var(--color-background);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.70rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 800;
+}

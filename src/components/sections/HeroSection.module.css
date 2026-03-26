@@ -1,0 +1,248 @@
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--color-background);
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center 20%;
+  background-repeat: no-repeat;
+  z-index: 1;
+  transform-origin: center center;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  z-index: 2;
+  transition: opacity 0.8s ease;
+}
+
+.overlayLight {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10vh;
+}
+
+.heading {
+  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-size: 3.5rem;
+  letter-spacing: 4px;
+  font-weight: 300;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.subheading {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 1rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 300;
+  margin-bottom: 3rem;
+  opacity: 0.9;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.ctaBtn {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  padding: 1.2rem 3rem;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(5px);
+}
+
+.ctaBtn:hover {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+}
+
+.themeLight {
+  color: #000000;
+}
+
+.themeLight .heading {
+  text-shadow: none;
+}
+
+.themeLight .subheading {
+  text-shadow: none;
+  font-weight: 500;
+}
+
+.themeLight .ctaBtn {
+  color: #000000;
+  border-color: #000000;
+}
+
+.themeLight .ctaBtn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.indicators {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1.5rem;
+  z-index: 10;
+}
+
+.indicatorTrack {
+  width: 80px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.8s ease;
+}
+
+.indicatorFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #ffffff;
+}
+
+.themeLight .indicatorTrack {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.themeLight .indicatorFill {
+  background: #000000;
+}
+
+@media (max-width: 768px) {
+  .heading {
+    font-size: 2.2rem;
+  }
+  .subheading {
+    font-size: 0.8rem;
+    padding: 0 1rem;
+  }
+  .indicatorTrack {
+    width: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heading {
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+  }
+  .subheading {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+  }
+  .ctaBtn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.6rem;
+  }
+  .indicatorTrack {
+    width: 25px;
+  }
+}
+
+@media (max-width: 250px) {
+  .heading {
+    font-size: 1rem;
+    letter-spacing: 1px;
+  }
+  .subheading {
+    font-size: 0.45rem;
+    letter-spacing: 1px;
+  }
+  .ctaBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.45rem;
+  }
+  .indicatorTrack {
+    width: 15px;
+  }
+}
+
+@media (max-width: 200px) {
+  .heading {
+    font-size: 0.8rem;
+    letter-spacing: 0px;
+    margin-bottom: 0.5rem;
+  }
+  .subheading {
+    font-size: 0.35rem;
+    letter-spacing: 0px;
+    margin-bottom: 1.5rem;
+    padding: 0 0.25rem;
+  }
+  .ctaBtn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.35rem;
+    letter-spacing: 1px;
+    border-width: 0.5px;
+  }
+  .indicators {
+    bottom: 1.5rem;
+    gap: 0.5rem;
+  }
+  .indicatorTrack {
+    width: 10px;
+    height: 1px;
+  }
+}

@@ -1,0 +1,108 @@
+.section {
+  padding: 5rem 2rem;
+  background: transparent;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.imageBox {
+  position: relative;
+  height: 250px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.imageBox:hover .image {
+  transform: scale(1.05);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0.5rem;
+}
+
+.category {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.8rem;
+}
+
+.postTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+  transition: color 0.2s ease;
+}
+
+.postTitle:hover {
+  color: var(--color-primary);
+}
+
+.readMore {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-block;
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.readMore:hover {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}

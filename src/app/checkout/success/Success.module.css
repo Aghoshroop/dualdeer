@@ -1,0 +1,183 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 5%;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 4rem 3rem;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.iconBox {
+  width: 100px;
+  height: 100px;
+  background: rgba(186, 153, 93, 0.1);
+  border-radius: 50%;
+  border: 1px solid var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  box-shadow: 0 0 30px rgba(186, 153, 93, 0.2);
+}
+
+.icon {
+  color: var(--color-primary);
+}
+
+.title {
+  font-family: var(--font-logo);
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+  line-height: 1.6;
+}
+
+.orderIdBox {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #fff;
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+}
+
+.orderIdBox strong {
+  color: var(--color-primary);
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.primaryBtn {
+  background: var(--color-primary);
+  color: #000;
+  padding: 1rem 2.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.primaryBtn:hover {
+  background: #fff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Truck Loading CSS */
+.animationGate {
+  width: 100%;
+  height: 80px;
+  margin: 0 auto 2rem;
+  border-bottom: 2px solid rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.truckTrack {
+  position: absolute;
+  bottom: 2px;
+  left: -80px;
+  display: flex;
+  align-items: center;
+  animation: driveIn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.drivingTruck {
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+}
+
+@keyframes driveIn {
+  0% { transform: translateX(0); }
+  60% { transform: translateX(250px); }
+  75% { transform: translateX(240px); } /* hard brake bounce effect */
+  100% { transform: translateX(250px); }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 5rem 1rem 2rem;
+  }
+  .container {
+    padding: 2.5rem 1rem;
+    border-radius: 12px;
+  }
+  .iconBox {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+  }
+  .iconBox svg {
+    width: 32px;
+    height: 32px;
+  }
+  .title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+  .orderIdBox {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+  }
+  .primaryBtn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  .animationGate {
+    height: 60px;
+    margin-bottom: 1.5rem;
+  }
+  .truckTrack {
+    bottom: 2px;
+    animation: driveInMobile 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  .drivingTruck {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@keyframes driveInMobile {
+  0% { transform: translateX(0); }
+  60% { transform: translateX(150px); }
+  75% { transform: translateX(140px); }
+  100% { transform: translateX(150px); }
+}

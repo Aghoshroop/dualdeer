@@ -1,0 +1,149 @@
+"use client";
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { getBanners, Banner } from '@/lib/firebaseUtils';
+import styles from './HeroSection.module.css';
+
+const fallbackSlides = [
+  {
+    id: 1,
+    image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=2600&auto=format&fit=crop", // Women high fashion editorial
+    heading: "The Women's Collection",
+    subheading: "Elegance redefined for the modern muse.",
+    cta: "SHOP WOMEN'S",
+    theme: 'dark'
+  },
+  {
+    id: 2,
+    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2600&auto=format&fit=crop", // Bright fashion street layout
+    heading: "The Men's Heritage",
+    subheading: "Uncompromising performance meets absolute refinement.",
+    cta: "SHOP MEN'S",
+    theme: 'light'
+  },
+  {
+    id: 3,
+    image: "https://images.unsplash.com/photo-1560243563-062bfc001d68?q=80&w=2600&auto=format&fit=crop", // Elite Speedsuits
+    heading: "Elite Speedsuits",
+    subheading: "Engineered for pure aerodynamic supremacy.",
+    cta: "DISCOVER ELITE",
+    theme: 'dark'
+  }
+];
+
+export default function HeroSection() {
+  const [current, setCurrent] = useState(0);
+  const [dynamicSlides, setDynamicSlides] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const banners = await getBanners();
+        const activeBanners = banners.filter(b => b.active);
+        
+        if (activeBanners.length > 0) {
+          const mappedSlides = activeBanners.map((b, index) => ({
+            id: b.id || index.toString(),
+            image: b.image,
+            heading: b.title,
+            subheading: "Premium exclusive selection.",
+            cta: b.link ? "DISCOVER MORE" : "SHOP NOW",
+            theme: 'dark' 
+          }));
+          setDynamicSlides(mappedSlides);
+        } else {
+          setDynamicSlides(fallbackSlides);
+        }
+      } catch (error) {
+        setDynamicSlides(fallbackSlides);
+      }
+      setLoading(false);
+    };
+    
+    fetchBanners();
+  }, []);
+
+  useEffect(() => {
+    if (dynamicSlides.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % dynamicSlides.length);
+    }, 6000); 
+    return () => clearInterval(timer);
+  }, [dynamicSlides]);
+
+  if (loading) return <section className={styles.hero} style={{ background: '#0a0a0a' }} />;
+
+  return (
+    <section className={styles.hero}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={current}
+          className={styles.slide}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+        >
+          {/* Background Image */}
+          <div 
+            className={styles.background} 
+            style={{ backgroundImage: `url(${dynamicSlides[current].image})` }} 
+          />
+          <div 
+            className={`${styles.overlay} ${dynamicSlides[current].theme === 'light' ? styles.overlayLight : ''}`} 
+          />
+
+          {/* Text Content */}
+          <div className={`${styles.content} ${dynamicSlides[current].theme === 'light' ? styles.themeLight : ''}`}>
+            <motion.h2 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5, duration: 1 }}
+              className={styles.heading}
+            >
+              {dynamicSlides[current].heading}
+            </motion.h2>
+            <motion.p 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.7, duration: 1 }}
+              className={styles.subheading}
+            >
+              {dynamicSlides[current].subheading}
+            </motion.p>
+            <motion.button 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.9, duration: 1 }}
+              className={styles.ctaBtn}
+            >
+              {dynamicSlides[current].cta}
+            </motion.button>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Slider Progress Indicators */}
+      <div className={`${styles.indicators} ${dynamicSlides[current].theme === 'light' ? styles.themeLight : ''}`}>
+        {dynamicSlides.map((_, index) => (
+          <div 
+            key={index} 
+            className={styles.indicatorTrack}
+            onClick={() => setCurrent(index)}
+          >
+            {current === index && (
+              <motion.div 
+                className={styles.indicatorFill}
+                layoutId="indicatorFill"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 6, ease: "linear" }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

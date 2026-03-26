@@ -1,0 +1,170 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-text);
+  overflow-x: hidden;
+}
+
+.mobileHeader {
+  display: none;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--color-border);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+[data-theme='dark'] .sidebar {
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: all 0.2s ease;
+}
+
+.link:hover, .link.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #ff4b4b;
+  margin-top: auto;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background: #ffebeb;
+}
+
+[data-theme='dark'] .logoutBtn:hover {
+  background: rgba(255, 75, 75, 0.1);
+}
+
+.main {
+  flex: 1;
+  padding: 2rem 3rem;
+  background: var(--color-background);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* =========================================
+   RESPONSIVE ADMIN ARCHITECTURE (DOWN TO 200px)
+=========================================== */
+
+@media (max-width: 1024px) {
+  .sidebar { width: 220px; padding: 2rem 1rem; }
+  .main { padding: 1.5rem; }
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  
+  .mobileHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--color-border);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    z-index: 100;
+  }
+  
+  .mobileBrand {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  
+  .hamburgerBtn {
+    background: transparent;
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 65px; /* Appx mobile header height */
+    left: -100%;
+    width: 100%; /* Full Takeover or mostly full */
+    height: calc(100vh - 65px);
+    z-index: 99;
+    transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 1rem;
+    background: var(--color-background);
+  }
+  
+  .sidebarOpen {
+    left: 0;
+  }
+
+  .brand {
+    display: none; /* Hide duplicate desktop brand */
+  }
+
+  .main {
+    padding: 1rem 0.5rem;
+    width: 100vw;
+  }
+}
+
+/* Microscopic 200px Viewport Support */
+@media (max-width: 380px) {
+  .link {
+    font-size: 0.8rem;
+    padding: 0.6rem;
+    gap: 0.5rem;
+  }
+  .logoutBtn {
+    font-size: 0.8rem;
+    padding: 0.6rem;
+    gap: 0.5rem;
+  }
+  .main {
+    padding: 0.5rem 0.2rem;
+  }
+  .mobileBrand {
+    font-size: 1rem;
+  }
+}

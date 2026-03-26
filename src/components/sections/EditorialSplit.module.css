@@ -1,0 +1,130 @@
+.section {
+  width: 100%;
+  background-color: var(--color-background);
+  /* The split spans full width, no padding */
+}
+
+.splitContainer {
+  display: flex;
+  width: 100%;
+  height: 90vh; /* Massive cinematic blocks */
+}
+
+.block {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.imageWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.25);
+  transition: background 0.6s ease;
+}
+
+.block:hover .image {
+  transform: scale(1.05); /* Slow premium zoom on hover */
+}
+
+.block:hover .overlay {
+  background: rgba(0,0,0,0.4); /* Darkens slightly to pop the text */
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+}
+
+.title {
+  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-size: 3.5rem;
+  font-weight: 300;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.shopLink {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-bottom: 1px solid #ffffff;
+  padding-bottom: 0.3rem;
+  transition: color 0.3s ease, border-color 0.3s ease;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.block:hover .shopLink {
+  color: #d8b4fe; /* Subtle accent on hover */
+  border-bottom-color: #d8b4fe;
+}
+
+@media (max-width: 768px) {
+  .splitContainer {
+    flex-direction: row;
+    height: 60vh;
+  }
+  .block {
+    height: 60vh;
+  }
+  .title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    margin-bottom: 0.8rem;
+  }
+  .shopLink {
+    font-size: 0.5rem;
+    letter-spacing: 1px;
+  }
+}
+
+@media (max-width: 250px) {
+  .title {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+  .shopLink {
+    font-size: 0.4rem;
+    letter-spacing: 1px;
+  }
+}

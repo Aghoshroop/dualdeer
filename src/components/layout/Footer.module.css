@@ -1,0 +1,150 @@
+.footer {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  padding: 6rem 2rem 2rem 2rem;
+}
+
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 6rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 4rem;
+}
+
+[data-theme='dark'] .container {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.newsletter {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.heading {
+  font-family: 'Inter', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.subtext {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.form {
+  display: flex;
+  margin-top: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+}
+
+[data-theme='dark'] .form {
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 1rem 0;
+  color: var(--color-background);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.input::placeholder {
+  color: #666;
+}
+
+.submitBtn {
+  background: transparent;
+  color: var(--color-background);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 0 1rem;
+}
+
+.submitBtn:hover {
+  color: #999;
+}
+
+.linksGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.colHeading {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.link {
+  font-size: 0.85rem;
+  color: #999;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: var(--color-background);
+}
+
+.bottomBar {
+  max-width: 1600px;
+  margin: 2rem auto 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.brand {
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.legalLinks {
+  display: flex;
+  gap: 2rem;
+}
+
+.legalLinks a:hover {
+  color: var(--color-background);
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .linksGrid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .bottomBar {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+}

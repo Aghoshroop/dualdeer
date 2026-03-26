@@ -1,0 +1,225 @@
+.container {
+  min-height: 100vh;
+  padding: 6rem 2rem 4rem;
+  background: var(--color-background);
+  display: flex;
+  gap: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.backBtn {
+  position: absolute;
+  top: 2.5rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.backBtn:hover {
+  color: var(--color-text);
+  transform: translateX(-5px);
+}
+
+.sidebar {
+  width: 280px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  height: calc(100vh - 8rem);
+  position: sticky;
+  top: 7rem;
+  align-self: flex-start;
+}
+
+.profileHead {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--color-primary), #6366f1);
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+}
+
+.profileHead h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.2rem;
+}
+
+.profileHead p {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.navBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+}
+
+.navBtn.active {
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border-color: rgba(var(--color-primary-rgb), 0.2);
+  color: var(--color-primary);
+}
+
+.logoutBtn {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  width: 100%;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: 2rem;
+}
+
+.logoutBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.main {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 3rem;
+  min-height: calc(100vh - 8rem);
+}
+
+/* Tabs Animation Container */
+.tabContent {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+    padding: 1.5rem 1rem;
+  }
+  .main {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 4.5rem 0.5rem 1rem;
+    gap: 0.25rem;
+  }
+
+  .sidebar {
+    width: 50px;
+    padding: 1rem 0.25rem;
+    top: 5rem;
+    height: calc(100vh - 5.5rem);
+    border-radius: 12px;
+  }
+
+  .profileHead {
+    display: none;
+  }
+
+  .nav {
+    gap: 0.25rem;
+  }
+
+  .navBtn {
+    justify-content: center;
+    padding: 0.75rem 0;
+    gap: 0;
+    border-radius: 8px;
+  }
+
+  .navText {
+    display: none;
+  }
+
+  .logoutBtn {
+    padding: 0.75rem 0;
+    justify-content: center;
+    gap: 0;
+    margin-top: 1rem;
+    border-radius: 8px;
+  }
+
+  .main {
+    padding: 0.75rem;
+    min-height: calc(100vh - 5.5rem);
+    border-radius: 12px;
+  }
+
+  .backText {
+    display: none;
+  }
+
+  .backBtn {
+    top: 1rem;
+    left: 0.5rem;
+  }
+}
+
