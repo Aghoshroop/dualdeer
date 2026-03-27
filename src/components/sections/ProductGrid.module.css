@@ -1,10 +1,10 @@
 .section {
-  padding: 8rem 2rem;
+  padding: 6rem 5%;
   background-color: var(--color-background);
 }
 
 .container {
-  max-width: 1400px;
+  max-width: 1300px; /* Perfectly balanced width */
   margin: 0 auto;
 }
 
@@ -12,193 +12,340 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 4rem;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.titleWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.preTitle {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--color-primary);
+  text-transform: uppercase;
 }
 
 .title {
-  font-family: var(--font-logo), 'Playfair Display', serif;
-  font-size: 2.2rem;
-  font-weight: 300;
-  letter-spacing: 2px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -1px;
   text-transform: uppercase;
+  margin: 0.3rem 0 0;
 }
 
 .shopAll {
-  font-family: var(--font-inter), sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--color-text-muted);
-  text-decoration: none;
-  transition: color 0.3s ease;
+  letter-spacing: 1px;
+  font-weight: 800;
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-text);
+  padding-bottom: 2px;
 }
 
 .shopAll:hover {
-  color: var(--color-text);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
+  grid-template-columns: repeat(4, 1fr); 
+  gap: 1.5rem;
 }
 
+/* Individual Card */
 .card {
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
   cursor: pointer;
 }
 
 .imageBox {
   position: relative;
   width: 100%;
-  aspect-ratio: 3/4;
-  background-color: #f4f4f4; /* Crucial Ralph Lauren flat grey background for product imagery */
+  aspect-ratio: 4/5; /* Restoring normal premium proportions */
+  background-color: var(--color-surface);
   overflow: hidden;
-  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
 }
 
-[data-theme='dark'] .imageBox {
-  background-color: #111111; /* Extremely dark solid for dark mode */
-}
-
-.image {
+.primaryImage, .hoverImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
-  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-.card:hover .image {
-  transform: scale(1.03); /* Extremely subtle premium breath on hover */
+.hoverImage {
+  opacity: 0;
+  transform: scale(1.02);
+  z-index: 2;
 }
 
-.info {
-  text-align: center;
+.primaryImage {
+  opacity: 1;
+  z-index: 1;
 }
 
-.name {
-  font-family: var(--font-logo), 'Playfair Display', serif;
-  font-size: 1.1rem;
-  font-weight: 400;
-  color: var(--color-text);
-  margin-bottom: 0.5rem;
-  letter-spacing: 1px;
+/* Hover swap remains - User wants it work though */
+.card:hover .primaryImage {
+  opacity: 0;
 }
 
-.priceContainer {
+.card:hover .hoverImage {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Badge System */
+.badgeContainer {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+  z-index: 5;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  gap: 0.4rem;
+}
+
+.saleBadge, .newBadge {
+  padding: 3px 8px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+
+.saleBadge { background: #ff3e3e; color: #fff; }
+.newBadge { background: #000; color: #fff; }
+
+/* Quick Actions Overlay (Hidden as per User's request for "Normal Card") */
+.quickActions {
+  position: absolute;
+  bottom: 0.8rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  display: flex;
   gap: 0.6rem;
-  margin-bottom: 0.4rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
 }
 
-.mrp {
-  font-family: var(--font-inter), sans-serif;
-  font-size: 0.8rem;
-  color: #ff4b4b;
-  text-decoration: line-through;
-  opacity: 0.8;
+.card:hover .quickActions {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
-.price {
-  font-family: var(--font-inter), sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text);
-  letter-spacing: 1px;
-}
-
-.rating {
-  font-family: var(--font-inter), sans-serif;
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+.actionCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  color: #000;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.actionCircle:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Product Info */
+.info {
+  display: flex;
+  flex-direction: column;
   gap: 0.3rem;
 }
 
-.star {
-  color: #D4AF37;
-  font-size: 0.85rem;
+.catRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: #888;
+  font-weight: 700;
 }
 
+.rating {
+  color: #000;
+  font-weight: 800;
+}
+
+[data-theme='dark'] .rating { color: #fff; }
+
+.name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 2px;
+}
+
+.price {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.mrp {
+  font-size: 0.8rem;
+  text-decoration: line-through;
+  color: #ff3e3e;
+  opacity: 0.6;
+}
+
+/* Buy Now Row - Optional, but keeping it small for User */
+.colorSwatches {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.colorCircle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+[data-theme='dark'] .colorCircle {
+  border-color: rgba(255,255,255,0.2);
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .cardActions {
+  opacity: 1;
+}
+
+.buyNowBtn {
+  flex: 1;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 8px 0;
+  background: #000;
+  color: #fff;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+[data-theme='dark'] .buyNowBtn { background: #fff; color: #000; }
+
 @media (max-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem 1rem;
-  }
+  .grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .section {
-    padding: 3rem 0.5rem;
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .title { font-size: 1.8rem; }
+}
+
+/* Premium Glass Card for Recommendations */
+.premiumGlassCard {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  height: 100%;
+}
+
+[data-theme='light'] .premiumGlassCard {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.premiumGlassCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.premiumImageBox {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/5;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.2rem;
+  background-color: var(--color-surface);
+}
+
+.premiumGlassCard:hover .primaryImage { opacity: 0; }
+.premiumGlassCard:hover .hoverImage { opacity: 1; transform: scale(1.05); }
+
+/* Mobile Compaction for Premium Glass Card */
+@media (max-width: 768px) {
+  .premiumGlassCard {
+    padding: 0.6rem;
+    border-radius: 12px;
   }
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.8rem 0.5rem;
-  }
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .title {
-    font-size: 1.4rem;
-  }
-  .name {
-    font-size: 0.8rem;
-    margin-bottom: 0.3rem;
-  }
-  .price {
-    font-size: 0.8rem;
-  }
-  .mrp {
-    font-size: 0.65rem;
-  }
-  .star {
-    font-size: 0.6rem;
+  .premiumImageBox {
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
   }
 }
 
 @media (max-width: 480px) {
   .grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
+    gap: 0.6rem;
   }
-  .section {
-    padding: 2rem 0.2rem;
+  .premiumGlassCard {
+    padding: 0.4rem;
+    border-radius: 8px;
   }
-  .imageBox {
-    margin-bottom: 0.5rem;
+  .premiumImageBox {
+    border-radius: 6px;
+    margin-bottom: 0.4rem;
   }
-  .title {
-    font-size: 0.9rem;
+  .premiumGlassCard .name {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin-bottom: 0.2rem;
   }
-  .name {
-    font-size: 0.5rem;
-    letter-spacing: 0;
-    line-height: 1.1;
+  .premiumGlassCard .price {
+    font-size: 0.8rem;
   }
-  .price {
-    font-size: 0.5rem;
+  .premiumGlassCard .mrp {
+    font-size: 0.7rem;
   }
-  .mrp {
-    font-size: 0.45rem;
-  }
-  .star {
-    font-size: 0.4rem;
-  }
-  .rating {
-    font-size: 0.4rem;
-  }
-  .shopAll {
-    font-size: 0.5rem;
+  .premiumGlassCard .rating {
+    font-size: 0.65rem;
   }
 }

@@ -2,8 +2,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingBag, User, X } from 'lucide-react';
+import { Search, ShoppingBag, User, X, Sun, Moon, Menu } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { useTheme } from 'next-themes';
 import LiveTrafficBadge from '../ui/LiveTrafficBadge';
 import { Product } from '@/lib/firebaseUtils';
 import { useCart } from '@/context/CartContext';
@@ -22,6 +23,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
   const { cartCount } = useCart();
+  const { theme, setTheme } = useTheme();
 
   const [isMobile, setIsMobile] = useState(false);
   const [isMicro, setIsMicro] = useState(false);
@@ -72,6 +74,7 @@ export default function Navbar() {
   
   const [isDocked, setIsDocked] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     return scrollY.onChange((latest) => {
@@ -96,7 +99,7 @@ export default function Navbar() {
 
   // This check is AFTER all hooks — safe per Rules of Hooks.
   // Early returns before hooks cause Turbopack's "static flag" panic.
-  if (!mounted || pathname?.startsWith('/profile') || pathname?.startsWith('/product/') || pathname?.startsWith('/checkout')) {
+  if (!mounted) {
     return null;
   }
 
@@ -136,6 +139,16 @@ export default function Navbar() {
               <span className={styles.brandAccent}>DEER</span>
             </Link>
           </motion.div>
+
+          <div className={styles.mobileActions}>
+            <button 
+              aria-label="Toggle Theme" 
+              className={styles.iconBtn}
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              {mounted && theme === 'dark' ? <Sun size={20} strokeWidth={1.5} /> : <Moon size={20} strokeWidth={1.5} />}
+            </button>
+          </div>
 
           <div className={styles.rightIcons}>
             <div className={styles.searchContainer} ref={searchRef}>
@@ -214,6 +227,15 @@ export default function Navbar() {
                 )}
               </AnimatePresence>
             </div>
+            
+            <button 
+              aria-label="Toggle Theme" 
+              className={styles.iconBtn}
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              {mounted && theme === 'dark' ? <Sun size={20} strokeWidth={1.5} /> : <Moon size={20} strokeWidth={1.5} />}
+            </button>
+
             <Link href="/auth">
               <button aria-label="Account" className={styles.iconBtn}><User size={20} strokeWidth={1.5} /></button>
             </Link>
@@ -269,6 +291,56 @@ export default function Navbar() {
       </header>
 
       {/* Global Storefront Traffic Badge */}
+      {/* Mobile Drawer */}
+      <AnimatePresence>
+        {isDrawerOpen && (
+          <>
+            <motion.div 
+              className={styles.drawerOverlay}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsDrawerOpen(false)}
+            />
+            <motion.div 
+              className={styles.drawer}
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            >
+              <div className={styles.drawerHeader}>
+                <Link href="/" onClick={() => setIsDrawerOpen(false)} className={styles.brand}>
+                   <span>DUAL</span><span className={styles.brandAccent}>DEER</span>
+                </Link>
+                <button onClick={() => setIsDrawerOpen(false)} className={styles.iconBtn}><X size={24} /></button>
+              </div>
+              <div className={styles.drawerContent}>
+                <nav className={styles.drawerNav}>
+                   <Link href="/shop" onClick={() => setIsDrawerOpen(false)}>COLLECTION</Link>
+                   {liveCategories.map((cat, i) => (
+                      <Link key={i} href="/shop" onClick={() => setIsDrawerOpen(false)} style={{ textTransform: 'uppercase' }}>
+                        {cat}
+                      </Link>
+                   ))}
+                   <div className={styles.drawerDivider} />
+                   <Link href="/auth" onClick={() => setIsDrawerOpen(false)}>MY ACCOUNT</Link>
+                   <Link href="/cart" onClick={() => setIsDrawerOpen(false)}>MY BAG ({cartCount})</Link>
+                </nav>
+              </div>
+              <div className={styles.drawerFooter}>
+                 <button 
+                  className={styles.themeToggleFull} 
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                >
+                  {theme === 'dark' ? <><Sun size={18} /> Light Mode</> : <><Moon size={18} /> Dark Mode</>}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <LiveTrafficBadge />
     </>
   );

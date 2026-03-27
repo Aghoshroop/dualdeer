@@ -140,7 +140,8 @@ function CheckoutEngine() {
           mrp: item.mrp || item.price,
           pricePaid: item.price,
           quantity: item.quantity,
-          size: item.size || 'M'
+          size: item.size || 'M',
+          image: item.image || ''
         })),
         total: total,
         discountAmount: discountAmountCapped,

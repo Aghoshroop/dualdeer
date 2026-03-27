@@ -86,7 +86,7 @@ function ShopEngine() {
       {/* 1. Hero Banner */}
       <section className={styles.halfScreenHero}>
         <img
-          src={heroUrl || "https://images.unsplash.com/photo-1550639525-c97d455acf70?q=80&w=2000&auto=format&fit=crop"}
+          src={heroUrl || "https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?q=80&w=2600&auto=format&fit=crop"}
           alt="Shop Collection"
         />
         <div className={styles.halfScreenOverlay}></div>
@@ -114,8 +114,8 @@ function ShopEngine() {
               >
                 <img src={cat.image || fallbackImages[i % 3]} alt={cat.name} />
                 <div className={styles.catOverlay}>
-                  <h3>{cat.name.toUpperCase()}</h3>
-                  <p>EXPLORE NOW</p>
+                   <h3>{cat.name.toUpperCase()}</h3>
+                   <p>EXPLORE NOW</p>
                 </div>
               </motion.div>
             );
@@ -153,7 +153,7 @@ function ShopEngine() {
         />
 
         <div className={styles.shopLayoutContainer}>
-          {/* Mobile Filter Toggle */}
+          {/* Mobile Filter Header */}
           <div className={styles.mobileFilterHeader}>
             <button className={styles.mobileFilterBtn} onClick={() => setIsMobileFilterOpen(true)}>
               <Filter size={16} strokeWidth={2} />
@@ -232,7 +232,7 @@ function ShopEngine() {
             </aside>
           </>
 
-          {/* ── Product Grid ── */}
+          {/* Product Grid */}
           <div className={styles.productGrid}>
             <AnimatePresence>
               {loading ? (
@@ -240,8 +240,7 @@ function ShopEngine() {
               ) : displayProducts.length === 0 ? (
                 <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '40px', color: '#fff' }}>No products matching this filter.</div>
               ) : displayProducts.map((product, i) => {
-                // Every 10th item (index 9, 19, 29...) → full-width featured card, not repeated as a grid card
-                if (i % 10 === 9) {
+                if (i % 7 === 6) {
                   return (
                     <motion.div
                       key={`featured-${product.id || i}`}
@@ -251,11 +250,9 @@ function ShopEngine() {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
                     >
-                      {/* Left: Product image covers full card height */}
                       <Link href={`/product/${product.id}`} className={styles.featuredImageWrap}>
                         <img src={product.image} alt={product.name} className={styles.featuredImg} />
                       </Link>
-                      {/* Right: Info + Actions */}
                       <div className={styles.featuredInfo}>
                         <p className={styles.featuredLabel}>★ FEATURED PICK</p>
                         <Link href={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -266,8 +263,22 @@ function ShopEngine() {
                             {product.description.slice(0, 140)}{product.description.length > 140 ? '…' : ''}
                           </p>
                         )}
-                        <div className={styles.featuredRating}>
-                          <span className={styles.star}>★</span> {product.rating || 5.0}
+                        <div className={styles.featuredRating} style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                          <div style={{ display: 'flex', gap: '1px' }}>
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <span 
+                                key={star} 
+                                className={styles.star}
+                                style={{ 
+                                  opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
+                                  fontSize: '0.8rem'
+                                }}
+                              >
+                                ★
+                              </span>
+                            ))}
+                          </div>
+                          <span style={{ fontWeight: 800 }}>{(product.rating || 5.0).toFixed(1)}</span>
                           <span style={{ opacity: 0.5, marginLeft: '0.3rem', fontSize: '0.7rem' }}>(Verified Client)</span>
                         </div>
                         <div className={styles.featuredPricing}>
@@ -276,6 +287,13 @@ function ShopEngine() {
                           )}
                           <span className={styles.featuredPrice}>₹{product.price.toFixed(2)}</span>
                         </div>
+                        {product.colors && product.colors.length > 0 && (
+                          <div className={styles.colorSwatches} style={{ marginBottom: '1.2rem' }}>
+                            {product.colors.map((color: string, idx: number) => (
+                              <div key={idx} className={styles.colorCircle} style={{ backgroundColor: color }} title={color} />
+                            ))}
+                          </div>
+                        )}
                         <div className={styles.featuredActions}>
                           <AnimatedCartButton
                             onAdd={() => addToCart({
@@ -301,7 +319,6 @@ function ShopEngine() {
                   );
                 }
 
-                // Regular 3-col grid card
                 return (
                   <motion.div
                     key={product.id || i}
@@ -315,11 +332,13 @@ function ShopEngine() {
                       <img
                         src={product.image}
                         alt={product.name}
-                        className={`${styles.primaryImg} ${product.images && product.images.length > 1 ? styles.hasSecondary : ''}`}
+                        className={styles.primaryImg}
                       />
-                      {product.images && product.images.length > 1 && (
-                        <img src={product.images[1]} alt={`${product.name} alternate`} className={styles.secondaryImg} />
-                      )}
+                      <img
+                        src={(product.images && product.images.length > 1) ? product.images[1] : (product.images && product.images[0]) || product.image}
+                        alt={`${product.name} alternate`} 
+                        className={styles.secondaryImg} 
+                      />
                     </Link>
                     <div className={styles.productInfoGlass}>
                       <div className={styles.infoTop}>
@@ -331,8 +350,30 @@ function ShopEngine() {
                           <span className={styles.price}>₹{product.price.toFixed(2)}</span>
                         </p>
                       </div>
-                      <div className={styles.rating}>
-                        <span className={styles.star}>★</span> {product.rating || 5.0} <span>(Verified Client)</span>
+                      {product.colors && product.colors.length > 0 && (
+                        <div className={styles.colorSwatches}>
+                          {product.colors.map((color: string, idx: number) => (
+                            <div key={idx} className={styles.colorCircle} style={{ backgroundColor: color }} title={color} />
+                          ))}
+                        </div>
+                      )}
+                      <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <div style={{ display: 'flex', gap: '1px' }}>
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <span 
+                              key={star} 
+                              className={styles.star}
+                              style={{ 
+                                opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
+                                fontSize: '0.85rem'
+                              }}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                        <span style={{ fontWeight: 800, marginLeft: '2px' }}>{(product.rating || 5.0).toFixed(1)}</span>
+                        <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>(Verified Client)</span>
                       </div>
                       <div className={styles.cardActionsGlass}>
                         <AnimatedCartButton
@@ -376,7 +417,7 @@ function ShopEngine() {
         </div>
       </section>
 
-      {/* 6. Recommendations Infinity Slider */}
+      {/* 6. Recommendations Slider */}
       <section className={styles.recommendationsSection}>
         <div className={styles.recHeader}>
           <h2>Explore our recommendations</h2>
@@ -394,11 +435,13 @@ function ShopEngine() {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className={`${styles.primaryImg} ${product.images && product.images.length > 1 ? styles.hasSecondary : ''}`}
+                      className={styles.primaryImg}
                     />
-                    {product.images && product.images.length > 1 && (
-                      <img src={product.images[1]} alt={`${product.name} alternate`} className={styles.secondaryImg} />
-                    )}
+                    <img
+                      src={(product.images && product.images.length > 1) ? product.images[1] : (product.images && product.images[0]) || product.image}
+                      alt={`${product.name} alternate view`} 
+                      className={styles.secondaryImg} 
+                    />
                   </Link>
                 </div>
                 <div className={styles.productInfoGlass}>
@@ -411,8 +454,30 @@ function ShopEngine() {
                       <span className={styles.price}>₹{product.price.toFixed(2)}</span>
                     </p>
                   </div>
-                  <div className={styles.rating}>
-                    <span className={styles.star}>★</span> {product.rating || 5.0} <span>(Verified Client)</span>
+                  {product.colors && product.colors.length > 0 && (
+                    <div className={styles.colorSwatches}>
+                      {product.colors.map((color: string, idx: number) => (
+                        <div key={idx} className={styles.colorCircle} style={{ backgroundColor: color }} title={color} />
+                      ))}
+                    </div>
+                  )}
+                  <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ display: 'flex', gap: '1px' }}>
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <span 
+                          key={star} 
+                          className={styles.star}
+                          style={{ 
+                            opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
+                            fontSize: '0.85rem'
+                          }}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                    <span style={{ fontWeight: 800, marginLeft: '2px' }}>{(product.rating || 5.0).toFixed(1)}</span>
+                    <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>(Verified Client)</span>
                   </div>
                   <div className={styles.cardActionsGlass}>
                     <AnimatedCartButton

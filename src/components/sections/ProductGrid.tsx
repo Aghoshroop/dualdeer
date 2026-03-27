@@ -1,9 +1,12 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import styles from "./ProductGrid.module.css";
-
 import { useEffect, useState } from "react";
+import { Eye, ShoppingBag } from "lucide-react";
+import { useCart } from "@/context/CartContext";
+import { useRouter } from "next/navigation";
+import AnimatedCartButton from "../ui/AnimatedCartButton";
 
 interface Product {
   id: string;
@@ -12,18 +15,22 @@ interface Product {
   mrp?: number;
   rating?: number;
   image: string;
+  images?: string[];
+  isNew?: boolean;
+  colors?: string[];
 }
 
 export default function ProductGrid({ title: fallbackTitle }: { title: string }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [title, setTitle] = useState(fallbackTitle);
   const [loading, setLoading] = useState(true);
+  const { addToCart } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     import('@/lib/firebaseUtils').then(({ getProducts, getContentBlock }) => {
       Promise.all([getProducts(), getContentBlock('home-season-title')]).then(([prods, titleBlock]) => {
-        // Only load products marked explicitly for the season grid
-        const seasonal = prods.filter(p => p.isSeasonal === true);
+        const seasonal = prods.filter(p => p.isSeasonal === true || (p.category && p.category.toUpperCase().includes('SEASONAL')));
         setProducts(seasonal as Product[]);
         if (titleBlock && titleBlock.title) {
           setTitle(titleBlock.title);
@@ -37,56 +44,127 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
     <section className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <motion.h2 
-            className={styles.title}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
+          <motion.div 
+            className={styles.titleWrapper}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 1 }}
           >
-            {title}
-          </motion.h2>
+            <span className={styles.preTitle}>CURATED SELECTION</span>
+            <h2 className={styles.title}>{title}</h2>
+          </motion.div>
           <Link href="/shop" className={styles.shopAll}>View Lookbook</Link>
         </div>
 
         <div className={styles.grid}>
+          <AnimatePresence>
           {loading ? (
-            <div style={{ color: '#fff', textAlign: 'center', width: '100%', padding: '2rem' }}>Loading Season Essentials...</div>
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className={styles.skeletonCard} />
+            ))
           ) : products.length === 0 ? (
-            <div style={{ color: '#fff', textAlign: 'center', width: '100%', padding: '2rem', opacity: 0.5 }}>New collection arriving soon.</div>
+            <div className={styles.emptyGrid}>New collection arriving soon.</div>
           ) : (
             products.slice(0, 4).map((product, i) => (
-              <Link href={`/product/${product.id}`} key={product.id} style={{ textDecoration: 'none' }}>
-                <motion.div 
-                  className={styles.card}
-                initial={{ opacity: 0, y: 30 }}
+              <motion.div 
+                key={product.id}
+                className={styles.card}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.05 }}
               >
-                <div className={styles.imageBox}>
+                <Link href={`/product/${product.id}`} className={styles.imageBox}>
+                  {/* Primary Image */}
                   <img 
                     src={product.image}
                     alt={product.name}
-                    className={styles.image}
+                    className={styles.primaryImage}
                   />
-                </div>
+                  {/* Hover Image */}
+                  <img 
+                    src={(product.images && product.images.length > 1) ? product.images[1] : (product.images && product.images[0]) || product.image} 
+                    alt={`${product.name} alternate view`} 
+                    className={styles.hoverImage} 
+                  />
+                  
+                  {/* Badge system */}
+                  <div className={styles.badgeContainer}>
+                     {product.mrp && product.mrp > product.price && (
+                       <span className={styles.saleBadge}>SALE</span>
+                     )}
+                     {product.isNew && (
+                       <span className={styles.newBadge}>NEW</span>
+                     )}
+                  </div>
+
+                  {/* Overlays */}
+                  <div className={styles.quickActions}>
+                      <button className={styles.actionCircle} aria-label="Quick View"><Eye size={16} /></button>
+                      <button className={styles.actionCircle} aria-label="Add to Bag" onClick={(e) => { e.preventDefault(); addToCart({ ...product, size: 'M', quantity: 1 }); }}><ShoppingBag size={16} /></button>
+                  </div>
+                </Link>
+
                 <div className={styles.info}>
-                  <h3 className={styles.name}>{product.name}</h3>
-                  <div className={styles.priceContainer}>
-                    {product.mrp && product.mrp > product.price && (
-                      <span className={styles.mrp}>₹{product.mrp.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
-                    )}
-                    <span className={styles.price}>₹{product.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                  <div className={styles.catRow}>
+                    <span className={styles.categoryName}>Dual Collection</span>
+                    <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <div style={{ display: 'flex', gap: '1px' }}>
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <span 
+                            key={star} 
+                            className={styles.star}
+                            style={{ 
+                              opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
+                              fontSize: '0.75rem'
+                            }}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <span style={{ fontWeight: 800 }}>{(product.rating || 5.0).toFixed(1)}</span>
+                    </div>
                   </div>
-                  <div className={styles.rating}>
-                    <span className={styles.star}>★</span> {product.rating || 5.0} <span>(Verified Client)</span>
+                  <Link href={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
+                    <h3 className={styles.name}>{product.name}</h3>
+                  </Link>
+                  <div className={styles.priceRow}>
+                    {product.mrp && product.mrp > product.price && (
+                      <span className={styles.mrp}>₹{product.mrp.toLocaleString()}</span>
+                    )}
+                    <span className={styles.price}>₹{product.price.toLocaleString()}</span>
+                  </div>
+
+                  {/* Color Swatches */}
+                  {product.colors && product.colors.length > 0 && (
+                    <div className={styles.colorSwatches}>
+                      {product.colors.map((color, idx) => (
+                        <div key={idx} className={styles.colorCircle} style={{ backgroundColor: color }} title={color} />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Optional Compact Action */}
+                  <div className={styles.cardActions}>
+                      <button
+                        className={styles.buyNowBtn}
+                        onClick={() => router.push(`/checkout?buyNow=${product.id}&size=M&qty=1`)}
+                      >
+                        Buy Now
+                      </button>
+                      <AnimatedCartButton
+                        size="small"
+                        onAdd={() => addToCart({ ...product, size: 'M', quantity: 1 })}
+                        label="+"
+                      />
                   </div>
                 </div>
-                </motion.div>
-              </Link>
+              </motion.div>
             ))
           )}
+          </AnimatePresence>
         </div>
       </div>
     </section>

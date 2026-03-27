@@ -1,5 +1,5 @@
 .pageContainer {
-  padding: 4rem 5% 4rem;
+  padding: 8rem 5% 4rem; /* INCREASED from 4rem to prevent navbar overlap */
   max-width: 1400px;
   margin: 0 auto;
   color: var(--color-text);
@@ -67,8 +67,8 @@
   aspect-ratio: 1/1;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   position: relative;
 }
 
@@ -236,7 +236,42 @@
   line-height: 1.6;
   opacity: 0.8;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.colorSelector h4,
+.sizeSelector h4 {
+  font-size: 0.9rem;
+  margin: 0 0 0.8rem 0;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.colorOptions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.colorBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 2px; /* Space for the border outline */
+  background-clip: content-box;
+}
+
+.activeColor {
+  border-color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+.colorBtn:hover {
+  transform: scale(1.1);
 }
 
 .sizeSelector h4 {
@@ -255,8 +290,8 @@
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   color: var(--color-text);
   font-weight: 600;
   cursor: pointer;
@@ -264,7 +299,7 @@
 }
 
 .sizeBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-border);
 }
 
 .activeSize {
@@ -279,7 +314,7 @@
   gap: 1rem;
   margin-top: 1rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
   width: 100%;
 }
@@ -288,8 +323,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
   border-radius: 30px;
   padding: 0.5rem 1rem;
   height: 50px;
@@ -349,10 +384,12 @@
 }
 
 .addToCartBtn:hover {
-  border-color: rgba(139, 92, 246, 0.4);
+  border-color: var(--color-primary);
   box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15), inset 0 0 15px rgba(139, 92, 246, 0.1);
-  color: #fff;
+  color: var(--color-background);
+  background: var(--color-foreground);
 }
+
 
 .addToCartBtn:hover::before {
   opacity: 1;
@@ -477,10 +514,11 @@
 .tabHeader {
   display: flex;
   gap: 3rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--color-border);
   margin-bottom: 2rem;
   justify-content: center;
 }
+
 
 @media (max-width: 600px) {
   .tabHeader {
@@ -722,20 +760,25 @@
 .submitReviewArea {
   margin-top: 4rem;
   background: rgba(255, 255, 255, 0.02);
-  padding: 2.5rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 3rem;
 }
 
 .submitReviewArea h3 {
   margin: 0 0 0.5rem 0;
   font-family: var(--font-logo), serif;
+  font-size: 1.8rem;
+  letter-spacing: 1px;
 }
 
 .submitReviewArea p {
   opacity: 0.6;
-  font-size: 0.9rem;
-  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  margin-bottom: 2.5rem;
 }
 
 .reviewForm {
@@ -757,18 +800,22 @@
 }
 
 .inputField, .textArea {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--color-text);
-  padding: 1rem;
-  border-radius: 8px;
+  padding: 1.2rem;
+  border-radius: 12px;
   font-family: var(--font-inter), sans-serif;
   width: 100%;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
 .inputField:focus, .textArea:focus {
   outline: none;
   border-color: var(--color-primary);
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.1);
 }
 
 .inputField option {
@@ -777,31 +824,35 @@
 }
 
 .textArea {
-  min-height: 120px;
+  min-height: 140px;
   resize: vertical;
 }
 
 .submitBtn {
-  background: var(--color-text);
-  color: var(--color-background);
-  border: none;
-  padding: 1rem 2rem;
-  font-weight: 600;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(109, 40, 217, 0.9));
+  color: #fff;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  padding: 1rem 2.5rem;
+  font-weight: 700;
   text-transform: uppercase;
   border-radius: 30px;
   cursor: pointer;
   align-self: flex-start;
-  transition: background 0.2s;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  font-size: 0.95rem;
+  letter-spacing: 1px;
 }
 
 .submitBtn:hover {
-  background: var(--color-primary);
-  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .submitBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 [data-theme='light'] .inputField,

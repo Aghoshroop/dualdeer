@@ -2,19 +2,18 @@
   --color-primary: #5A0FC8; /* Deep Violet */
   --color-secondary: #7B2FF7; /* Royal Purple */
   --color-accent: #9D4EDD; /* Neon Violet */
-  
+}
+
+[data-theme='light'] {
   --color-background: #ffffff;
-  --color-foreground: #111111;
+  --color-foreground: #000000;
   --color-border: #EAEAEA;
   --color-text: #111111;
   --color-text-muted: #666666;
   --color-surface: #F8F8F8;
-  
-  --color-surface: #0A0A0A;
 }
 
-* {
-  box-sizing: border-box;
+[data-theme='dark'] {
   --color-background: #000000;
   --color-foreground: #ffffff;
   --color-border: #222222;
@@ -22,6 +21,7 @@
   --color-text-muted: #999999;
   --color-surface: #0A0A0A;
 }
+
 
 * {
   box-sizing: border-box;

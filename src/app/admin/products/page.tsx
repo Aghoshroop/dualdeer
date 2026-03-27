@@ -33,7 +33,8 @@ export default function AdminProductsPage() {
     rating: 5,
     image: '',
     images: [] as string[],
-    stock: 0
+    stock: 0,
+    colors: ''
   });
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -64,7 +65,7 @@ export default function AdminProductsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ name: '', description: '', sizes: '', category: '', subcategory: '', price: 0, mrp: 0, rating: 5, image: '', images: [], stock: 0 });
+    setFormData({ name: '', description: '', sizes: '', category: '', subcategory: '', price: 0, mrp: 0, rating: 5, image: '', images: [], stock: 0, colors: '' });
     setEditingId(null);
     setShowModal(true);
   };
@@ -81,7 +82,8 @@ export default function AdminProductsPage() {
       rating: product.rating || 5,
       image: product.image,
       images: product.images || [],
-      stock: product.stock
+      stock: product.stock,
+      colors: product.colors ? product.colors.join(', ') : ''
     });
     setEditingId(product.id!);
     setShowModal(true);
@@ -91,7 +93,8 @@ export default function AdminProductsPage() {
     e.preventDefault();
     const payload = {
       ...formData,
-      sizes: formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : []
+      sizes: formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : [],
+      colors: formData.colors ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : []
     };
     
     // Convert 'sizes' string into string array
@@ -374,6 +377,16 @@ export default function AdminProductsPage() {
                   onChange={(e) => setFormData({...formData, sizes: e.target.value})}
                   required
                   placeholder="e.g. S, M, L, XL, OSFA"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Colors (Comma separated HEX/Names)</label>
+                <input 
+                  type="text" 
+                  value={formData.colors} 
+                  onChange={(e) => setFormData({...formData, colors: e.target.value})}
+                  placeholder="e.g. #000000, white, #ff0000"
                 />
               </div>
 

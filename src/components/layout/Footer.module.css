@@ -1,21 +1,41 @@
 .footer {
-  background-color: var(--color-foreground);
-  color: var(--color-background);
-  padding: 6rem 2rem 2rem 2rem;
+  /* Site-wide Dark Footer for Luxury Presence */
+  background-color: #050505;
+  color: #ffffff;
+  padding: 10rem 5% 4rem;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Subtle Cinematic Glow for Dark Mode Excellence */
+[data-theme='dark'] .footer::before {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 400px;
+  background: radial-gradient(circle, rgba(90, 15, 200, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-theme='dark'] .footer {
+  background-color: #020202; /* Even deeper black */
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .container {
   max-width: 1600px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 6rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 4rem;
-}
-
-[data-theme='dark'] .container {
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  grid-template-columns: 1.2fr 2fr;
+  gap: 8rem;
+  padding-bottom: 6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  z-index: 1;
 }
 
 .newsletter {
@@ -24,101 +44,153 @@
   gap: 1.5rem;
 }
 
-.heading {
-  font-family: 'Inter', sans-serif;
-  font-size: 2.5rem;
+.label {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.7rem;
   font-weight: 800;
+  letter-spacing: 4px;
+  color: #7B2FF7; /* Royal Purple Accent */
   text-transform: uppercase;
-  letter-spacing: -1px;
+  display: block;
+}
+
+.heading {
+  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-size: 3.5rem;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0.5rem 0;
+  color: #ffffff;
 }
 
 .subtext {
-  font-size: 0.85rem;
-  color: #999;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.4);
+  max-width: 400px;
+  line-height: 1.6;
 }
 
 .form {
   display: flex;
-  margin-top: 1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.3);
+  margin-top: 2rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-[data-theme='dark'] .form {
-  border-bottom: 1px solid rgba(255,255,255,0.3);
+.form:focus-within {
+  border-color: #9D4EDD; /* Neon violet on focus */
+  transform: translateY(-2px);
 }
 
 .input {
   flex: 1;
   background: transparent;
   border: none;
-  padding: 1rem 0;
-  color: var(--color-background);
-  font-size: 0.85rem;
+  padding: 1.5rem 0;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
   outline: none;
+  text-transform: uppercase;
 }
 
 .input::placeholder {
-  color: #666;
+  color: rgba(255, 255, 255, 0.15);
 }
 
 .submitBtn {
   background: transparent;
-  color: var(--color-background);
-  font-size: 0.75rem;
-  font-weight: 600;
+  color: #9D4EDD;
+  font-size: 0.8rem;
+  font-weight: 900;
   letter-spacing: 2px;
   text-transform: uppercase;
   padding: 0 1rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
 }
 
 .submitBtn:hover {
-  color: #999;
+  color: #ffffff;
+  letter-spacing: 4px;
+}
+
+.socials {
+  display: flex;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.socials a {
+  color: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.socials a:hover {
+  color: #ffffff;
+  transform: translateY(-5px);
+  filter: drop-shadow(0 0 10px rgba(157, 78, 221, 0.5));
 }
 
 .linksGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  gap: 4rem;
 }
 
 .column {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .colHeading {
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 2px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 3px;
   text-transform: uppercase;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
 }
 
 .link {
-  font-size: 0.85rem;
-  color: #999;
-  transition: color 0.3s ease;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .link:hover {
-  color: var(--color-background);
+  color: #ffffff;
+  padding-left: 10px;
 }
 
 .bottomBar {
   max-width: 1600px;
-  margin: 2rem auto 0;
+  margin: 4rem auto 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 0.75rem;
-  color: #666;
+  position: relative;
+  z-index: 1;
+}
+
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .brand {
-  font-weight: 600;
+  font-weight: 800;
   letter-spacing: 2px;
   text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.2);
 }
 
 .legalLinks {
@@ -126,25 +198,77 @@
   gap: 2rem;
 }
 
+.legalLinks a {
+  color: rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
 .legalLinks a:hover {
-  color: var(--color-background);
+  color: #ffffff;
+}
+
+.paymentIcons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.5rem;
+}
+
+.paymentStrip {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.cards {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.miniCard {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 900;
 }
 
 @media (max-width: 1024px) {
   .container {
     grid-template-columns: 1fr;
-    gap: 4rem;
+    gap: 6rem;
   }
 }
 
 @media (max-width: 768px) {
   .linksGrid {
-    grid-template-columns: 1fr;
-    gap: 3rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4rem;
   }
   .bottomBar {
     flex-direction: column;
-    gap: 1.5rem;
-    text-align: center;
+    align-items: flex-start;
+    gap: 4rem;
+  }
+  .paymentIcons {
+    align-items: flex-start;
+  }
+  .heading {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .linksGrid {
+    grid-template-columns: 1fr;
+  }
+  .heading {
+    font-size: 2.2rem;
   }
 }

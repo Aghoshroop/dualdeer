@@ -6,7 +6,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 import styles from './AuthPage.module.css';
 import Link from 'next/link';
 import { auth } from '@/lib/firebase';
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 const TypewriterText = ({ text, onComplete }: { text: string; onComplete: () => void }) => {
   const [displayedText, setDisplayedText] = useState('');
@@ -60,22 +60,30 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate Magical Network Delay for the animation loop
-    await new Promise(r => setTimeout(r, 1000));
+    try {
+      if (mode === 'signup') {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, {
+          displayName: name || 'Elite User'
+        });
+        
+        const newUser = { id: userCredential.user.uid, name: name || 'Elite User', email, phone, joinDate: new Date().toISOString() };
+        const currentUsers = JSON.parse(localStorage.getItem('dualdeer_users') || '[]');
+        localStorage.setItem('dualdeer_users', JSON.stringify([newUser, ...currentUsers]));
+        localStorage.setItem('dualdeer_active_user', name || 'Elite User');
+      } else {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userName = userCredential.user.displayName || email.split('@')[0] || 'Elite User';
+        localStorage.setItem('dualdeer_active_user', userName);
+      }
 
-    let userName = name || 'Elite User';
-    if (mode === 'signup') {
-      const newUser = { id: Date.now().toString(), name, email, phone, joinDate: new Date().toISOString() };
-      const currentUsers = JSON.parse(localStorage.getItem('dualdeer_users') || '[]');
-      localStorage.setItem('dualdeer_users', JSON.stringify([newUser, ...currentUsers]));
-    } else {
-      userName = email.split('@')[0] || 'Elite User';
+      setLoading(false);
+      setIsTransitioning(true); // Triggers cinematic black screen
+    } catch (error: any) {
+      console.error("Firebase Authentication Error:", error);
+      alert(error.message); // Temporary error handling
+      setLoading(false);
     }
-
-    localStorage.setItem('dualdeer_active_user', userName);
-
-    setLoading(false);
-    setIsTransitioning(true); // Triggers cinematic black screen
   };
 
   const handleGoogleSignIn = async () => {

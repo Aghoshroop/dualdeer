@@ -145,7 +145,7 @@ export default function RootLayout({
             alt=""
           />
         </noscript>
-        <ThemeProvider defaultTheme="dark" forcedTheme="dark" attribute="data-theme">
+        <ThemeProvider defaultTheme="dark" attribute="data-theme">
         <CartProvider>
             <HideOnAdmin>
               <Navbar />

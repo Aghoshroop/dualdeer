@@ -12,7 +12,7 @@ export default function FeaturedProducts() {
   useEffect(() => {
     getProducts().then(prods => {
       // Find products that are NOT exclusively part of the seasonal home grid
-      const coreProducts = prods.filter(p => !p.isSeasonal);
+      const coreProducts = prods.filter(p => !p.isSeasonal && (!p.category || !p.category.toUpperCase().includes('SEASONAL')));
       setProducts(coreProducts.slice(0, 4));
       setLoading(false);
     });
@@ -36,40 +36,85 @@ export default function FeaturedProducts() {
 
         <div className={styles.grid}>
           {loading ? (
-            <div style={{ color: '#fff', textAlign: 'center', width: '100%', padding: '2rem' }}>Loading the Archives...</div>
+            <div style={{ color: 'var(--color-text)', textAlign: 'center', width: '100%', padding: '2rem' }}>Loading the Archives...</div>
           ) : products.length === 0 ? (
-            <div style={{ color: '#fff', textAlign: 'center', width: '100%', padding: '2rem', opacity: 0.5 }}>Core collection updating. Add products unflagged as Seasonal via Admin.</div>
+            <div style={{ color: 'var(--color-text)', textAlign: 'center', width: '100%', padding: '2rem', opacity: 0.5 }}>Core collection updating. Add products unflagged as Seasonal via Admin.</div>
           ) : (
             products.map((product, i) => (
-              <Link href={`/product/${product.id}`} key={product.id} style={{ textDecoration: 'none' }}>
-                <motion.div 
-                  className={styles.card}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
-                >
-                  <div className={styles.imageBox}>
-                    <img 
-                      src={product.image}
-                      alt={product.name}
-                      className={styles.image}
-                    />
+              <motion.div 
+                key={product.id}
+                className={styles.card}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.05 }}
+              >
+                <Link href={`/product/${product.id}`} className={styles.imageBox}>
+                  {/* Primary Image */}
+                  <img 
+                    src={product.image}
+                    alt={product.name}
+                    className={styles.primaryImage}
+                  />
+                  {/* Hover Image */}
+                  <img 
+                    src={(product.images && product.images.length > 1) ? product.images[1] : (product.images && product.images[0]) || product.image} 
+                    alt={`${product.name} alternate view`} 
+                    className={styles.hoverImage} 
+                  />
+                  
+                  {/* Badge system */}
+                  <div className={styles.badgeContainer}>
+                     {product.mrp && product.mrp > product.price && (
+                       <span className={styles.saleBadge}>SALE</span>
+                     )}
+                     {product.isNew && (
+                       <span className={styles.newBadge}>NEW</span>
+                     )}
                   </div>
-                  <div className={styles.info}>
+                </Link>
+
+                <div className={styles.info}>
+                  <div className={styles.catRow}>
+                    <span className={styles.categoryName}>Core Arsenal</span>
+                    <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <div style={{ display: 'flex', gap: '1px' }}>
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <span 
+                            key={star} 
+                            className={styles.star}
+                            style={{ 
+                              opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
+                              fontSize: '0.75rem'
+                            }}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <span style={{ fontWeight: 800 }}>{(product.rating || 5.0).toFixed(1)}</span>
+                    </div>
+                  </div>
+                  <Link href={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
                     <h3 className={styles.name}>{product.name}</h3>
-                    <div className={styles.priceContainer}>
-                      {product.mrp && product.mrp > product.price && (
-                        <span className={styles.mrp}>₹{product.mrp.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
-                      )}
-                      <span className={styles.price}>₹{product.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
-                    </div>
-                    <div className={styles.rating}>
-                      <span className={styles.star}>★</span> {product.rating || 5.0} <span>(Verified Client)</span>
-                    </div>
+                  </Link>
+                  <div className={styles.priceRow}>
+                    {product.mrp && product.mrp > product.price && (
+                      <span className={styles.mrp}>₹{product.mrp.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                    )}
+                    <span className={styles.price}>₹{product.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                   </div>
-                </motion.div>
-              </Link>
+
+                  {/* Color Swatches */}
+                  {product.colors && product.colors.length > 0 && (
+                    <div className={styles.colorSwatches}>
+                      {product.colors.map((color, idx) => (
+                        <div key={idx} className={styles.colorCircle} style={{ backgroundColor: color }} title={color} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
             ))
           )}
         </div>

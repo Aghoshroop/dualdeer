@@ -17,20 +17,20 @@
   position: relative;
   height: 48px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(139, 92, 246, 0.15);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   overflow: visible; /* Allow orb to float above the bar edge */
   display: flex;
   align-items: center;
   backdrop-filter: blur(8px);
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.06), inset 0 1px 0 rgba(0, 0, 0, 0.04);
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 /* Hovering reveals the interaction */
 .energyBar:hover {
   border-color: rgba(139, 92, 246, 0.3);
-  box-shadow: 0 0 18px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 18px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
 /* The fill layer — constrained with clip within a clipping wrapper */
@@ -152,7 +152,7 @@
   flex-shrink: 0;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-muted);
   font-size: 1.2rem;
   font-weight: 300;
   display: flex;
@@ -165,7 +165,7 @@
 
 .decrementBtn:hover,
 .incrementBtn:hover {
-  color: #fff;
+  color: var(--color-text);
 }
 
 .decrementBtn:disabled,
@@ -183,7 +183,7 @@
   font-family: var(--font-inter), 'Inter', sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text);
   letter-spacing: 2px;
   text-transform: uppercase;
   /* The transition makes the number feel intentional, not instant */
@@ -223,7 +223,7 @@
   z-index: 2;
   width: 1px;
   height: 60%;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-border);
   flex-shrink: 0;
 }
 

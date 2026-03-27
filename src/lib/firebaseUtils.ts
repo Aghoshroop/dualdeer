@@ -28,6 +28,8 @@ export interface Product {
   images?: string[];
   stock: number;
   isSeasonal?: boolean;
+  isNew?: boolean;
+  colors?: string[];
   createdAt?: Timestamp;
 }
 
@@ -75,6 +77,7 @@ export interface OrderItem {
   pricePaid: number;
   quantity: number;
   size?: string;
+  image?: string;
 }
 
 export interface Order {
@@ -248,6 +251,17 @@ export const updateOrder = async (id: string, data: Partial<Order>) => {
 
 export const deleteOrder = async (id: string) => {
   return deleteDocument('orders', id);
+};
+export const getOrder = async (id: string): Promise<Order | null> => {
+  try {
+    const docSnap = await getDoc(doc(db, 'orders', id));
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as Order;
+    }
+  } catch(e) {
+    console.error("Error fetching single order", e);
+  }
+  return null;
 };
 
 // ========================

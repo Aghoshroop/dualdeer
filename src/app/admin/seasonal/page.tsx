@@ -26,15 +26,20 @@ export default function AdminSeasonalPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
+    description: '',
     category: '',
+    subcategory: '',
+    sizes: '',
+    colors: '',
     price: '',
     mrp: '',
     rating: '',
     stock: '',
     image: '',
-    imageFile: null as File | null
+    images: [] as string[]
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -92,7 +97,7 @@ export default function AdminSeasonalPage() {
 
   const openAddModal = () => {
     setEditingId(null);
-    setFormData({ name: '', category: 'SEASONAL', price: '', mrp: '', rating: '5', stock: '', image: '', imageFile: null });
+    setFormData({ name: '', description: '', sizes: '', colors: '', category: 'SEASONAL', subcategory: '', price: '', mrp: '', rating: '5', stock: '', image: '', images: [] });
     setShowModal(true);
   };
 
@@ -100,15 +105,42 @@ export default function AdminSeasonalPage() {
     setEditingId(product.id!);
     setFormData({
       name: product.name,
+      description: product.description || '',
       category: product.category,
+      subcategory: product.subcategory || '',
+      sizes: product.sizes ? product.sizes.join(', ') : '',
+      colors: product.colors ? product.colors.join(', ') : '',
       price: product.price.toString(),
       mrp: product.mrp?.toString() || '',
       rating: product.rating?.toString() || '5',
       stock: product.stock.toString(),
       image: product.image,
-      imageFile: null
+      images: product.images || []
     });
     setShowModal(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const files = Array.from(e.target.files);
+    const currentCount = formData.images?.length || 0;
+    if (currentCount + files.length > 5) {
+      alert(`Capacity reached: You can only upload a maximum of 5 images per product.`);
+      return;
+    }
+    setUploadingImage(true);
+    const urls = await Promise.all(files.map(file => uploadImageToImgBB(file)));
+    const validUrls = urls.filter(Boolean) as string[];
+    if (validUrls.length > 0) {
+      setFormData(prev => ({ 
+        ...prev, 
+        image: prev.image || validUrls[0],
+        images: [...(prev.images || []), ...validUrls]
+      }));
+    } else {
+      alert("Image upload failed.");
+    }
+    setUploadingImage(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -129,13 +161,7 @@ export default function AdminSeasonalPage() {
     e.preventDefault();
     setIsUploading(true);
     try {
-      let finalImageUrl = formData.image;
-      if (formData.imageFile) {
-        const uploadedUrl = await uploadImageToImgBB(formData.imageFile);
-        if (uploadedUrl) finalImageUrl = uploadedUrl;
-      }
-
-      if (!finalImageUrl) {
+      if (!formData.image && formData.images.length === 0) {
         alert("Please provide an image or upload one.");
         setIsUploading(false);
         return;
@@ -143,13 +169,18 @@ export default function AdminSeasonalPage() {
 
       const productData = {
         name: formData.name,
+        description: formData.description,
         category: formData.category,
+        subcategory: formData.subcategory,
+        sizes: formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : [],
+        colors: formData.colors ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : [],
         price: parseFloat(formData.price),
         mrp: formData.mrp ? parseFloat(formData.mrp) : undefined,
         rating: formData.rating ? parseFloat(formData.rating) : 5,
         stock: parseInt(formData.stock),
-        image: finalImageUrl,
-        isSeasonal: true, // EXPLICITLY BOUND TO THE SEASONAL HOME GRID
+        image: formData.image || formData.images[0],
+        images: formData.images,
+        isSeasonal: true,
       };
 
       if (editingId) {
@@ -337,91 +368,100 @@ export default function AdminSeasonalPage() {
               <h2>{editingId ? 'Edit Seasonal Product' : 'Add New Seasonal Product'}</h2>
               <button className={styles.closeBtn} onClick={() => setShowModal(false)}>×</button>
             </div>
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem', maxHeight: '70vh', overflowY: 'auto' }}>
+            <form onSubmit={handleSubmit} className={styles.form} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', padding: 0 }}>
               
               <div className={styles.formGroup}>
                 <label>Product Name</label>
-                <input 
-                  type="text" 
-                  value={formData.name} 
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  required 
-                />
-              </div>
-
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label>Offer Price ($)</label>
-                  <input 
-                    type="number" 
-                    step="0.01"
-                    value={formData.price} 
-                    onChange={e => setFormData({ ...formData, price: e.target.value })}
-                    required 
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>MRP ($) <small>(Optional)</small></label>
-                  <input 
-                    type="number" 
-                    step="0.01"
-                    value={formData.mrp} 
-                    onChange={e => setFormData({ ...formData, mrp: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label>Stock</label>
-                  <input 
-                    type="number" 
-                    value={formData.stock} 
-                    onChange={e => setFormData({ ...formData, stock: e.target.value })}
-                    required 
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Category Tag</label>
-                  <input 
-                    type="text" 
-                    value={formData.category} 
-                    onChange={e => setFormData({ ...formData, category: e.target.value })}
-                  />
-                </div>
+                <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
               </div>
 
               <div className={styles.formGroup}>
-                <label>Image Upload</label>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  style={{ marginBottom: '10px' }}
-                  onChange={e => {
-                    if (e.target.files?.length) {
-                      setFormData({ ...formData, imageFile: e.target.files[0] });
-                    }
-                  }}
+                <label>Description</label>
+                <textarea 
+                  value={formData.description} 
+                  onChange={e => setFormData({ ...formData, description: e.target.value })} 
+                  required 
+                  style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.4)', color: 'var(--color-text)', minHeight: '80px', fontFamily: 'inherit' }}
                 />
-                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
-                  <small>Or provide a raw URL path:</small>
-                  <input 
-                    type="url" 
-                    value={formData.image} 
-                    placeholder="https://..."
-                    onChange={e => setFormData({ ...formData, image: e.target.value, imageFile: null })}
-                    style={{ marginTop: '5px' }}
-                  />
+              </div>
+
+              <div className={styles.formRow} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className={styles.formGroup}>
+                  <label>Sizes (Comma separated)</label>
+                  <input type="text" value={formData.sizes} onChange={e => setFormData({ ...formData, sizes: e.target.value })} required placeholder="S, M, L" />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Colors (Comma separated HEX/Names)</label>
+                  <input type="text" value={formData.colors} onChange={e => setFormData({ ...formData, colors: e.target.value })} placeholder="#fff, red" />
                 </div>
               </div>
 
-              <div className={styles.formActions}>
+              <div className={styles.formRow} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className={styles.formGroup}>
+                  <label>Offer Price ($)</label>
+                  <input type="number" step="0.01" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} required />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>MRP ($) <small>(Optional)</small></label>
+                  <input type="number" step="0.01" value={formData.mrp} onChange={e => setFormData({ ...formData, mrp: e.target.value })} />
+                </div>
+              </div>
+
+              <div className={styles.formRow} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className={styles.formGroup}>
+                  <label>Stock</label>
+                  <input type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: e.target.value })} required min="0" />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Category Tag</label>
+                  <input type="text" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} placeholder="e.g. SEASONAL" />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Sub Category</label>
+                  <input type="text" value={formData.subcategory} onChange={e => setFormData({ ...formData, subcategory: e.target.value })} placeholder="e.g. Hoodies, Tops" />
+                </div>
+              </div>
+
+              <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
+                <label>Product Gallery (Max 5 Images) {uploadingImage && <span style={{color: 'var(--color-primary)'}}>Uploading...</span>}</label>
+                <input 
+                  type="file" multiple accept="image/*" 
+                  onChange={handleImageUpload} 
+                  disabled={uploadingImage || formData.images.length >= 5}
+                  style={{ marginBottom: '10px' }}
+                />
+                <input 
+                  type="url" value={formData.image} 
+                  onChange={e => setFormData({ ...formData, image: e.target.value })} 
+                  placeholder="Primary thumbnail URL..." 
+                  required
+                />
+                <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+                  {formData.images.map((img, i) => (
+                    <div key={i} style={{ position: 'relative' }}>
+                      <img src={img} alt="Gallery item" style={{ height: '80px', width: '80px', borderRadius: '8px', objectFit: 'cover' }} />
+                      <button 
+                         type="button"
+                         onClick={() => setFormData(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
+                         style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ff3333', color: 'white', border: 'none', borderRadius: '50%', width: '22px', height: '22px', cursor: 'pointer' }}
+                      >×</button>
+                    </div>
+                  ))}
+                  {formData.image && formData.images.length === 0 && (
+                     <img src={formData.image} alt="Preview" style={{ height: '80px', width: '80px', borderRadius: '8px', objectFit: 'cover' }} />
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.formActions} style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className={styles.saveBtn} disabled={isUploading}>
+                <button type="submit" className={styles.saveBtn} disabled={isUploading || uploadingImage} style={{ flex: 1, background: 'var(--color-primary)', border: 'none', color: '#fff', borderRadius: '8px', padding: '0.8rem' }}>
                   {isUploading ? 'Saving...' : 'Save Product'}
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}

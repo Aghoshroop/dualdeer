@@ -7,26 +7,26 @@ import styles from './HeroSection.module.css';
 const fallbackSlides = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=2600&auto=format&fit=crop", // Women high fashion editorial
-    heading: "The Women's Collection",
-    subheading: "Elegance redefined for the modern muse.",
-    cta: "SHOP WOMEN'S",
+    image: "https://images.unsplash.com/photo-1548690312-e3b507d17a12?q=80&w=2600&auto=format&fit=crop", // Male training
+    heading: "Engineered Performance",
+    subheading: "High-intensity gear for the modern athlete.",
+    cta: "EXPLORE COLLECTION",
     theme: 'dark'
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2600&auto=format&fit=crop", // Bright fashion street layout
-    heading: "The Men's Heritage",
-    subheading: "Uncompromising performance meets absolute refinement.",
-    cta: "SHOP MEN'S",
+    image: "https://images.unsplash.com/photo-1518611012118-29a8d63ee0c2?q=80&w=2600&auto=format&fit=crop", // Yoga women
+    heading: "Absolute Zen",
+    subheading: "Seamless comfort for mindful movement.",
+    cta: "SHOP YOGA",
     theme: 'light'
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1560243563-062bfc001d68?q=80&w=2600&auto=format&fit=crop", // Elite Speedsuits
-    heading: "Elite Speedsuits",
-    subheading: "Engineered for pure aerodynamic supremacy.",
-    cta: "DISCOVER ELITE",
+    image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?q=80&w=2600&auto=format&fit=crop", // Sprinting
+    heading: "Elite Supremacy",
+    subheading: "Unleash your full potential on the track.",
+    cta: "DISCOVER SPEED",
     theme: 'dark'
   }
 ];
@@ -86,9 +86,12 @@ export default function HeroSection() {
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
           {/* Background Image */}
-          <div 
+          <motion.div 
             className={styles.background} 
             style={{ backgroundImage: `url(${dynamicSlides[current].image})` }} 
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 6, ease: "linear" }}
           />
           <div 
             className={`${styles.overlay} ${dynamicSlides[current].theme === 'light' ? styles.overlayLight : ''}`} 

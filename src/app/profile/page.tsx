@@ -2,10 +2,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, ShoppingBag, Gift, Award, LogOut, ArrowLeft, Bookmark } from 'lucide-react';
+import { User, ShoppingBag, Gift, Award, LogOut, ArrowLeft, Bookmark, LayoutDashboard } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import styles from './ProfilePage.module.css';
+import EliteOverview from '@/components/profile/EliteOverview';
 import RewardGame from '@/components/profile/RewardGame';
 import OrderHistory from '@/components/profile/OrderHistory';
 import ProfileCart from '@/components/profile/ProfileCart';
@@ -44,11 +45,12 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) return null; // Prevent flash before redirect
+  if (!user) return null;
 
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
+        return <EliteOverview user={user} setActiveTab={setActiveTab} />;
       case 'orders':
         return <OrderHistory user={user} />;
       case 'rewards':
@@ -58,12 +60,15 @@ export default function ProfilePage() {
       case 'cart':
         return <ProfileCart />;
       default:
-        return null;
+        return <EliteOverview user={user} setActiveTab={setActiveTab} />;
     }
   };
 
   return (
     <div className={styles.container}>
+      {/* BACKGROUND EFFECTS */}
+      <div className={styles.bgGlow} />
+
       {/* BACK NAVIGATION */}
       <button className={styles.backBtn} onClick={() => router.push('/')}>
         <ArrowLeft size={16} /> <span className={styles.backText}>RETREAT</span>
@@ -73,10 +78,16 @@ export default function ProfilePage() {
       <aside className={styles.sidebar}>
         <div className={styles.profileHead}>
           <div className={styles.avatar}>
-            {user.displayName ? user.displayName.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
+            {user.photoURL ? (
+              <img src={user.photoURL} alt="" />
+            ) : (
+              user.displayName ? user.displayName.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()
+            )}
           </div>
-          <h3>{user.displayName || 'Elite Member'}</h3>
-          <p>{user.email}</p>
+          <div className={styles.headText}>
+            <h3>{user.displayName || 'Elite Operative'}</h3>
+            <p>{user.email}</p>
+          </div>
         </div>
 
         <nav className={styles.nav}>
@@ -84,14 +95,14 @@ export default function ProfilePage() {
             className={`${styles.navBtn} ${activeTab === 'overview' ? styles.active : ''}`}
             onClick={() => setActiveTab('overview')}
           >
-            <User size={20} /> <span className={styles.navText}>Overview</span>
+            <LayoutDashboard size={20} /> <span className={styles.navText}>Command Center</span>
           </button>
           
           <button 
             className={`${styles.navBtn} ${activeTab === 'orders' ? styles.active : ''}`}
             onClick={() => setActiveTab('orders')}
           >
-            <ShoppingBag size={20} /> <span className={styles.navText}>Order History</span>
+            <ShoppingBag size={20} /> <span className={styles.navText}>Payload History</span>
           </button>
           
           <button 
@@ -105,14 +116,14 @@ export default function ProfilePage() {
             className={`${styles.navBtn} ${activeTab === 'wishlist' ? styles.active : ''}`}
             onClick={() => setActiveTab('wishlist')}
           >
-            <Bookmark size={20} /> <span className={styles.navText}>Wishlist</span>
+            <Bookmark size={20} /> <span className={styles.navText}>Saved Tech</span>
           </button>
 
           <button 
             className={`${styles.navBtn} ${activeTab === 'cart' ? styles.active : ''}`}
             onClick={() => setActiveTab('cart')}
           >
-            <Gift size={20} /> <span className={styles.navText}>Shopping Cart</span>
+            <Gift size={20} /> <span className={styles.navText}>Active Bag</span>
           </button>
         </nav>
 
@@ -126,10 +137,10 @@ export default function ProfilePage() {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.4, ease: "circOut" }}
             className={styles.tabContent}
           >
             {renderTab()}
