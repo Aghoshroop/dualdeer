@@ -44,7 +44,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  verification: {
+   google: "cvUp3ToWivbX7NaGg_l0-rNmvUI3JfmUJ-yeYR8BSBQ",
+  },
   openGraph: {
+
     title: "DualDeer | Premium Activewear & Luxury Athleisure",
     description: "Shop DualDeer for exclusive luxury activewear, premium gym apparel, and high-performance streetwear. Designed for the relentless.",
     url: "https://dualdeer.com",

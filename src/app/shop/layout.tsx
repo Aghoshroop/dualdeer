@@ -21,6 +21,26 @@ export const metadata: Metadata = {
 };
 
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
-  // Pass-through wrapper, purely injecting server-side SEO into the <head>
-  return <>{children}</>;
+  // Collection Schema for advanced e-commerce snippet
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "DualDeer Premium Activewear Collection",
+    "url": "https://dualdeer.com/shop",
+    "description": "Explore the complete DualDeer catalog of premium activewear, luxury athleisure, and performance gear.",
+    "brand": {
+      "@type": "Brand",
+      "name": "DualDeer"
+    }
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
+      {children}
+    </>
+  );
 }

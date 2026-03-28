@@ -66,56 +66,11 @@ export async function generateMetadata(
 
 export default async function ProductLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  const product = await getProduct(id);
-
-  // Deeply structured product data for Google Shopping & Advanced SEO
-  const jsonLd = product ? {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": product.name,
-    "image": product.images && product.images.length > 0 ? product.images : [product.image],
-    "description": product.description || `Premium luxury activewear from DualDeer. ${product.name}`,
-    "sku": product.id,
-    "brand": {
-      "@type": "Brand",
-      "name": "DualDeer"
-    },
-    "category": product.category,
-    "offers": {
-      "@type": "Offer",
-      "url": `https://dualdeer.com/product/${id}`,
-      "priceCurrency": "INR",
-      "price": product.price,
-      "itemCondition": "https://schema.org/NewCondition",
-      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "DualDeer"
-      }
-    },
-    ...((product.rating && product.rating > 0) ? {
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": product.rating,
-        "reviewCount": 24 // hardcoded or dynamic base
-      }
-    } : {})
-  } : null;
-
   return (
     <>
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      )}
       {children}
     </>
   );

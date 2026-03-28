@@ -198,8 +198,57 @@ export default function ProductDetailsPage() {
     ? product.images 
     : [product.image, product.image, product.image, product.image];
 
+  // Advanced Product SEO Schema
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.image,
+    "description": product.description || "Premium DualDeer activewear product.",
+    "sku": `DUALDEER-${product.id?.slice(0, 8).toUpperCase()}`,
+    "brand": {
+      "@type": "Brand",
+      "name": "DualDeer"
+    },
+    "category": product.category,
+    "offers": {
+      "@type": "Offer",
+      "url": `https://dualdeer.com/product/${product.id}`,
+      "priceCurrency": "INR",
+      "price": product.price,
+      "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "DualDeer"
+      }
+    },
+    "aggregateRating": combinedReviews.length > 0 ? {
+      "@type": "AggregateRating",
+      "ratingValue": avgRating,
+      "reviewCount": totalReviews
+    } : undefined,
+    "review": combinedReviews.map(r => ({
+      "@type": "Review",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": r.rating,
+        "bestRating": "5"
+      },
+      "author": {
+        "@type": "Person",
+        "name": r.userName
+      }
+    }))
+  };
+
   return (
     <div className={styles.pageContainer}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       
       <button 
         onClick={() => router.back()} 
