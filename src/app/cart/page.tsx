@@ -5,6 +5,8 @@ import { Trash2, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import styles from './CartPage.module.css';
 import { validateCoupon } from '@/lib/firebaseUtils';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
 import QuantitySelector from '@/components/ui/QuantitySelector';
 
@@ -17,8 +19,14 @@ export default function CartPage() {
   const [couponSuccess, setCouponSuccess] = useState('');
   const [isApplying, setIsApplying] = useState(false);
 
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
   useEffect(() => {
     setMounted(true);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
   }, []);
 
   const subtotal = cartTotal;
@@ -35,7 +43,7 @@ export default function CartPage() {
     
     setIsApplying(true);
     try {
-      const coupon = await validateCoupon(couponCode);
+      const coupon = await validateCoupon(couponCode, currentUser?.uid);
       if (!coupon) {
         setCouponError('Invalid or inactive coupon code');
       } else {
@@ -46,8 +54,8 @@ export default function CartPage() {
         setDiscount(discountAmount);
         setCouponSuccess(`Coupon applied: ${coupon.discountType === 'percentage' ? coupon.discountValue + '%' : '₹' + coupon.discountValue} OFF`);
       }
-    } catch (err) {
-      setCouponError('Error applying coupon');
+    } catch (err: any) {
+      setCouponError(err.message || 'Error applying coupon');
     }
     setIsApplying(false);
   };

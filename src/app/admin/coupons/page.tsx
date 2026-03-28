@@ -14,7 +14,8 @@ export default function AdminCouponsPage() {
     code: '',
     discountType: 'percentage' as 'percentage' | 'fixed',
     discountValue: 0,
-    active: true
+    active: true,
+    usageLimitType: 'unlimited' as 'single_use' | 'once_per_user' | 'unlimited',
   });
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function AdminCouponsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ code: '', discountType: 'percentage', discountValue: 0, active: true });
+    setFormData({ code: '', discountType: 'percentage', discountValue: 0, active: true, usageLimitType: 'unlimited' });
     setEditingId(null);
     setShowModal(true);
   };
@@ -43,7 +44,8 @@ export default function AdminCouponsPage() {
       code: coupon.code,
       discountType: coupon.discountType,
       discountValue: coupon.discountValue,
-      active: coupon.active
+      active: coupon.active,
+      usageLimitType: coupon.usageLimitType || 'unlimited'
     });
     setEditingId(coupon.id!);
     setShowModal(true);
@@ -86,6 +88,7 @@ export default function AdminCouponsPage() {
                 <th>Code</th>
                 <th>Discount</th>
                 <th>Status</th>
+                <th>Usage Limit</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -99,6 +102,12 @@ export default function AdminCouponsPage() {
                   <td>
                     <span className={`${styles.statusBadge} ${coupon.active ? styles.active : styles.inactive}`}>
                       {coupon.active ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={styles.usageBadge}>
+                      {coupon.usageLimitType === 'single_use' ? 'Single Use' : 
+                       coupon.usageLimitType === 'once_per_user' ? 'Once/User' : 'Unlimited'}
                     </span>
                   </td>
                   <td>
@@ -146,6 +155,18 @@ export default function AdminCouponsPage() {
               >
                 <option value="percentage">Percentage (%)</option>
                 <option value="fixed">Fixed Amount ($)</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Usage Limit</label>
+              <select 
+                value={formData.usageLimitType}
+                onChange={(e) => setFormData({...formData, usageLimitType: e.target.value as any})}
+              >
+                <option value="unlimited">Unlimited (All Users)</option>
+                <option value="single_use">Single Use (Burned once used by anyone)</option>
+                <option value="once_per_user">Once Per User (Each user gets 1 use)</option>
               </select>
             </div>
 

@@ -107,15 +107,15 @@ function CheckoutEngine() {
     if (!couponCode.trim()) return;
     setCouponLoading(true);
     try {
-      const coupon = await validateCoupon(couponCode);
+      const coupon = await validateCoupon(couponCode, currentUser?.uid);
       if (coupon) {
         setAppliedCoupon(coupon);
         setCouponCode('');
       } else {
         setCouponError('Invalid or expired coupon code.');
       }
-    } catch (e) {
-      setCouponError('Error verifying coupon.');
+    } catch (e: any) {
+      setCouponError(e.message || 'Error verifying coupon.');
     }
     setCouponLoading(false);
   };
@@ -148,10 +148,14 @@ function CheckoutEngine() {
         status: 'processing'
       });
 
-      // Burn the active promo code to enforce single-use limitations explicitly requested by Admin
       if (appliedCoupon && appliedCoupon.id) {
         try {
-          await updateCoupon(appliedCoupon.id, { active: false });
+          if (appliedCoupon.usageLimitType === 'single_use') {
+            await updateCoupon(appliedCoupon.id, { active: false });
+          } else if (appliedCoupon.usageLimitType === 'once_per_user' && currentUser?.uid) {
+            const currentUsedBy = appliedCoupon.usedBy || [];
+            await updateCoupon(appliedCoupon.id, { usedBy: [...currentUsedBy, currentUser.uid] });
+          }
         } catch (couponErr) {
           console.warn('Coupon invalidation failed manually - verify security rules applied:', couponErr);
         }

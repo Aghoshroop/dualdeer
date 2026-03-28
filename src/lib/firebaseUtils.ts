@@ -67,6 +67,8 @@ export interface Coupon {
   discountType: 'percentage' | 'fixed';
   discountValue: number;
   active: boolean;
+  usageLimitType?: 'single_use' | 'once_per_user' | 'unlimited';
+  usedBy?: string[];
   createdAt?: Timestamp;
 }
 
@@ -194,7 +196,7 @@ export const addCoupon = (data: Omit<Coupon, 'id'>) => addDocument('coupons', da
 export const updateCoupon = (id: string, data: Partial<Coupon>) => updateDocument('coupons', id, data);
 export const deleteCoupon = (id: string) => deleteDocument('coupons', id);
 
-export const validateCoupon = async (code: string): Promise<Coupon | null> => {
+export const validateCoupon = async (code: string, userId?: string): Promise<Coupon | null> => {
   const q = query(collection(db, 'coupons'), where('code', '==', code.trim().toUpperCase()), where('active', '==', true));
   const querySnapshot = await getDocs(q);
   
@@ -202,7 +204,18 @@ export const validateCoupon = async (code: string): Promise<Coupon | null> => {
     return null;
   }
   
-  return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Coupon;
+  const coupon = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Coupon;
+  
+  if (coupon.usageLimitType === 'once_per_user') {
+    if (!userId) {
+      throw new Error('You must be logged in to use this coupon.');
+    }
+    if (coupon.usedBy && coupon.usedBy.includes(userId)) {
+      throw new Error('You have already used this coupon.');
+    }
+  }
+
+  return coupon;
 };
 
 // ========================

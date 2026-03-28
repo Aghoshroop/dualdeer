@@ -105,6 +105,16 @@
   color: #ef4444;
 }
 
+.usageBadge {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--color-primary);
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .actions {
   display: flex;
   gap: 0.5rem;

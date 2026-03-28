@@ -12,6 +12,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import { ThemeProvider } from "next-themes";
 import { CartProvider } from '@/context/CartContext';
 import Script from "next/script";
+import SplashScreen from "@/components/layout/SplashScreen";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -145,8 +146,9 @@ export default function RootLayout({
             alt=""
           />
         </noscript>
-        <ThemeProvider defaultTheme="dark" attribute="data-theme">
+        <ThemeProvider defaultTheme="light" attribute="data-theme">
         <CartProvider>
+            <SplashScreen />
             <HideOnAdmin>
               <Navbar />
               <NewsletterModal />
