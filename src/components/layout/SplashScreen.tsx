@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-export default function SplashScreen() {
+import { Suspense } from 'react';
+
+function SplashScreenContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [showSplash, setShowSplash] = useState(true);
@@ -223,5 +225,13 @@ export default function SplashScreen() {
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+export default function SplashScreen() {
+  return (
+    <Suspense fallback={null}>
+      <SplashScreenContent />
+    </Suspense>
   );
 }
