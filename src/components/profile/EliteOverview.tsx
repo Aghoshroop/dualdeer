@@ -113,7 +113,7 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
       </motion.div>
 
       {/* QUICK ACTIONS */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '2rem' }}>
+      <div className={styles.quickActionsGrid}>
         <motion.div 
           variants={item} 
           className={styles.quickActionCard}

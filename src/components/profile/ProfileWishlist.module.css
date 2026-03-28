@@ -63,7 +63,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 1.5rem;
 }
 
@@ -173,7 +173,7 @@
 
 @media (max-width: 768px) {
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
     gap: 0.5rem;
   }
   
@@ -191,3 +191,111 @@
     font-size: 0.75rem;
   }
 }
+
+/* Refined Microscopic Viewport Support (< 350px) */
+@media (max-width: 350px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .infoBox {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    align-items: center;
+  }
+  .infoBox h4 {
+    font-size: 1rem;
+    white-space: normal;
+    margin-bottom: 0.8rem;
+  }
+  .price {
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+  .addCartBtn {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+  .removeBtn {
+    width: 35px;
+    height: 35px;
+    top: 0.8rem;
+    right: 0.8rem;
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #ef4444;
+  }
+}
+
+/* Supreme 200px Compact View */
+@media (max-width: 250px) {
+  .title {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .infoBox {
+    padding: 1rem 0.5rem;
+  }
+  .infoBox h4 {
+    font-size: 0.9rem;
+  }
+  .price {
+    font-size: 1rem;
+  }
+  .addCartBtn {
+    padding: 0.8rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  .emptyState {
+    padding: 2rem 1rem;
+  }
+  .emptyState h2 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Extreme 200px Compact View */
+@media (max-width: 200px) {
+  .title {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+  }
+  .emptyState {
+    padding: 1.5rem 0.5rem;
+  }
+  .emptyState h2 {
+    font-size: 1rem;
+  }
+  .emptyState p {
+    font-size: 0.7rem;
+  }
+  .shopBtn {
+    font-size: 0.75rem;
+    padding: 0.6rem 1rem;
+  }
+  .infoBox {
+    padding: 0.6rem 0.4rem;
+  }
+  .infoBox h4 {
+    font-size: 0.75rem;
+    word-break: break-word;
+    margin-bottom: 0.5rem;
+  }
+  .price {
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+  }
+  .addCartBtn {
+    font-size: 0.7rem;
+    padding: 0.5rem 0.3rem;
+  }
+  .removeBtn {
+    width: 25px;
+    height: 25px;
+    top: 0.4rem;
+    right: 0.4rem;
+  }
+}
+

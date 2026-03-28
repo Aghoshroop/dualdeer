@@ -83,7 +83,7 @@
 /* Coupon Wallet */
 .walletGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: 1.5rem;
 }
 
@@ -128,7 +128,7 @@
 /* Analytics & Orders Grid */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
@@ -403,6 +403,13 @@
   border-radius: 4px;
 }
 
+.quickActionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
 .quickActionCard {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -525,9 +532,23 @@
   .tierIcon {
     margin: 0 auto;
   }
+  .quickActionsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 @media (max-width: 600px) {
+  .tierStatus {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  .tierInfo h3 {
+    font-size: 1.1rem;
+    word-break: break-word;
+    letter-spacing: 1px;
+    white-space: normal;
+  }
   .quickActionCard {
     padding: 1.2rem;
   }
@@ -539,3 +560,216 @@
     font-size: 0.9rem;
   }
 }
+
+/* Refined Microscopic Support (< 350px) */
+@media (max-width: 350px) {
+  .sectionTitle {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    word-break: break-word;
+    justify-content: center;
+  }
+  .gameContainer {
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .pointsBadge {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: fit-content;
+    margin: 0 auto;
+  }
+  .gameTitle {
+    font-size: 1.3rem;
+    margin: 0;
+  }
+  .gameDescription {
+    display: block; /* Restore description */
+    font-size: 0.85rem;
+    margin-bottom: 0;
+  }
+  .playBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem;
+    margin-top: 0.5rem;
+  }
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  .statCard {
+    padding: 1.2rem;
+    justify-content: center;
+  }
+  .walletGrid {
+    grid-template-columns: 1fr;
+  }
+  .couponCard {
+    padding: 1.2rem;
+  }
+  .orderItem {
+    padding: 1.2rem;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .orderPrice {
+    align-self: flex-start;
+  }
+  .tierStatus {
+    padding: 1.5rem !important;
+  }
+  .tierIcon {
+    width: 60px;
+    height: 60px;
+    display: flex; /* Restore Icon */
+  }
+  .quickActionCard {
+    padding: 1.2rem;
+    flex-direction: column;
+    text-align: center;
+  }
+  .actionArrow {
+    margin: 0 auto;
+    transform: rotate(90deg); /* Point downwards since it's stacked */
+  }
+  .missionCard {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.2rem;
+    gap: 1rem;
+  }
+  .missionPrice {
+    margin: 0;
+  }
+}
+
+/* Supreme 200px Compact View */
+@media (max-width: 250px) {
+  .gameContainer, .statCard, .couponCard, .orderItem, .quickActionCard, .tierStatus {
+    padding: 1rem !important;
+  }
+  .sectionTitle {
+    font-size: 1rem;
+  }
+  .gameTitle {
+    font-size: 1.1rem;
+  }
+  .gameDescription {
+    font-size: 0.8rem;
+  }
+  .statValue {
+    font-size: 1.2rem;
+  }
+  .statIconBox {
+    display: flex; /* keep it visible but small */
+    width: 40px;
+    height: 40px;
+  }
+  .couponCode {
+    flex-wrap: wrap; /* allow long codes to break lines */
+    word-break: break-all;
+    font-size: 1.1rem;
+  }
+  .orderInfo h4 {
+    font-size: 0.95rem;
+    white-space: normal;
+  }
+}
+
+/* Extreme 200px Compact View */
+@media (max-width: 200px) {
+  .gameContainer, .statCard, .couponCard, .orderItem, .quickActionCard, .tierStatus {
+    padding: 0.6rem !important;
+    gap: 0.5rem;
+    border-radius: 8px;
+  }
+  .sectionTitle {
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+  }
+  .gameTitle {
+    font-size: 1rem;
+  }
+  .gameDescription {
+    font-size: 0.7rem;
+  }
+  .pointsBadge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+  .playBtn {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+  .statIconBox {
+    width: 30px;
+    height: 30px;
+  }
+  .statValue {
+    font-size: 1rem;
+  }
+  .statLabel {
+    font-size: 0.75rem;
+  }
+  .couponCode {
+    font-size: 0.95rem;
+  }
+  .discountTag {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.3rem;
+  }
+  .couponDesc {
+    font-size: 0.7rem;
+  }
+  .orderInfo h4 {
+    font-size: 0.85rem;
+  }
+  .orderInfo p {
+    font-size: 0.7rem;
+  }
+  .orderPrice .paid {
+    font-size: 0.95rem;
+  }
+  .orderPrice .mrp {
+    font-size: 0.7rem;
+  }
+  .tierIcon {
+    width: 40px;
+    height: 40px;
+  }
+  .tierInfo h3 {
+    font-size: 0.9rem;
+  }
+  .tierLabel {
+    font-size: 0.6rem;
+  }
+  .progressLabel {
+    font-size: 0.6rem;
+  }
+  .actionIcon {
+    width: 30px;
+    height: 30px;
+  }
+  .actionText h4 {
+    font-size: 0.75rem;
+  }
+  .actionText p {
+    font-size: 0.65rem;
+  }
+  .missionId {
+    font-size: 0.75rem;
+    word-break: break-all;
+  }
+  .missionStatus {
+    font-size: 0.6rem;
+  }
+  .missionPrice {
+    font-size: 0.9rem;
+  }
+}
+
