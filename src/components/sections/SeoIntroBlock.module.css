@@ -1,8 +1,8 @@
 .seoSection {
   padding: 8rem 2rem;
-  background: var(--color-background, #000000);
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
   position: relative;
   overflow: hidden;
 }
@@ -46,7 +46,7 @@
   position: absolute;
   top: 2rem;
   left: -1rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-surface);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   padding: 0.5rem 1.5rem;
@@ -54,17 +54,19 @@
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   z-index: 10;
+  opacity: 0.95;
 }
 
 .imageWrapper::after {
   content: '';
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
   pointer-events: none;
+  opacity: 0.5;
 }
 
 .image {
@@ -110,14 +112,14 @@
   line-height: 1.2;
   margin-bottom: 2rem;
   font-weight: 400;
-  color: var(--color-text, #ffffff);
+  color: var(--color-text);
   letter-spacing: -0.02em;
 }
 
 .divider {
   height: 1px;
   width: 40px;
-  background: var(--color-primary, #a78bfa);
+  background: var(--color-primary);
   margin-bottom: 2rem;
   opacity: 0.5;
 }
@@ -126,7 +128,8 @@
   font-size: 1.2rem;
   margin-bottom: 1.2rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-text);
+  opacity: 0.9;
 }
 
 .paragraphs {
@@ -150,28 +153,30 @@
   left: 0;
   right: 0;
   height: 80px;
-  background: linear-gradient(to bottom, transparent, var(--color-background, #000000));
+  background: linear-gradient(to bottom, transparent, var(--color-background));
 }
 
 .text {
   font-family: var(--font-inter), sans-serif;
   font-size: 1.05rem;
   line-height: 1.9;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-text);
   margin: 0;
   font-weight: 300;
+  opacity: 0.8;
 }
 
 .text strong {
-  color: #fff;
+  color: var(--color-foreground);
   font-weight: 500;
 }
 
 .inlineLink {
-  color: #fff;
+  color: var(--color-text);
   text-decoration: underline;
   text-underline-offset: 4px;
   transition: opacity 0.3s;
+  font-weight: 500;
 }
 
 .inlineLink:hover {
@@ -215,8 +220,8 @@
 .readMoreBtn {
   margin-top: 1rem;
   background: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   padding: 0.6rem 1.5rem;
   font-family: var(--font-inter), sans-serif;
   font-size: 0.85rem;
@@ -230,6 +235,6 @@
 }
 
 .readMoreBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: var(--color-surface);
+  border-color: var(--color-foreground);
 }
