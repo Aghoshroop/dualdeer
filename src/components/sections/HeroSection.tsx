@@ -4,15 +4,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getBanners, Banner } from '@/lib/firebaseUtils';
 import styles from './HeroSection.module.css';
 
+const speedSuitSlide = {
+  id: 'speedsuit-hero',
+  image: "https://images.unsplash.com/photo-1548690312-e3b507d17a12?q=80&w=2600&auto=format&fit=crop", // Male training
+  heading: "Signature SpeedSuits",
+  subheading: "Advanced compression and aerodynamic design.",
+  cta: "EXPLORE SPEEDSUITS",
+  theme: 'dark'
+};
+
 const fallbackSlides = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1548690312-e3b507d17a12?q=80&w=2600&auto=format&fit=crop", // Male training
-    heading: "Engineered Performance",
-    subheading: "High-intensity gear for the modern athlete.",
-    cta: "EXPLORE COLLECTION",
-    theme: 'dark'
-  },
+  speedSuitSlide,
   {
     id: 2,
     image: "https://images.unsplash.com/photo-1518611012118-29a8d63ee0c2?q=80&w=2600&auto=format&fit=crop", // Yoga women
@@ -51,7 +53,9 @@ export default function HeroSection() {
             cta: b.link ? "DISCOVER MORE" : "SHOP NOW",
             theme: 'dark' 
           }));
-          setDynamicSlides(mappedSlides);
+          // Filter out any DB banner that might be a duplicate speedsuit to avoid double-showing
+          const otherSlides = mappedSlides.filter(s => !s.heading.toLowerCase().includes('speedsuit'));
+          setDynamicSlides([speedSuitSlide, ...otherSlides]);
         } else {
           setDynamicSlides(fallbackSlides);
         }
@@ -120,6 +124,13 @@ export default function HeroSection() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.9, duration: 1 }}
               className={styles.ctaBtn}
+              onClick={() => {
+                if (dynamicSlides[current].heading.includes('SpeedSuit')) {
+                  window.location.href = '/shop?category=speedsuit';
+                } else {
+                  window.location.href = '/shop';
+                }
+              }}
             >
               {dynamicSlides[current].cta}
             </motion.button>

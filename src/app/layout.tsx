@@ -27,12 +27,12 @@ const engry = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "DualDeer | Premium Activewear & Luxury Athleisure",
+    default: "DualDeer SpeedSuits | Premium Activewear for Performance",
     template: "%s | DualDeer",
   },
-  description: "Discover DualDeer, the ultimate destination for premium activewear, luxury athleisure, and high-performance menswear. Elevate your lifestyle with aesthetic, gym-ready, and street-ready apparel.",
+  description: "Discover DualDeer SpeedSuits — affordable high-performance activewear engineered for athletes. Premium comfort, aesthetic design, and elite performance.",
   keywords: [
-    "DualDeer", "premium activewear", "luxury athleisure", "menswear", "gym wear",
+    "DualDeer", "SpeedSuit", "DualDeer SpeedSuits", "premium activewear", "luxury athleisure", "menswear", "gym wear",
     "high-performance sportswear", "aesthetic fitness apparel", "luxury workout clothes",
     "street-ready activewear", "men's gym clothing", "premium fitness gear", "lifestyle apparel",
     "workout gear", "elevated athleisure", "bodybuilding apparel", "sports fashion", "urban activewear"
@@ -49,8 +49,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
 
-    title: "DualDeer | Premium Activewear & Luxury Athleisure",
-    description: "Shop DualDeer for exclusive luxury activewear, premium gym apparel, and high-performance streetwear. Designed for the relentless.",
+    title: "DualDeer SpeedSuits | Premium Activewear for Performance",
+    description: "Discover DualDeer SpeedSuits — affordable high-performance activewear engineered for athletes. Premium comfort, aesthetic design, and elite performance.",
     url: "https://dualdeer.com",
     siteName: "DualDeer",
     images: [
@@ -66,8 +66,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "DualDeer | Premium Activewear & Luxury Athleisure",
-    description: "Elevate your performance. Explore the latest drop of luxury athleisure & activewear from DualDeer.",
+    title: "DualDeer SpeedSuits | Premium Activewear for Performance",
+    description: "Discover DualDeer SpeedSuits — affordable high-performance activewear engineered for athletes. Premium comfort, aesthetic design, and elite performance.",
     images: ["https://images.unsplash.com/photo-1550639525-c97d455acf70?q=80&w=1200&auto=format&fit=crop"],
     creator: "@DualDeerOfficial",
   },
