@@ -26,11 +26,8 @@ const engry = localFont({
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: "DualDeer SpeedSuits | Premium Activewear for Performance",
-    template: "%s | DualDeer",
-  },
-  description: "Discover DualDeer SpeedSuits — affordable high-performance activewear engineered for athletes. Premium comfort, aesthetic design, and elite performance.",
+  title: "DualDeer SpeedSuits | Affordable High-Performance SpeedSuits in India",
+  description: "Shop DualDeer SpeedSuits — affordable, high-performance compression gear engineered for elite training, gym, and running. Premium activewear redefined.",
   keywords: [
     "DualDeer", "SpeedSuit", "DualDeer SpeedSuits", "premium activewear", "luxury athleisure", "menswear", "gym wear",
     "high-performance sportswear", "aesthetic fitness apparel", "luxury workout clothes",

@@ -1,17 +1,16 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Shop All | DualDeer Activewear',
-  description: 'Browse the complete collection of DualDeer premium activewear, luxury athleisure, and performance menswear. Discover exclusive drops, best sellers, and aesthetic gym apparel.',
-  // Using extensive keywords to dominate activewear search
+  title: 'Shop DualDeer SpeedSuits | Full Activewear Collection',
+  description: 'Browse the complete collection of DualDeer premium SpeedSuits, luxury athleisure, and elite performance menswear. The best aerodynamic gym gear in India.',
   keywords: [
-    'mens activewear shop', 'luxury gym clothes online', 'buy premium athleisure',
-    'high end workout gear', 'aesthetic bodybuilding clothes', 'streetwear gym wear',
+    'mens activewear shop', 'luxury gym clothes online', 'buy premium speedsuits',
+    'high end workout gear', 'aesthetic bodybuilding clothes', 'streetwear speedsuit',
     'DualDeer collection', 'mens performance apparel', 'luxury sportswear catalogue'
   ],
   openGraph: {
-    title: 'Shop DualDeer | Luxury Activewear & Athleisure',
-    description: 'Explore the latest in high-performance luxury menswear. Elevate your training with DualDeer.',
+    title: 'Shop DualDeer SpeedSuits | Luxury Activewear & Athleisure',
+    description: 'Explore the latest in high-performance luxury menswear including our signature SpeedSuits. Elevate your training with DualDeer.',
     url: 'https://dualdeer.com/shop',
     type: 'website',
   },

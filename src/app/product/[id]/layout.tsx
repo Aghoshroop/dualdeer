@@ -6,11 +6,11 @@ type Props = {
 };
 
 export async function generateMetadata(
-  props: Props,
+  { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const params = await props.params;
-  const product = await getProduct(params.id);
+  const p = await params;
+  const product = await getProduct(p.id);
 
   if (!product) {
     return {
@@ -19,29 +19,14 @@ export async function generateMetadata(
     };
   }
 
-  // Optimize title length and description for Google SERP
-  const rawDescription = product.description || '';
-  const metaDescription = rawDescription.length > 155 
-    ? rawDescription.substring(0, 155) + '...' 
-    : (rawDescription || `Explore the ${product.name} from DualDeer's highly acclaimed activewear collection.`);
-
   return {
-    title: `${product.name} | DualDeer luxury activewear`,
-    description: metaDescription,
-    keywords: [
-      product.name,
-      product.category,
-      product.subcategory || '',
-      'luxury activewear',
-      'DualDeer',
-      'aesthetic gym wear',
-      'mens premium sports clothing',
-      'buy activewear online'
-    ].filter(Boolean),
+    title: `${product.name} SpeedSuit | Buy Online in India | DualDeer`,
+    description: product.description || `Buy the highly-acclaimed ${product.name} SpeedSuit exclusively from DualDeer. Premium athletic apparel.`,
+    keywords: [product.name, 'SpeedSuit', 'buy activewear online', 'DualDeer', product.category, product.subcategory].filter(Boolean) as string[],
     openGraph: {
-      title: `${product.name} - Premium Performance Gear | DualDeer`,
-      description: metaDescription,
-      url: `https://dualdeer.com/product/${params.id}`,
+      title: `${product.name} SpeedSuit | DualDeer`,
+      description: product.description || `Explore the ${product.name} from DualDeer's highly acclaimed activewear collection.`,
+      url: `https://dualdeer.com/product/${p.id}`,
       type: 'article',
       images: [
         {
@@ -54,12 +39,12 @@ export async function generateMetadata(
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${product.name} | DualDeer Activewear`,
-      description: metaDescription,
+      title: `${product.name} SpeedSuit | DualDeer Activewear`,
+      description: product.description,
       images: [product.image],
     },
     alternates: {
-      canonical: `/product/${params.id}`,
+      canonical: `/product/${p.id}`,
     }
   };
 }

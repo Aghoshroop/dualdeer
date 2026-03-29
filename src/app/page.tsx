@@ -7,18 +7,7 @@ import TestimonialSlider from "@/components/sections/TestimonialSlider";
 import FeaturedProducts from "@/components/sections/FeaturedProducts";
 import React from "react";
 import Link from 'next/link';
-import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "DualDeer | Premium Activewear & Luxury Athleisure",
-  description: "Shop DualDeer for exclusive luxury activewear, premium gym apparel, and high-performance streetwear designed specifically for the relentless and the elite.",
-  keywords: [
-    "DualDeer", "premium activewear", "luxury athleisure", "best activewear brand", "high-end fitness apparel", "luxury gym clothes"
-  ],
-  alternates: {
-    canonical: "https://dualdeer.com",
-  }
-};
 
 export default function Home() {
   const storeJsonLd = {
