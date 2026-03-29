@@ -61,8 +61,8 @@ export default function Home() {
       </section>
       
       <SeoIntroBlock
-        h1="Best Premium Activewear & Luxury Athleisure Brand in India"
-        h2="Engineered for Elite Performance and Contemporary Style"
+        h1="High-Performance SpeedSuits in India | DualDeer"
+        h2="Premium Activewear & Luxury Athleisure Brand"
         image="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1600&auto=format&fit=crop"
         paragraphs={[
           <React.Fragment key="1">
