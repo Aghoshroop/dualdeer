@@ -25,7 +25,7 @@ export default function SeoIntroBlock({ h1, h2, h3, paragraphs, image, reverse =
         <div className={styles.imageColumn}>
           <div className={styles.imageWrapper}>
             <div className={styles.glassBadge}>Premium Reserve</div>
-            <img src={displayImage} alt="Luxury Activewear" className={styles.image} />
+            <img src={displayImage}alt="DualDeer SpeedSuit premium compression wear India" className={styles.image} />
           </div>
         </div>
         <div className={styles.textColumn}>

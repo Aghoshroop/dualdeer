@@ -26,6 +26,14 @@ export default function AboutPage() {
           </React.Fragment>
         ]}
       />
+      <div style={{ maxWidth: '800px', margin: '4rem auto 0', padding: '0 2rem', textAlign: 'center', color: 'var(--color-text)' }}>
+        <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Best SpeedSuits in India</h2>
+        <p style={{ fontSize: '1.1rem', opacity: 0.8, lineHeight: 1.6 }}>
+          DualDeer offers premium SpeedSuits designed for athletes in India.
+          Our compression SpeedSuits improve performance, enhance recovery,
+          and provide unmatched comfort for gym and running.
+        </p>
+      </div>
       
       <div style={{ textAlign: 'center', marginTop: '4rem' }}>
         <Link href="/shop" style={{ display: 'inline-block', padding: '1rem 3rem', background: 'var(--color-primary)', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '30px', textTransform: 'uppercase', letterSpacing: '1px' }}>
