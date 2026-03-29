@@ -7,6 +7,8 @@ import { ChevronLeft, ChevronRight, Filter, X } from 'lucide-react';
 import styles from './ShopPage.module.css';
 import { useCart } from '@/context/CartContext';
 import AnimatedCartButton from '@/components/ui/AnimatedCartButton';
+import SeoIntroBlock from '@/components/sections/SeoIntroBlock';
+import React from 'react';
 
 const filters = ["ALL", "SPECIAL", "BEST SELLER", "FEATURED PRODUCTS"];
 
@@ -91,9 +93,25 @@ function ShopEngine() {
         />
         <div className={styles.halfScreenOverlay}></div>
         <div className={styles.halfScreenText}>
-          <h1>{heroText || "ELEVATE YOUR PERFORMANCE"}</h1>
+          <h2>{heroText || "ELEVATE YOUR PERFORMANCE"}</h2>
         </div>
       </section>
+
+      <SeoIntroBlock
+        h1="Explore the Best Premium Activewear in India"
+        h2="Unrivaled Luxury Athleisure and Performance Gear"
+        paragraphs={[
+          <React.Fragment key="1">
+            Discover the absolute pinnacle of athletic fashion with DualDeer&apos;s extensive shop collection. As India&apos;s premier destination for high-performance activewear and luxury athleisure, our meticulously curated catalog caters to both dedicated professional athletes and style-conscious individuals who absolutely refuse to compromise. Each individual piece within our collection is developed using revolutionary, state-of-the-art fabrications—offering unprecedented moisture management, highly advanced kinetic stretch capabilities, and unparalleled long-term durability. From rigorous, high-intensity interval training sessions to refined, sophisticated casual outings, our elite performance gear guarantees that you remain entirely comfortable, incredibly confident, and visually striking at all times.
+          </React.Fragment>,
+          <React.Fragment key="2">
+            Whether you are actively searching for dynamic compression garments that stabilize core muscles during heavy lifts, ultralight breathable tops precisely engineered to dramatically enhance airflow, or extremely sleek outerwear designed to flawlessly combat unpredictable elements in unmistakable style, you will find it right here. We strictly and systematically source all of our premium materials to thoroughly guarantee that every single reinforced seam and intelligently contoured panel powerfully supports elite physical exertion. Our revolutionary contemporary designs not only elevate your visual presence but proactively and efficiently assist in allowing you to aggressively push past your perceived physical limits. Feel the remarkable difference of intelligent, responsive sportswear that intuitively adapts directly to your unique needs.
+          </React.Fragment>,
+          <React.Fragment key="3">
+            By seamlessly marrying modern, fashion-forward silhouettes with hardcore technical functionality and utility, <Link href="/" style={{ textDecoration: 'underline', color: 'inherit' }}>DualDeer</Link> has firmly established itself as the very best premium activewear brand available on the market today. When you consciously choose to invest in our meticulously tailored, luxury garments, you are actively investing in peak physiological performance and an inherently superior, commanding aesthetic. Browse our incredibly diverse range of specialized athletic categories to find the exact performance lifestyle pieces necessary to flawlessly complete your luxury training wardrobe. Fully embrace the unmatched power, supreme physical resilience, and truly distinctive look that only DualDeer can provide—because achieving true greatness inherently requires gear that is equally exceptional.
+          </React.Fragment>
+        ]}
+      />
 
       {/* 2. Category Strip */}
       <section className={styles.categoryStrip}>
