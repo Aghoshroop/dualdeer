@@ -45,6 +45,18 @@ function ShopEngine() {
   const [liveCategories, setLiveCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+  const sliderRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollSlider = (direction: 'left' | 'right') => {
+    if (sliderRef.current) {
+      const scrollAmount = 324; // Card width 300px + some gap
+      if (direction === 'left') {
+        sliderRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        sliderRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }
+  };
 
   useEffect(() => {
     import('@/lib/firebaseUtils').then(({ getProducts, getCategories, getContentBlock }) => {
@@ -434,7 +446,7 @@ function ShopEngine() {
       <section className={styles.benefitsBar}>
         <div className={styles.benefit}>
           <h4>FREE INTERNATIONAL DELIVERY</h4>
-          <p>On all orders over ₹150.00</p>
+          <p>On all orders over $150.00</p>
         </div>
         <div className={styles.benefit}>
           <h4>50% OFF MEN&apos;S SUITS</h4>
@@ -447,13 +459,13 @@ function ShopEngine() {
         <div className={styles.recHeader}>
           <h2>Explore our recommendations</h2>
           <div className={styles.recArrows}>
-            <button aria-label="Previous" className={styles.arrowBtn}><ChevronLeft size={20} strokeWidth={1} /></button>
-            <button aria-label="Next" className={styles.arrowBtn}><ChevronRight size={20} strokeWidth={1} /></button>
+            <button aria-label="Previous" className={styles.arrowBtn} onClick={() => scrollSlider('left')}><ChevronLeft size={20} strokeWidth={1} /></button>
+            <button aria-label="Next" className={styles.arrowBtn} onClick={() => scrollSlider('right')}><ChevronRight size={20} strokeWidth={1} /></button>
           </div>
         </div>
         <div className={styles.infinitySliderContainer}>
-          <div className={styles.infinitySliderTrack}>
-            {[...liveProducts.slice(0, 8), ...liveProducts.slice(0, 8)].map((product, i) => (
+          <div className={styles.infinitySliderTrack} ref={sliderRef}>
+            {liveProducts.slice(0, 16).map((product, i) => (
               <div key={`rec-${product.id || i}-${i}`} className={styles.glassCard}>
                 <div className={styles.productImageGlass}>
                   <Link href={`/product/${product.id}`} style={{ display: 'block', width: '100%', height: '100%', position: 'relative' }}>

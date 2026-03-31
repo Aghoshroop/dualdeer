@@ -944,14 +944,18 @@
 
 .infinitySliderTrack {
   display: flex;
-  width: max-content;
+  width: 100%;
   gap: 1.5rem;
-  animation: scrollInfinite 40s linear infinite;
-  padding: 0 1.5rem;
+  padding: 0 1.5rem 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
-.infinitySliderTrack:hover {
-  animation-play-state: paused;
+.infinitySliderTrack::-webkit-scrollbar {
+  display: none;
 }
 
 /* Force the cards inside the slider to maintain exact width */
@@ -959,11 +963,7 @@
   width: 300px;
   min-width: 300px;
   flex-shrink: 0;
-}
-
-@keyframes scrollInfinite {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-50% - 0.75rem)); }
+  scroll-snap-align: start;
 }
 
 .recHeader {

@@ -12,6 +12,7 @@ interface RelatedProductsProps {
 
 export default function RelatedProducts({ category, excludeId }: RelatedProductsProps) {
   const [products, setProducts] = useState<Product[]>([]);
+  const [originalCount, setOriginalCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,7 +21,11 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
     getProducts().then(prods => {
       // Find products matching the same category, excluding the current product itself
       const related = prods.filter(p => p.category === category && p.id !== excludeId);
-      setProducts(related.slice(0, 4));
+      setOriginalCount(related.length);
+      
+      // Make it feel infinite on mobile by extending short lists up to 8 items
+      const extendedRelated = related.length > 0 && related.length < 8 ? [...related, ...related, ...related].slice(0, 8) : related.slice(0, 8);
+      setProducts(extendedRelated);
       setLoading(false);
     });
   }, [category, excludeId]);
@@ -44,9 +49,14 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
           <Link href={`/shop?category=${encodeURIComponent(category)}`} className={styles.shopAll}>View Category</Link>
         </div>
 
-        <div className={styles.grid}>
+        <div className={`${styles.grid} ${styles.mobileSlider}`}>
           {products.map((product, i) => (
-            <Link href={`/product/${product.id}`} key={product.id} style={{ textDecoration: 'none' }}>
+            <Link 
+              href={`/product/${product.id}`} 
+              key={`${product.id}-${i}`} 
+              style={{ textDecoration: 'none' }}
+              className={i >= originalCount || i >= 4 ? styles.desktopHidden : ''}
+            >
               <motion.div 
                 className={styles.premiumGlassCard}
                 initial={{ opacity: 0, y: 30 }}

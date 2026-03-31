@@ -349,3 +349,39 @@
     font-size: 0.65rem;
   }
 }
+
+/* Mobile Slider override for RelatedProducts */
+@media (max-width: 768px) {
+  .mobileSlider {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: 1rem;
+    padding-bottom: 2rem;
+    margin-left: -5%;
+    margin-right: -5%;
+    padding-left: 5%;
+    padding-right: 5%;
+    scrollbar-width: none;
+  }
+  .mobileSlider::-webkit-scrollbar {
+    display: none;
+  }
+  .mobileSlider > * {
+    flex: 0 0 65%;
+    scroll-snap-align: center;
+  }
+}
+@media (max-width: 480px) {
+  .mobileSlider > * {
+    flex: 0 0 75%;
+  }
+}
+
+@media (min-width: 769px) {
+  .desktopHidden {
+    display: none !important;
+  }
+}

@@ -120,12 +120,6 @@ export default function Navbar() {
             >
               <Link href="/shop" className={styles.link}>COLLECTION</Link>
             </div>
-            <div 
-              className={styles.navItem}
-              onMouseEnter={() => setHoveredMenu(null)}
-            >
-              <Link href="/speedsuits-india" className={styles.link}>SPEEDSUITS</Link>
-            </div>
           </div>
 
           {/* Logo Placeholder to maintain flex space */}
@@ -324,9 +318,6 @@ export default function Navbar() {
               <div className={styles.drawerContent}>
                 <nav className={styles.drawerNav}>
                    <Link href="/shop" onClick={() => setIsDrawerOpen(false)}>COLLECTION</Link>
-                   <Link href="/speedsuits-india" onClick={() => setIsDrawerOpen(false)} style={{ textTransform: 'uppercase', fontWeight: 700, color: '#c9a96e' }}>
-                     SPEEDSUITS
-                   </Link>
                    {liveCategories.map((cat, i) => (
                       <Link key={i} href="/shop" onClick={() => setIsDrawerOpen(false)} style={{ textTransform: 'uppercase' }}>
                         {cat}

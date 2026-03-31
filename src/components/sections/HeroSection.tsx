@@ -53,9 +53,7 @@ export default function HeroSection() {
             cta: b.link ? "DISCOVER MORE" : "SHOP NOW",
             theme: 'dark' 
           }));
-          // Filter out any DB banner that might be a duplicate speedsuit to avoid double-showing
-          const otherSlides = mappedSlides.filter(s => !s.heading.toLowerCase().includes('speedsuit'));
-          setDynamicSlides([speedSuitSlide, ...otherSlides]);
+          setDynamicSlides(mappedSlides);
         } else {
           setDynamicSlides(fallbackSlides);
         }
@@ -125,8 +123,11 @@ export default function HeroSection() {
               transition={{ delay: 0.9, duration: 1 }}
               className={styles.ctaBtn}
               onClick={() => {
-                if (dynamicSlides[current].heading.includes('SpeedSuit')) {
-                  window.location.href = '/shop?category=speedsuit';
+                const heading = dynamicSlides[current].heading?.toLowerCase() || '';
+                if (heading.includes('speedsuit')) {
+                  window.location.href = '/speedsuits-india';
+                } else if (heading.includes('men') || heading.includes('male')) {
+                  window.location.href = '/men';
                 } else {
                   window.location.href = '/shop';
                 }

@@ -39,6 +39,7 @@ export default function ProductDetailsPage() {
   const [isZoomed, setIsZoomed] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
   
   // Review Form State
   const [reviewName, setReviewName] = useState('');
@@ -420,37 +421,50 @@ export default function ProductDetailsPage() {
       {/* 300+ Words SEO Content Section */}
       <section className={styles.seoProductSection}>
         <div className={styles.seoProductContainer}>
-          <h2>Why Choose the {product.name}</h2>
-    <p>
-      Experience the absolute apex of modern athletic engineering with the exclusively designed <strong>{product.name}</strong>. At DualDeer, we critically recognize that true high-intensity performance strictly requires specialized apparel that actively and instinctively works alongside your body&apos;s natural biomechanical movements. As part of our signature <Link href="/shop?category=speedsuit" style={{ textDecoration: 'underline', color: 'inherit' }}>SpeedSuit lineup</Link>, this expertly crafted garment is meticulously built from the ground up to decisively deliver unprecedented aerodynamic efficiency, supreme long-lasting comfort, and an unmistakable, commanding luxury aesthetic that is incredibly rare to find in modern performance activewear. Whether you are relentlessly pushing your physical boundaries in the gym, logging exhaustive endurance miles on the track, or simply navigating a demanding and dynamic urban lifestyle, the {product.name} seamlessly acts as your ultimate, supportive armor.
-    </p>
+          <div className={isDescExpanded ? styles.contentExpanded : styles.contentCollapsed}>
+            <h2>Why Choose the {product.name}</h2>
+            <p>
+              Experience the absolute apex of modern athletic engineering with the exclusively designed <strong>{product.name}</strong>. At DualDeer, we critically recognize that true high-intensity performance strictly requires specialized apparel that actively and instinctively works alongside your body&apos;s natural biomechanical movements. As part of our signature <Link href="/shop?category=speedsuit" style={{ textDecoration: 'underline', color: 'inherit' }}>SpeedSuit lineup</Link>, this expertly crafted garment is meticulously built from the ground up to decisively deliver unprecedented aerodynamic efficiency, supreme long-lasting comfort, and an unmistakable, commanding luxury aesthetic that is incredibly rare to find in modern performance activewear. Whether you are relentlessly pushing your physical boundaries in the gym, logging exhaustive endurance miles on the track, or simply navigating a demanding and dynamic urban lifestyle, the {product.name} seamlessly acts as your ultimate, supportive armor.
+            </p>
 
-    <h3>Revolutionary Fabric Technology</h3>
-    <p>
-      The fundamental core of this exceptional piece, consistent with our entire signature SpeedSuit collection, lies directly within our proprietary, state-of-the-art fabric blend. This incredibly advanced textile actively incorporates intelligent four-way kinetic stretch capabilities, allowing for an entire, unrestricted range of rapid multi-directional movement without ever spontaneously losing essential structural integrity. Furthermore, the specialized synthetic hydrophobic micro-fibers are precision-engineered to rapidly and continuously wick away heavy sweat and moisture. This advanced moisture-management system ensures you remain remarkably cool, entirely dry, and intensely focused even during the most grueling, high-temperature athletic training conditions.
-    </p>
+            <h3>Revolutionary Fabric Technology</h3>
+            <p>
+              The fundamental core of this exceptional piece, consistent with our entire signature SpeedSuit collection, lies directly within our proprietary, state-of-the-art fabric blend. This incredibly advanced textile actively incorporates intelligent four-way kinetic stretch capabilities, allowing for an entire, unrestricted range of rapid multi-directional movement without ever spontaneously losing essential structural integrity. Furthermore, the specialized synthetic hydrophobic micro-fibers are precision-engineered to rapidly and continuously wick away heavy sweat and moisture. This advanced moisture-management system ensures you remain remarkably cool, entirely dry, and intensely focused even during the most grueling, high-temperature athletic training conditions.
+            </p>
 
-          <h3>Elite Performance Benefits</h3>
-          <p>Every single technical detail of the {product.name} is rigorously and thoroughly tested to forcefully elevate your physical potential and output to the next level:</p>
-          <ul>
-            <li><strong>Advanced Muscle Stabilization:</strong> Strategically integrated, targeted compression zones effectively reduce muscular vibration, enhance critical blood flow, and significantly accelerate your vital post-workout recovery times.</li>
-            <li><strong>Chafe-Free Construction:</strong> The precision flatlock seams alongside intelligent, body-mapped ergonomic paneling practically eliminate uncomfortable chafing, allowing for seamless, prolonged physical exertion without subsequent irritation.</li>
-            <li><strong>Dynamic Climate Control:</strong> State-of-the-art responsive weaving naturally and efficiently regulates your core body temperature, keeping you consistently warm in the harsh, biting cold and incredibly cool under intense, radiating heat.</li>
-            <li><strong>Unmatched Durability:</strong> Substantially reinforced, heavy-duty stitching specifically guarantees that the piece effortlessly and repeatedly withstands the rigorous, daily demands of relentless elite athletic training without rapidly degrading.</li>
-          </ul>
+            <h3>Elite Performance Benefits</h3>
+            <p>Every single technical detail of the {product.name} is rigorously and thoroughly tested to forcefully elevate your physical potential and output to the next level:</p>
+            <ul>
+              <li><strong>Advanced Muscle Stabilization:</strong> Strategically integrated, targeted compression zones effectively reduce muscular vibration, enhance critical blood flow, and significantly accelerate your vital post-workout recovery times.</li>
+              <li><strong>Chafe-Free Construction:</strong> The precision flatlock seams alongside intelligent, body-mapped ergonomic paneling practically eliminate uncomfortable chafing, allowing for seamless, prolonged physical exertion without subsequent irritation.</li>
+              <li><strong>Dynamic Climate Control:</strong> State-of-the-art responsive weaving naturally and efficiently regulates your core body temperature, keeping you consistently warm in the harsh, biting cold and incredibly cool under intense, radiating heat.</li>
+              <li><strong>Unmatched Durability:</strong> Substantially reinforced, heavy-duty stitching specifically guarantees that the piece effortlessly and repeatedly withstands the rigorous, daily demands of relentless elite athletic training without rapidly degrading.</li>
+            </ul>
 
-          <h3>Versatile Luxury Use Cases</h3>
-          <p>
-            While undeniably and explicitly engineered for the highest echelons of professional physical performance, the inherently sleek, minimalist visual aesthetic of this piece effortlessly transitions straight into your elevated daily lifestyle routine. The {product.name} is purposefully built for:
-          </p>
-          <ul>
-            <li><strong>High-Intensity Gym Training:</strong> Experience the profound, supportive confidence required to safely conquer heavy compound lifts, grueling CrossFit regimens, and aggressive high-intensity interval circuits.</li>
-            <li><strong>Endurance Running and Track:</strong> Benefit immensely from the ultra-lightweight, highly breathable aerodynamic profile that decisively shaves invaluable seconds off your personal best times while effortlessly managing wind resistance.</li>
-            <li><strong>Sophisticated Lifestyle Wear:</strong> Seamlessly pair this distinctively elegant luxury piece with your existing contemporary wardrobe for a sharp, refined, and distinctly powerful athleisure look outside the studio or directly on the sophisticated city streets.</li>
-          </ul>
-    <p>
-      Invest today in the remarkable {product.name} and firmly secure your rightful place among the dedicated athletic elite who simply refuse to ever settle for anything less than absolute sportswear perfection. <Link href="/speedsuit" style={{ textDecoration: 'underline', color: 'inherit' }}>Explore related luxury pieces within our signature SpeedSuit lineup</Link> to systematically and intelligently build the ultimate, highly versatile performance wardrobe.
-    </p>
+            <h3>Versatile Luxury Use Cases</h3>
+            <p>
+              While undeniably and explicitly engineered for the highest echelons of professional physical performance, the inherently sleek, minimalist visual aesthetic of this piece effortlessly transitions straight into your elevated daily lifestyle routine. The {product.name} is purposefully built for:
+            </p>
+            <ul>
+              <li><strong>High-Intensity Gym Training:</strong> Experience the profound, supportive confidence required to safely conquer heavy compound lifts, grueling CrossFit regimens, and aggressive high-intensity interval circuits.</li>
+              <li><strong>Endurance Running and Track:</strong> Benefit immensely from the ultra-lightweight, highly breathable aerodynamic profile that decisively shaves invaluable seconds off your personal best times while effortlessly managing wind resistance.</li>
+              <li><strong>Sophisticated Lifestyle Wear:</strong> Seamlessly pair this distinctively elegant luxury piece with your existing contemporary wardrobe for a sharp, refined, and distinctly powerful athleisure look outside the studio or directly on the sophisticated city streets.</li>
+            </ul>
+            <p>
+              Invest today in the remarkable {product.name} and firmly secure your rightful place among the dedicated athletic elite who simply refuse to ever settle for anything less than absolute sportswear perfection. <Link href="/speedsuit" style={{ textDecoration: 'underline', color: 'inherit' }}>Explore related luxury pieces within our signature SpeedSuit lineup</Link> to systematically and intelligently build the ultimate, highly versatile performance wardrobe.
+            </p>
+          </div>
+          <button 
+            className={styles.readMoreBtn} 
+            onClick={() => setIsDescExpanded(!isDescExpanded)}
+            aria-expanded={isDescExpanded}
+          >
+            {isDescExpanded ? 'Show Less' : 'Read More'}
+            <ChevronDown size={16} style={{ 
+              transform: isDescExpanded ? 'rotate(180deg)' : 'none', 
+              transition: 'transform 0.3s ease' 
+            }} />
+          </button>
         </div>
       </section>
 

@@ -37,7 +37,7 @@ export default function SpeedSuitsIndiaPage() {
       {/* 1. Cinematic Hero Section */}
       <section className={styles.hero}>
         <motion.img
-          src="https://images.unsplash.com/photo-1549476464-37392f717541?q=80&w=2000&auto=format&fit=crop"
+          src="/speedsuitgang.jpeg"
           className={styles.heroImage}
           alt="High-Performance SpeedSuits India"
           initial={{ scale: 1.1 }}
@@ -118,7 +118,7 @@ export default function SpeedSuitsIndiaPage() {
           {/* Performance */}
           <div className={styles.splitSection}>
             <motion.div className={styles.splitImage} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000&auto=format&fit=crop" alt="SpeedSuit Compression Performance" />
+              <img src="/speedsuit.png" alt="SpeedSuit Compression Performance" />
             </motion.div>
             <motion.div className={styles.splitContent} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
               <h2 className={styles.splitTitle}>Engineered for Greatness</h2>
@@ -131,7 +131,7 @@ export default function SpeedSuitsIndiaPage() {
           {/* Luxury Craft */}
           <div className={`${styles.splitSection} ${styles.splitReverse}`}>
             <motion.div className={styles.splitImage} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-              <img src="https://images.unsplash.com/photo-1516481157630-05bc0aeba8fa?q=80&w=1000&auto=format&fit=crop" alt="Luxury Craftsmanship" />
+              <img src="/speedsuit-luxury.jpg" alt="Luxury Craftsmanship" />
             </motion.div>
             <motion.div className={styles.splitContent} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
               <h2 className={styles.splitTitle}>Absolute Precision Artistry</h2>
