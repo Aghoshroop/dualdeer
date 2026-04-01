@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc, query, where, Timestamp } from 'firebase/firestore';
+import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc, query, where, Timestamp, orderBy, limit } from 'firebase/firestore';
 import { db } from './firebase';
 
 // ========================
@@ -382,3 +382,99 @@ export const updateAIMemory = async (userId: string, userName: string, newContex
     console.error("AI Brain write error:", e);
   }
 };
+
+// ========================
+// AI Global Knowledge Base (V2 STRUCTURED GRAPH)
+// ========================
+export interface KnowledgeNode {
+  id?: string;
+  subject: string;
+  relation: string;
+  object: string;
+  confidence: number;
+  sources: number;
+  contradictions?: string[];
+  createdAt?: Timestamp;
+}
+
+export const getGlobalKnowledgeV2 = async (): Promise<KnowledgeNode[]> => {
+  try {
+    const q = query(collection(db, 'global_knowledge_v2'), orderBy('confidence', 'desc'), limit(500));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as KnowledgeNode));
+  } catch (e) {
+    console.error("Global Knowledge V2 read error:", e);
+    return [];
+  }
+};
+
+export const addGlobalKnowledgeV2 = async (node: KnowledgeNode) => {
+  try {
+    await addDoc(collection(db, 'global_knowledge_v2'), {
+      ...node,
+      createdAt: Timestamp.now()
+    });
+  } catch (e) {
+    console.error("Global Knowledge V2 write error:", e);
+  }
+};
+
+export const updateKnowledgeConfidence = async (id: string, newConfidence: number, incrementSource: boolean) => {
+  try {
+    const docRef = doc(db, 'global_knowledge_v2', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+       const data = docSnap.data();
+       await updateDoc(docRef, {
+          confidence: newConfidence,
+          sources: incrementSource ? (data.sources || 1) + 1 : data.sources
+       });
+    }
+  } catch(e) {
+    console.error("Knowledge update error", e);
+  }
+}
+
+// ========================
+// AI User Memory (Preferences & Context)
+// ========================
+export interface UserMemoryV2 {
+  id?: string;
+  userId: string;
+  preferences: string[];
+  pastQueries: string[];
+  lastUpdated: Timestamp;
+}
+
+export const getUserMemoryV2 = async (userId: string): Promise<UserMemoryV2 | null> => {
+   try {
+     const q = query(collection(db, 'user_memory'), where('userId', '==', userId));
+     const snap = await getDocs(q);
+     if (!snap.empty) {
+       return { id: snap.docs[0].id, ...snap.docs[0].data() } as UserMemoryV2;
+     }
+   } catch(e) {}
+   return null;
+}
+
+export const updateUserMemoryV2 = async (userId: string, prefsToAdd: string[], queryToAdd: string) => {
+   try {
+     const existing = await getUserMemoryV2(userId);
+     if (existing && existing.id) {
+        const newPrefs = Array.from(new Set([...existing.preferences, ...prefsToAdd])).slice(-10);
+        const newQueries = [...existing.pastQueries, queryToAdd].slice(-20);
+        await updateDoc(doc(db, 'user_memory', existing.id), {
+           preferences: newPrefs,
+           pastQueries: newQueries,
+           lastUpdated: Timestamp.now()
+        });
+     } else {
+        await addDoc(collection(db, 'user_memory'), {
+           userId,
+           preferences: prefsToAdd,
+           pastQueries: [queryToAdd],
+           lastUpdated: Timestamp.now()
+        });
+     }
+   } catch(e) {}
+}

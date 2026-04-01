@@ -1,13 +1,12 @@
 import HeroSection from "@/components/sections/HeroSection";
 import SeoIntroBlock from "@/components/sections/SeoIntroBlock";
 import EditorialSplit from "@/components/sections/EditorialSplit";
-import ProductGrid from "@/components/sections/ProductGrid";
+import SeasonalShowcaseSlider from "@/components/sections/SeasonalShowcaseSlider";
 import BrandStory from "@/components/sections/BrandStory";
 import TestimonialSlider from "@/components/sections/TestimonialSlider";
 import FeaturedProducts from "@/components/sections/FeaturedProducts";
 import React from "react";
 import Link from 'next/link';
-
 
 export default function Home() {
   const storeJsonLd = {
@@ -81,7 +80,7 @@ export default function Home() {
       />
 
       <EditorialSplit />
-      <ProductGrid title="The Spring Collection" />
+      <SeasonalShowcaseSlider title="The Spring Collection" />
       <BrandStory />
       <FeaturedProducts />
       <TestimonialSlider />

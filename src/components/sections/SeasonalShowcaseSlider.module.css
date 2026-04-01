@@ -1,0 +1,310 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+}
+
+.activeBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.activeImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.1) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.contentContainer {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 5%;
+  display: flex;
+  align-items: center;
+}
+
+.textContent {
+  max-width: 600px;
+}
+
+.categorySpan {
+  display: inline-block;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.title {
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-family: var(--font-logo), serif;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  font-weight: 400;
+  color: #fff;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.shopButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  color: #000;
+  padding: 1rem 2rem;
+  border-radius: 30px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.shopButton:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+.controls {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.navButton {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navButton:hover {
+  background: #fff;
+  color: #000;
+}
+
+.previewStrip {
+  position: absolute;
+  bottom: 6%;
+  right: 4%;
+  z-index: 10;
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.previewCard {
+  width: 140px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.previewCard::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  transition: background 0.3s ease;
+  z-index: 2;
+}
+
+.previewCard:hover::after {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.previewCard:hover .previewImage {
+  transform: scale(1.05);
+}
+
+.loadingState {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-logo), serif;
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.mobileView {
+  display: none;
+  width: 100vw;
+  box-sizing: border-box;
+  padding: clamp(2rem, 8vw, 4rem) clamp(0.5rem, 4vw, 1rem);
+  background: var(--color-background);
+}
+
+.mobileHeader {
+  text-align: center;
+  margin-bottom: clamp(1rem, 5vw, 2rem);
+  padding: 0 clamp(0.2rem, 2vw, 1rem);
+}
+
+.mobileTitle {
+  font-family: var(--font-logo), serif;
+  font-size: clamp(1.5rem, 10vw, 2.5rem);
+  font-weight: 400;
+  color: var(--color-text);
+  margin-bottom: clamp(0.25rem, 2vw, 0.5rem);
+  word-wrap: break-word;
+  line-height: 1.1;
+}
+
+.mobileSubtitle {
+  font-size: clamp(0.65rem, 4vw, 0.875rem);
+  text-transform: uppercase;
+  letter-spacing: clamp(1px, 0.5vw, 2px);
+  font-weight: 600;
+  color: var(--color-text);
+  opacity: 0.7;
+}
+
+.mobileSlider {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: clamp(0.5rem, 3vw, 1rem);
+  padding-bottom: clamp(1rem, 5vw, 2rem);
+  scrollbar-width: none; /* Firefox */
+}
+
+.mobileSlider::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
+.mobileCard {
+  flex: 0 0 85vw;
+  scroll-snap-align: center;
+  border-radius: clamp(8px, 4vw, 16px);
+  overflow: hidden;
+  position: relative;
+  background: #f5f5f5;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileImageWrapper {
+  width: 100%;
+  aspect-ratio: 3/4;
+  position: relative;
+  overflow: hidden;
+}
+
+.mobileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mobileInfo {
+  padding: clamp(0.75rem, 5vw, 1.5rem);
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.mobileName {
+  font-size: clamp(1rem, 6vw, 1.25rem);
+  font-weight: 600;
+  margin-bottom: clamp(0.25rem, 2vw, 0.5rem);
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.mobilePrice {
+  font-size: clamp(0.85rem, 5vw, 1.1rem);
+  font-weight: 400;
+  color: var(--color-text);
+  opacity: 0.8;
+  margin-bottom: clamp(0.75rem, 5vw, 1.5rem);
+}
+
+.mobileShopBtn {
+  margin-top: auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: clamp(0.5rem, 4vw, 1rem);
+  background: var(--color-foreground);
+  color: var(--color-background);
+  text-align: center;
+  text-decoration: none;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: clamp(0.75rem, 4vw, 1rem);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  word-wrap: break-word;
+}
+
+/* Restrict desktop view on small screens and show mobile view */
+@media (max-width: 768px) {
+  .desktopView {
+    display: none !important;
+  }
+  .mobileView {
+    display: block;
+  }
+}
