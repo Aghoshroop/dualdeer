@@ -27,39 +27,60 @@ export default function SpeedSuitsIndiaPage() {
     });
   }, []);
 
+  const fadeUpBlur: any = {
+    hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1] } }
+  };
+
   const fadeUp: any = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
   };
 
   return (
     <main className={styles.main}>
       {/* 1. Cinematic Hero Section */}
       <section className={styles.hero}>
-        <motion.img
-          src="/speedsuitgang.jpeg"
-          className={styles.heroImage}
-          alt="High-Performance SpeedSuits India"
-          initial={{ scale: 1.1 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-        />
+        <div className={styles.heroImageWrapper}>
+          <motion.img
+            src="/speedsuitgang.jpeg"
+            className={styles.heroImage}
+            alt="High-Performance SpeedSuits India"
+            initial={{ scale: 1.05 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+          />
+          <div className={styles.heroOverlay}></div>
+        </div>
         <div className={styles.heroContent}>
-          <motion.h1
-            className={styles.heroTitle}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-          >
-            SpeedSuits in India
-          </motion.h1>
+          <div className={styles.heroTitleWrapper}>
+            <motion.h1
+              className={styles.heroTitle}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUpBlur}
+            >
+              SPEEDSUITS
+            </motion.h1>
+            <motion.h1
+              className={styles.heroTitle}
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+                visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.15 } }
+              }}
+            >
+              IN INDIA
+            </motion.h1>
+          </div>
           <motion.p
             className={styles.heroSubtitle}
             initial="hidden"
             animate="visible"
             variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 0.9, y: 0, transition: { duration: 0.8, delay: 0.2 } },
+              hidden: { opacity: 0, y: 20, filter: "blur(5px)" },
+              visible: { opacity: 0.9, y: 0, filter: "blur(0px)", transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.3 } },
             }}
           >
             The Ultimate Fusion of Elite Performance & Luxury Craftsmanship
@@ -149,7 +170,7 @@ export default function SpeedSuitsIndiaPage() {
           Why DualDeer SpeedSuits?
         </motion.h2>
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-          <p style={{ fontSize: "1.2rem", lineHeight: "1.8", opacity: 0.8, marginTop: "2rem" }}>
+          <p style={{ fontSize: "clamp(14px, 4vw, 1.2rem)", lineHeight: "1.8", opacity: 0.8, marginTop: "2rem" }}>
             Mass-produced activewear dilutes identity. DualDeer strictly designs for the 1%. In India's rising luxury activewear scene, our SpeedSuits act as an undeniable badge of physical authority. When you wear a DualDeer signature piece, you immediately step into an exclusive tier of uncompromised aesthetic dominance.
           </p>
         </motion.div>
