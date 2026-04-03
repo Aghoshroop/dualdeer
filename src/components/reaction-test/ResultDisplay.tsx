@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import styles from '../../app/reaction-test/ReactionTest.module.css';
 import { ReactionScore } from '@/lib/firebaseUtils';
 
@@ -25,9 +25,9 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ state, reactionTim
     };
 
     return (
-        <>
+        <AnimatePresence mode="wait">
           {state === 'result' && (
-            <motion.div key="result" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className={styles.instructionBox}>
+            <motion.div key="result" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }} className={styles.instructionBox}>
               {errorMsg ? (
                 <>
                   <h2 className={styles.errText}>{errorMsg}</h2>
@@ -47,7 +47,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ state, reactionTim
           )}
 
           {state === 'submit' && (
-            <motion.div key="submit" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} className={styles.formBox}>
+            <motion.div key="submit" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className={styles.formBox}>
               <h2 className={styles.title} style={{ fontSize: '2rem', textAlign: 'left', marginBottom: '2rem' }}>VERIFY SCORE</h2>
               
               <div className={styles.inputGroup}>
@@ -66,7 +66,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ state, reactionTim
           )}
 
           {state === 'leaderboard' && (
-            <motion.div key="leaderboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10 }}>
+            <motion.div key="leaderboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10 }}>
                <h2 className={styles.title} style={{ fontSize: '3rem' }}>GLOBAL <span className={styles.accent}>LEADERBOARD</span></h2>
                <div className={styles.leaderboardContainer}>
                  {leaderboard.map((lb, i) => (
@@ -84,6 +84,6 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ state, reactionTim
                <button className={styles.champagneBtnOutline} onClick={resetTest} style={{ marginTop: '2rem', background: '#000' }}>GO TO TEST</button>
             </motion.div>
           )}
-        </>
+        </AnimatePresence>
     );
 };

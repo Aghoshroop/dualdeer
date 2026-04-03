@@ -14,6 +14,7 @@ import { useReactionTimer } from '@/hooks/useReactionTimer';
 import { CameraView } from '@/components/reaction-test/CameraView';
 import { ReactionOverlay } from '@/components/reaction-test/ReactionOverlay';
 import { ResultDisplay } from '@/components/reaction-test/ResultDisplay';
+import { TutorialModal } from '@/components/reaction-test/TutorialModal';
 
 type TestState = 'intro' | 'setup' | 'waiting' | 'ready' | 'reacting' | 'result' | 'submit' | 'leaderboard';
 
@@ -22,6 +23,7 @@ export default function ReactionTestPage() {
   const [reactionTime, setReactionTime] = useState<number>(0);
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [leaderboard, setLeaderboard] = useState<ReactionScore[]>([]);
+  const [showTutorial, setShowTutorial] = useState<boolean>(true);
   
   const stateRef = useRef<TestState>(state);
   
@@ -30,7 +32,7 @@ export default function ReactionTestPage() {
   }, [state]);
   
   // Custom hooks
-  const { videoRef, startCamera, stopCamera, toggleCamera, cameraError, setCameraError } = useCamera();
+  const { videoRef, startCamera, stopCamera, toggleCamera, facingMode, cameraError, setCameraError } = useCamera();
   const { beginSequence, clearTimers, initAudio, startTimeRef } = useReactionTimer(setState, stateRef);
 
   const onCheat = useCallback(() => {
@@ -91,16 +93,18 @@ export default function ReactionTestPage() {
 
   return (
     <div className={styles.container}>
+      <AnimatePresence>
+         {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
+      </AnimatePresence>
       <div className={styles.navBarSpacer} />
       
-      <CameraView videoRef={videoRef} canvasRef={canvasRef} />
+      <CameraView videoRef={videoRef} canvasRef={canvasRef} facingMode={facingMode} />
 
       <Link href="/" className={styles.backBtn} onClick={stopCamera}>
         <ChevronLeft size={20} /> EXIT
       </Link>
 
       <div className={styles.content}>
-        <AnimatePresence mode="wait">
            <ReactionOverlay 
                state={state} 
                errorMsg={errorMsg || cameraError} 
@@ -118,7 +122,6 @@ export default function ReactionTestPage() {
                submitScore={handleSubmitScore}
                leaderboard={leaderboard}
            />
-        </AnimatePresence>
       </div>
     </div>
   );
