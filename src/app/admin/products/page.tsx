@@ -26,6 +26,7 @@ export default function AdminProductsPage() {
     name: '',
     description: '',
     sizes: '',
+    sizeUnits: {} as Record<string, number>,
     category: '',
     subcategory: '',
     price: 0,
@@ -65,7 +66,7 @@ export default function AdminProductsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ name: '', description: '', sizes: '', category: '', subcategory: '', price: 0, mrp: 0, rating: 5, image: '', images: [], stock: 0, colors: '' });
+    setFormData({ name: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, rating: 5, image: '', images: [], stock: 0, colors: '' });
     setEditingId(null);
     setShowModal(true);
   };
@@ -75,6 +76,7 @@ export default function AdminProductsPage() {
       name: product.name,
       description: product.description || '',
       sizes: product.sizes ? product.sizes.join(', ') : '',
+      sizeUnits: product.sizeUnits || {},
       category: product.category,
       subcategory: product.subcategory || '',
       price: product.price,
@@ -91,9 +93,21 @@ export default function AdminProductsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsedSizes = formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
+    
+    let calculatedStock = formData.stock;
+    if (parsedSizes.length > 0) {
+      calculatedStock = 0;
+      parsedSizes.forEach(size => {
+        calculatedStock += formData.sizeUnits?.[size] || 0;
+      });
+    }
+
     const payload = {
       ...formData,
-      sizes: formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : [],
+      sizes: parsedSizes,
+      sizeUnits: formData.sizeUnits,
+      stock: calculatedStock,
       colors: formData.colors ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : []
     };
     
@@ -375,10 +389,34 @@ export default function AdminProductsPage() {
                   type="text" 
                   value={formData.sizes} 
                   onChange={(e) => setFormData({...formData, sizes: e.target.value})}
-                  required
                   placeholder="e.g. S, M, L, XL, OSFA"
                 />
               </div>
+
+              {formData.sizes && formData.sizes.split(',').filter(s => s.trim()).length > 0 && (
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px' }}>
+                  <label>Stock per Size</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.5rem' }}>
+                    {formData.sizes.split(',').map(s => s.trim()).filter(Boolean).map(size => (
+                      <div key={size} style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', flex: '1 1 100px' }}>
+                        <label style={{ fontSize: '0.8rem', opacity: 0.8 }}>Size: {size}</label>
+                        <input 
+                          type="number" 
+                          value={formData.sizeUnits?.[size] || 0}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            const updatedUnits = { ...formData.sizeUnits, [size]: val };
+                            setFormData({...formData, sizeUnits: updatedUnits});
+                          }}
+                          min="0"
+                          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.4)', color: 'white' }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.6}}>Total stock will be auto-calculated from these values.</p>
+                </div>
+              )}
 
               <div className={styles.formGroup}>
                 <label>Colors (Comma separated HEX/Names)</label>
@@ -391,13 +429,15 @@ export default function AdminProductsPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label>Stock Quantity</label>
+                <label>Total Stock Quantity</label>
                 <input 
                   type="number" 
-                  value={formData.stock} 
+                  value={formData.sizes && formData.sizes.split(',').filter(s=>s.trim()).length > 0 ? formData.sizes.split(',').map(s=>s.trim()).filter(Boolean).reduce((acc, curr) => acc + (formData.sizeUnits?.[curr] || 0), 0) : formData.stock} 
                   onChange={(e) => setFormData({...formData, stock: Number(e.target.value)})}
                   required
                   min="0"
+                  disabled={!!(formData.sizes && formData.sizes.split(',').filter(s=>s.trim()).length > 0)}
+                  style={formData.sizes && formData.sizes.split(',').filter(s=>s.trim()).length > 0 ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                 />
               </div>
 

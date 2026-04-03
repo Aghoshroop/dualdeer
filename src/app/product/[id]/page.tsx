@@ -26,7 +26,7 @@ const MOCK_REVIEWS: Review[] = [
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { addToCart } = useCart();
+  const { addToCart, cart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -167,6 +167,25 @@ export default function ProductDetailsPage() {
   const avgRating = product.rating
     ? Number(product.rating).toFixed(1)
     : reviewAvg.toFixed(1);
+
+  // Dynamic Stock Calculation
+  const getAvailableStock = (size: string) => {
+    if (!product) return 0;
+    if (product.sizeUnits && product.sizeUnits[size] !== undefined) {
+      return product.sizeUnits[size];
+    }
+    return product.stock;
+  };
+
+  const currentAvailableStock = getAvailableStock(selectedSize);
+  const isOutOfStock = currentAvailableStock <= 0;
+
+  // Real-time Cart Limit calculation
+  const cartItemInfo = cart.find(c => c.id === product?.id && c.size === selectedSize);
+  const qtyInCart = cartItemInfo ? cartItemInfo.quantity : 0;
+  const maxAddable = Math.max(0, currentAvailableStock - qtyInCart);
+  const isMaxInCart = maxAddable <= 0 && !isOutOfStock;
+  const canPerformAction = !isOutOfStock && maxAddable > 0;
 
   // Calculate Star Distro dynamically so the graph perfectly reflects the rating
   const starCounts = [0, 0, 0, 0, 0]; // 1-star to 5-star
@@ -311,7 +330,11 @@ export default function ProductDetailsPage() {
 
           <div className={styles.titleHeader}>
             <h1 className={styles.productTitle}>{product.name}</h1>
-            {product.stock > 0 && <span className={styles.stockBadge}>In Stock</span>}
+            {!isOutOfStock ? (
+              <span className={styles.stockBadge}>{currentAvailableStock} In Stock ({selectedSize})</span>
+            ) : (
+              <span className={styles.stockBadge} style={{ background: '#ff3333' }}>Out of Stock</span>
+            )}
           </div>
 
           <div className={styles.quickRating}>
@@ -355,51 +378,83 @@ export default function ProductDetailsPage() {
           <div className={styles.sizeSelector}>
             <h4>Size</h4>
             <div className={styles.sizeOptions}>
-              {(product.sizes && product.sizes.length > 0 ? product.sizes : ['OSFA']).map(size => (
-                <button 
-                  key={size}
-                  className={`${styles.sizeBtn} ${selectedSize === size ? styles.activeSize : ''}`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
+              {(product.sizes && product.sizes.length > 0 ? product.sizes : ['OSFA']).map(size => {
+                const stockLeft = getAvailableStock(size);
+                const disabled = product.sizes && product.sizes.length > 0 ? stockLeft <= 0 : false;
+                return (
+                  <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
+                    <button 
+                      className={`${styles.sizeBtn} ${selectedSize === size ? styles.activeSize : ''}`}
+                      onClick={() => {
+                         if (!disabled) {
+                            setSelectedSize(size);
+                            const newStockLeft = getAvailableStock(size);
+                            const newCartItem = cart.find(c => c.id === product?.id && c.size === size);
+                            const newQtyInCart = newCartItem ? newCartItem.quantity : 0;
+                            const newMax = Math.max(0, newStockLeft - newQtyInCart);
+                            
+                            if (quantity > newMax) {
+                               setQuantity(newMax || 1);
+                            }
+                         }
+                      }}
+                      disabled={disabled}
+                      style={{ 
+                        opacity: disabled ? 0.3 : 1, 
+                        cursor: disabled ? 'not-allowed' : 'pointer'
+                      }}
+                      title={disabled ? "Sold out" : `${stockLeft} in stock`}
+                    >
+                      {size}
+                    </button>
+                    {product.sizes && product.sizes.length > 0 && (
+                      <span style={{ fontSize: '0.65rem', opacity: disabled ? 0.8 : 0.6, whiteSpace: 'nowrap', fontWeight: 500 }}>
+                        {stockLeft > 0 ? `${stockLeft} left` : 'Sold out'}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           <div className={styles.actionsBox}>
             <QuantitySelector
-              value={quantity}
+              value={quantity > maxAddable && maxAddable > 0 ? maxAddable : quantity}
               min={1}
-              max={product.stock > 0 ? product.stock : 99}
+              max={maxAddable > 0 ? maxAddable : 1}
               onChange={setQuantity}
             />
-            <AnimatedCartButton
-              onAdd={() => {
-                if (product) {
-                  addToCart({
-                    id: product.id as string,
-                    name: product.name,
-                    price: product.price,
-                    mrp: product.mrp,
-                    image: product.image,
-                    size: selectedSize,
-                    color: selectedColor || undefined,
-                    quantity: quantity
-                  });
-                }
-              }}
-              label="Add To Cart"
-            />
+            <div style={{ flex: 1, pointerEvents: !canPerformAction ? 'none' : 'auto', opacity: !canPerformAction ? 0.5 : 1 }}>
+              <AnimatedCartButton
+                onAdd={() => {
+                  if (product && canPerformAction) {
+                    addToCart({
+                      id: product.id as string,
+                      name: product.name,
+                      price: product.price,
+                      mrp: product.mrp,
+                      image: product.image,
+                      size: selectedSize,
+                      color: selectedColor || undefined,
+                      quantity: Math.min(quantity, maxAddable) // ensuring safety
+                    });
+                  }
+                }}
+                label={isOutOfStock ? "Sold Out" : isMaxInCart ? "Max in Cart" : "Add To Cart"}
+              />
+            </div>
             <button 
               className={styles.buyNowBtn}
+              disabled={!canPerformAction}
+              style={{ opacity: !canPerformAction ? 0.5 : 1, cursor: !canPerformAction ? 'not-allowed' : 'pointer' }}
               onClick={() => {
-                if(product) {
-                  router.push(`/checkout?buyNow=${product.id}&size=${encodeURIComponent(selectedSize)}&qty=${quantity}`);
+                if(product && canPerformAction) {
+                  router.push(`/checkout?buyNow=${product.id}&size=${encodeURIComponent(selectedSize)}&qty=${Math.min(quantity, maxAddable)}`);
                 }
               }}
             >
-              Buy Now
+              {!canPerformAction ? (isOutOfStock ? 'Unavailable' : 'Limit Reached') : 'Buy Now'}
             </button>
             <button 
               className={styles.wishlistBtn}

@@ -1,0 +1,318 @@
+.container {
+  min-height: 100vh;
+  background-color: #050505;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Champagne accents */
+.accent {
+  color: #D4AF37;
+}
+
+.champagneBtn {
+  background: linear-gradient(135deg, #D4AF37, #C5A028);
+  color: #000;
+  border: none;
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border-radius: 50px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.champagneBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+}
+
+.champagneBtnOutline {
+  background: transparent;
+  color: #D4AF37;
+  border: 2px solid #D4AF37;
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border-radius: 50px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.champagneBtnOutline:hover {
+  background: rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  margin-bottom: 1rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #999;
+  margin-bottom: 3rem;
+  text-align: center;
+  max-width: 600px;
+}
+
+.videoContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: #000;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
+  filter: grayscale(100%) contrast(1.2);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.8));
+  z-index: 1;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+}
+
+.instructionBox {
+  background: rgba(5, 5, 5, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 2rem 4rem;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.hugeText {
+  font-size: 6rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #fff;
+}
+
+.signalBox {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #D4AF37; /* Champagne flash */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.flash {
+  animation: flashAnim 0.3s ease-out forwards;
+}
+
+@keyframes flashAnim {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.resultTitle {
+  font-size: 2rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.resultTime {
+  font-size: 7rem;
+  font-weight: 900;
+  color: #D4AF37;
+  line-height: 1;
+  margin-bottom: 2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.resultControls {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.formBox {
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid #333;
+  padding: 3rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.inputGroup {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.inputGroup label {
+  display: block;
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.inputGroup input {
+  width: 100%;
+  background: #111;
+  border: 1px solid #333;
+  padding: 1rem;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1.1rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.inputGroup input:focus {
+  border-color: #D4AF37;
+}
+
+.leaderboardContainer {
+  width: 100%;
+  max-width: 800px;
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.leaderboardRow {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #222;
+}
+
+.leaderboardRow:last-child {
+  border-bottom: none;
+}
+
+.leaderboardRow.topThree {
+  background: linear-gradient(90deg, rgba(212,175,55,0.1) 0%, transparent 100%);
+  border-left: 3px solid #D4AF37;
+}
+
+.rank {
+  font-size: 1.5rem;
+  font-weight: 800;
+  width: 50px;
+  color: #555;
+}
+
+.topThree .rank {
+  color: #D4AF37;
+}
+
+.playerInfo {
+  flex: 1;
+}
+
+.playerName {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.playerSport {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.playerTime {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.topThree .playerTime {
+  color: #D4AF37;
+}
+
+.backBtn {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  color: #fff;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,0,0,0.5);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  backdrop-filter: blur(5px);
+  border: 1px solid #333;
+}
+
+.backBtn:hover {
+  border-color: #D4AF37;
+  color: #D4AF37;
+}
+
+.errText {
+  color: #ff4444;
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2rem;
+  max-width: 600px;
+}
+
+.navBarSpacer {
+  height: 80px; /* offset for universal top nav */
+}

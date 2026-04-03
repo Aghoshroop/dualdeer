@@ -19,6 +19,7 @@ export interface Product {
   name: string;
   description?: string;
   sizes?: string[];
+  sizeUnits?: Record<string, number>;
   category: string;
   subcategory?: string;
   price: number;
@@ -478,3 +479,36 @@ export const updateUserMemoryV2 = async (userId: string, prefsToAdd: string[], q
      }
    } catch(e) {}
 }
+
+// ========================
+// Reaction Test Leaderboard
+// ========================
+export interface ReactionScore {
+  id?: string;
+  name: string;
+  sport?: string;
+  reactionTime: number; // in milliseconds
+  createdAt?: Timestamp;
+}
+
+export const getReactionLeaderboard = async (): Promise<ReactionScore[]> => {
+  try {
+    const q = query(collection(db, 'reaction_leaderboard'), orderBy('reactionTime', 'asc'), limit(50));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ReactionScore));
+  } catch (e) {
+    console.error("Leaderboard read error:", e);
+    return [];
+  }
+};
+
+export const submitReactionScore = async (score: Omit<ReactionScore, 'id'>) => {
+  try {
+    await addDoc(collection(db, 'reaction_leaderboard'), {
+      ...score,
+      createdAt: Timestamp.now()
+    });
+  } catch (e) {
+    console.error("Leaderboard write error:", e);
+  }
+};

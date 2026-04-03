@@ -8,6 +8,7 @@ import { getAIMemory, updateAIMemory } from '@/lib/firebaseUtils';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  products?: any[];
 }
 
 export default function SupportAgent() {
@@ -122,7 +123,7 @@ export default function SupportAgent() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: data.reply, products: data.products }]);
 
         // 🧠 SAFE MEMORY MERGE (CRITICAL)
         if (data.memory) {
@@ -192,7 +193,7 @@ export default function SupportAgent() {
               </button>
             </div>
 
-            {/* MESSAGES */}
+             {/* MESSAGES */}
             <div className={styles.messagesContainer}>
                <AnimatePresence>
                  {messages.map((msg, i) => (
@@ -205,10 +206,37 @@ export default function SupportAgent() {
                      transition={{ duration: 0.2 }}
                    >
                      {msg.role === 'assistant' && (
-                       <div className={styles.msgAvatar}><Sparkles size={12} /></div>
+                       <div className={styles.assistantSidebar}>
+                         <div className={styles.msgAvatar}>🦌</div>
+                         <span className={styles.avatarLabel}>DEER</span>
+                       </div>
                      )}
-                     <div className={`${styles.messageBubble} ${msg.role === 'user' ? styles.userBubble : styles.assistantBubble}`}>
-                       {msg.content}
+                     <div className={styles.messageContentBlock}>
+                       <div className={`${styles.messageBubble} ${msg.role === 'user' ? styles.userBubble : styles.assistantBubble}`}>
+                         {msg.content}
+                       </div>
+                       
+                       {msg.products && msg.products.length > 0 && (
+                         <motion.div 
+                           className={styles.productCarousel}
+                           initial={{ opacity: 0, y: 20 }}
+                           animate={{ opacity: 1, y: 0 }}
+                           transition={{ delay: 0.3, duration: 0.4 }}
+                         >
+                           {msg.products.map(p => (
+                              <div key={p.id} className={styles.productCard}>
+                                <div className={styles.productImageWrapper}>
+                                    <img src={p.images?.[0] || p.image || '/placeholder-product.png'} alt={p.name} className={styles.productImage} />
+                                </div>
+                                <div className={styles.productInfo}>
+                                  <h4 className={styles.productTitle}>{p.name}</h4>
+                                  <p className={styles.productPrice}>₹{p.price}</p>
+                                  <button className={styles.viewBtn}>View</button>
+                                </div>
+                              </div>
+                           ))}
+                         </motion.div>
+                       )}
                      </div>
                    </motion.div>
                  ))}
@@ -220,11 +248,16 @@ export default function SupportAgent() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
-                  <div className={styles.msgAvatar}><Sparkles size={12} /></div>
-                  <div className={`${styles.messageBubble} ${styles.assistantBubble} ${styles.typingBubble}`}>
-                    <span className={styles.dot}></span>
-                    <span className={styles.dot}></span>
-                    <span className={styles.dot}></span>
+                  <div className={styles.assistantSidebar}>
+                    <div className={styles.msgAvatar}>🦌</div>
+                    <span className={styles.avatarLabel}>DEER</span>
+                  </div>
+                  <div className={styles.messageContentBlock}>
+                    <div className={`${styles.messageBubble} ${styles.assistantBubble} ${styles.typingBubble}`}>
+                      <span className={styles.dot}></span>
+                      <span className={styles.dot}></span>
+                      <span className={styles.dot}></span>
+                    </div>
                   </div>
                 </motion.div>
               )}

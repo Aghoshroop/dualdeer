@@ -34,6 +34,33 @@ export function isGreeting(msg: string): boolean {
   return /^(hi|hello|hey|yo|hii)$/i.test(msg.trim());
 }
 
+export function normalizeInput(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\byor\b/g, "your")
+    .replace(/\byoiur\b/g, "your")
+    .replace(/\bur\b/g, "your")
+    .trim();
+}
+
+export function isNameQuery(msg: string): boolean {
+  const m = normalizeInput(msg);
+  return (
+    m.includes("your name") ||
+    m.includes("who are you") ||
+    m.includes("ur name") ||
+    m.includes("name ") ||
+    m.endsWith("name")
+  );
+}
+
+export function isIdentityLearning(msg: string): boolean {
+  const m = normalizeInput(msg);
+  return m.includes("your name is") || m.includes("remember your name");
+}
+
 // -------------------------------------------------------------
 // 1. PRIVACY ENGINE
 // -------------------------------------------------------------
@@ -293,8 +320,18 @@ export class DeerOSCoordinator {
    }
    
    async executeRaw(rawInput: string, lastSystemMessage: string): Promise<string> {
-       if (isGreeting(rawInput)) {
+       const normalized = normalizeInput(rawInput);
+
+       if (isGreeting(normalized)) {
            return "Hey. What are you looking for today?";
+       }
+
+       if (isIdentityLearning(rawInput)) {
+           return "I’m already Deer.";
+       }
+
+       if (isNameQuery(rawInput)) {
+           return "I’m Deer — your DualDeer performance assistant.";
        }
 
        const cleanInput = PrivacyEngine.sanitize(rawInput);
@@ -351,7 +388,7 @@ export class DeerOSCoordinator {
            }
        }
        
-       return "I didn’t quite get that—what are you looking for?";
+       return "I’m here to help with performance gear or anything you need—what are you looking for?";
    }
 
    async execute(rawInput: string, lastSystemMessage: string): Promise<string> {
