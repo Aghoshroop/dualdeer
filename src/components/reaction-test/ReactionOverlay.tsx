@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Camera } from 'lucide-react';
 import styles from '../../app/reaction-test/ReactionTest.module.css';
 
 type TestState = 'intro' | 'setup' | 'waiting' | 'ready' | 'reacting' | 'result' | 'submit' | 'leaderboard';
@@ -10,16 +11,44 @@ interface ReactionOverlayProps {
     startTest: () => void;
     beginSequence: () => void;
     handleSkipToLeaderboard: () => void;
+    toggleCamera?: () => void;
 }
 
-export const ReactionOverlay: React.FC<ReactionOverlayProps> = ({ state, errorMsg, startTest, beginSequence, handleSkipToLeaderboard }) => {
+export const ReactionOverlay: React.FC<ReactionOverlayProps> = ({ state, errorMsg, startTest, beginSequence, handleSkipToLeaderboard, toggleCamera }) => {
+    
+    // Progress calculation based on state
+    const getProgress = () => {
+        switch(state) {
+            case 'intro': return 0;
+            case 'setup': return 25;
+            case 'waiting': return 60;
+            case 'ready': return 85;
+            case 'reacting': return 95;
+            default: return 0;
+        }
+    };
+
+    const isTestActive = ['setup', 'waiting', 'ready', 'reacting'].includes(state);
+
     return (
         <>
+          {isTestActive && (
+              <div className={styles.progressBar}>
+                  <div className={styles.progressFill} style={{ width: `${getProgress()}%` }} />
+              </div>
+          )}
+
+          {state === 'setup' && toggleCamera && (
+              <button className={styles.cameraToggleBtn} onClick={toggleCamera} aria-label="Toggle Camera">
+                  <Camera size={24} />
+              </button>
+          )}
+
           {state === 'intro' && (
             <motion.div key="intro" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={styles.instructionBox} style={{ background: 'transparent', border: 'none' }}>
               <h1 className={styles.title}>TEST YOUR <span className={styles.accent}>REACTION</span></h1>
               <p className={styles.subtitle}>Measure your explosive start like elite athletes.<br/>Uses your device camera to detect motion accurately. Step back, wait for the signal, and go.</p>
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                  <button className={styles.champagneBtn} onClick={startTest}>START TEST</button>
                  <button className={styles.champagneBtnOutline} onClick={handleSkipToLeaderboard}>VIEW LEADERBOARD</button>
               </div>

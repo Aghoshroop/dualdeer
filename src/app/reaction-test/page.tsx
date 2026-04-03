@@ -30,7 +30,7 @@ export default function ReactionTestPage() {
   }, [state]);
   
   // Custom hooks
-  const { videoRef, startCamera, stopCamera, cameraError, setCameraError } = useCamera();
+  const { videoRef, startCamera, stopCamera, toggleCamera, cameraError, setCameraError } = useCamera();
   const { beginSequence, clearTimers, initAudio, startTimeRef } = useReactionTimer(setState, stateRef);
 
   const onCheat = useCallback(() => {
@@ -107,6 +107,7 @@ export default function ReactionTestPage() {
                startTest={handleStartTest} 
                beginSequence={beginSequence} 
                handleSkipToLeaderboard={handleSkipToLeaderboard} 
+               toggleCamera={toggleCamera}
            />
            <ResultDisplay 
                state={state}

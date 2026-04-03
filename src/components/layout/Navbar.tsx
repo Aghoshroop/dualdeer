@@ -120,9 +120,6 @@ export default function Navbar() {
             >
               <Link href="/shop" className={styles.link}>COLLECTION</Link>
             </div>
-            <div className={styles.navItem}>
-              <Link href="/reaction-test" className={styles.link}>REACTION TEST</Link>
-            </div>
           </div>
 
           {/* Logo Placeholder to maintain flex space */}
@@ -321,7 +318,6 @@ export default function Navbar() {
               <div className={styles.drawerContent}>
                 <nav className={styles.drawerNav}>
                    <Link href="/shop" onClick={() => setIsDrawerOpen(false)}>COLLECTION</Link>
-                   <Link href="/reaction-test" onClick={() => setIsDrawerOpen(false)}>REACTION TEST</Link>
                    {liveCategories.map((cat, i) => (
                       <Link key={i} href="/shop" onClick={() => setIsDrawerOpen(false)} style={{ textTransform: 'uppercase' }}>
                         {cat}
