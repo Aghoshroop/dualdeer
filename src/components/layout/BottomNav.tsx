@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, ShoppingBag, User, Home, Grip } from 'lucide-react';
+import { Search, ShoppingBag, User, Home, Grip, Zap } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import styles from './BottomNav.module.css';
 
@@ -29,6 +29,11 @@ export default function BottomNav() {
       <Link href="/shop" className={`${styles.navItem} ${pathname?.startsWith('/shop') ? styles.active : ''}`}>
         <Grip size={22} strokeWidth={pathname?.startsWith('/shop') ? 2 : 1.5} />
         <span>Shop</span>
+      </Link>
+      
+      <Link href="/reaction-test" className={`${styles.navItem} ${pathname?.startsWith('/reaction-test') ? styles.active : ''}`}>
+        <Zap size={22} strokeWidth={pathname?.startsWith('/reaction-test') ? 2 : 1.5} />
+        <span>Test</span>
       </Link>
       
       <Link href="/auth" className={`${styles.navItem} ${pathname?.startsWith('/profile') || pathname?.startsWith('/auth') ? styles.active : ''}`}>
