@@ -11,7 +11,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { QrCode, ArrowRight } from 'lucide-react';
 
 export default function ProjectXClient() {
-  const [timeLeft, setTimeLeft] = useState(86400 * 3); // 3 days
+  const [timeLeft, setTimeLeft] = useState(0);
   const [step, setStep] = useState<'form' | 'payment' | 'success'>('form');
   const [transactionId, setTransactionId] = useState('');
   const [formData, setFormData] = useState({
@@ -25,8 +25,13 @@ export default function ProjectXClient() {
   const yBg = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
   useEffect(() => {
+    const targetDate = new Date('2026-05-01T00:00:00').getTime();
+    const calculateTime = () => Math.max(0, Math.floor((targetDate - new Date().getTime()) / 1000));
+    
+    setTimeLeft(calculateTime());
+    
     const timer = setInterval(() => {
-      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+      setTimeLeft(calculateTime());
     }, 1000);
     return () => clearInterval(timer);
   }, []);
