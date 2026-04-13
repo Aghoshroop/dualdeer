@@ -22,7 +22,10 @@ function CheckoutEngine() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [step, setStep] = useState<'shipping' | 'payment'>('shipping');
+  const [step, setStep] = useState<'shipping' | 'payment' | 'upi-verification'>('shipping');
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi'>('upi');
+  const [utrNumber, setUtrNumber] = useState('');
+  const [upiTr] = useState(() => `DD${Math.floor(Math.random() * 10000000)}`);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   const [authLoading, setAuthLoading] = useState(true);
@@ -130,23 +133,39 @@ function CheckoutEngine() {
     if (activeItems.length === 0) return;
     setIsSubmitting(true);
 
+    const orderPayload = {
+      userId: currentUser ? currentUser.uid : 'guest',
+      shippingDetails: formData,
+      items: activeItems.map((item: any) => ({
+        productId: item.id,
+        name: item.name,
+        mrp: item.mrp || item.price,
+        pricePaid: item.price,
+        quantity: item.quantity,
+        size: item.size || 'M',
+        image: item.image || ''
+      })),
+      total: total,
+      discountAmount: discountAmountCapped,
+      status: 'processing' as const,
+      paymentMethod: paymentMethod,
+      utrNumber: paymentMethod === 'upi' ? utrNumber : '',
+      shiprocketSyncStatus: 'pending' as const
+    };
+
     try {
-      const orderId = await createOrder({
-        userId: currentUser ? currentUser.uid : 'guest',
-        shippingDetails: formData,
-        items: activeItems.map((item: any) => ({
-          productId: item.id,
-          name: item.name,
-          mrp: item.mrp || item.price,
-          pricePaid: item.price,
-          quantity: item.quantity,
-          size: item.size || 'M',
-          image: item.image || ''
-        })),
-        total: total,
-        discountAmount: discountAmountCapped,
-        status: 'processing'
-      });
+      const orderId = await createOrder(orderPayload);
+      
+      // Async Shiprocket Sync
+      try {
+        await fetch('/api/shiprocket/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, orderData: orderPayload })
+        });
+      } catch (syncErr) {
+        console.error("Shiprocket Background Sync Failed:", syncErr);
+      }
 
       if (appliedCoupon && appliedCoupon.id) {
         try {
@@ -260,7 +279,7 @@ function CheckoutEngine() {
             </div>
           </form>
             </>
-          ) : (
+          ) : step === 'payment' ? (
             <>
               <div className={styles.paymentHeader}>
                 <button type="button" onClick={() => setStep('shipping')} className={styles.backToShippingBtn}>
@@ -269,33 +288,88 @@ function CheckoutEngine() {
                 <h2>Secure Payment Portal</h2>
               </div>
               <div className={styles.paymentMethods}>
-                <div className={styles.paymentOptionDisabled}>
-                   <div className={styles.payIcon}><CreditCard size={24} /></div>
-                   <div className={styles.payInfo}>
-                     <h4>Credit / Debit Card</h4>
-                     <span>Processed securely via Stripe</span>
-                   </div>
-                   <span className={styles.offlineTag}>Temporarily Offline</span>
-                </div>
-                
-                <div className={styles.paymentOptionDisabled}>
+                <div 
+                   className={`${styles.paymentOption} ${paymentMethod === 'upi' ? styles.paymentOptionActive : ''}`}
+                   onClick={() => setPaymentMethod('upi')}
+                >
                    <div className={styles.payIcon}><Wallet size={24} /></div>
                    <div className={styles.payInfo}>
-                     <h4>UPI / Digital Wallet</h4>
-                     <span>Google Pay, PhonePe, Paytm</span>
+                     <h4>Pre Online Payment (UPI)</h4>
+                     <span>Pay via UPI directly to the merchant</span>
                    </div>
-                   <span className={styles.offlineTag}>Temporarily Offline</span>
+                   {paymentMethod === 'upi' && (
+                     <div className={styles.activeCheck}>
+                       <ShieldAlert size={16} color="#48bb78" /> Selected
+                     </div>
+                   )}
                 </div>
 
-                <div className={`${styles.paymentOption} ${styles.paymentOptionActive}`}>
+                <div 
+                   className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
+                   onClick={() => setPaymentMethod('cod')}
+                >
                    <div className={styles.payIcon}><Banknote size={24} /></div>
                    <div className={styles.payInfo}>
                      <h4>Cash on Delivery (COD)</h4>
                      <span>Pay at your doorstep with Cash or UPI</span>
                    </div>
-                   <div className={styles.activeCheck}>
-                     <ShieldAlert size={16} color="#48bb78" /> Guaranteed Active
-                   </div>
+                   {paymentMethod === 'cod' && (
+                     <div className={styles.activeCheck}>
+                       <ShieldAlert size={16} color="#48bb78" /> Selected
+                     </div>
+                   )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.paymentHeader}>
+                <button type="button" onClick={() => setStep('payment')} className={styles.backToShippingBtn}>
+                  <ChevronLeft size={16} /> Returns to Payment Selection
+                </button>
+                <h2>Verify UPI Payment</h2>
+              </div>
+              <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--color-border)', textAlign: 'center' }}>
+                <p style={{ marginBottom: '15px', fontSize: '1rem', color: 'var(--color-text)' }}>
+                  Please transfer exactly <strong style={{color: 'var(--color-primary)', fontSize: '1.2rem'}}>₹{total.toFixed(2)}</strong> to proceed.
+                </p>
+                
+                <div style={{ background: '#fff', padding: '1rem', borderRadius: '12px', display: 'inline-block', marginBottom: '1.5rem' }}>
+                   <img 
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980105971@YBL&pn=DualDeer&am=${total.toFixed(2)}&tr=${upiTr}&mc=0000&cu=INR`} 
+                      alt="UPI QR Code" 
+                      style={{ width: '200px', height: '200px' }}
+                   />
+                </div>
+                
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <p style={{ fontSize: '0.9rem', color: '#888', marginBottom: '8px' }}>Or pay using UPI ID directly:</p>
+                  <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: 'var(--color-primary)', letterSpacing: '1px' }}>
+                    7980105971@YBL
+                  </div>
+                </div>
+
+                <a 
+                   href={`upi://pay?pa=7980105971@YBL&pn=DualDeer&am=${total.toFixed(2)}&tr=${upiTr}&mc=0000&cu=INR`}
+                   className={styles.submitBtn} 
+                   style={{ marginBottom: '2rem', display: 'flex', textDecoration: 'none', justifyContent: 'center' }}
+                >
+                   Tap to Pay with UPI App
+                </a>
+
+                <div className={styles.formGroup} style={{ textAlign: 'left' }}>
+                  <label>12-Digit Transaction ID (UTR)</label>
+                  <input 
+                    type="text" 
+                    className={styles.input} 
+                    required
+                    placeholder="e.g. 234567890123" 
+                    value={utrNumber} 
+                    onChange={e => setUtrNumber(e.target.value)} 
+                  />
+                  <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '8px' }}>
+                    * Enter the UTR number from your payment app after successful transfer.
+                  </p>
                 </div>
               </div>
             </>
@@ -367,9 +441,17 @@ function CheckoutEngine() {
             <button form="checkout-form" type="submit" className={styles.submitBtn}>
               Proceed to Payment
             </button>
+          ) : step === 'payment' ? (
+            <button 
+              onClick={() => paymentMethod === 'upi' ? setStep('upi-verification') : handleSubmitOrder()} 
+              disabled={isSubmitting} 
+              className={styles.submitBtn}
+            >
+              {paymentMethod === 'upi' ? `Pay ₹${total.toFixed(2)} Now` : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
+            </button>
           ) : (
-            <button onClick={handleSubmitOrder} disabled={isSubmitting} className={styles.submitBtn}>
-              {isSubmitting ? 'Processing...' : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
+            <button onClick={handleSubmitOrder} disabled={isSubmitting || !utrNumber || utrNumber.length < 5} className={styles.submitBtn}>
+              {isSubmitting ? 'Processing...' : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Payment & Order</>}
             </button>
           )}
         </aside>

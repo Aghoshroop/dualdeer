@@ -98,6 +98,10 @@ export interface Order {
   total: number;
   discountAmount?: number;
   status: 'processing' | 'shipped' | 'delivered';
+  paymentMethod?: string;
+  utrNumber?: string;
+  shiprocketSyncStatus?: 'pending' | 'synced' | 'failed';
+  shiprocketOrderId?: string;
   createdAt?: Timestamp;
 }
 

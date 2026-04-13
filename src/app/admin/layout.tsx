@@ -40,6 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin/coupons" className={styles.link} onClick={closeMenu}><Ticket size={20} /> Coupons</Link>
             <Link href="/admin/content" className={styles.link} onClick={closeMenu}><FileText size={20} /> Site Content</Link>
             <Link href="/admin/banners" className={styles.link} onClick={closeMenu}><LayoutDashboard size={20} /> Hero Slider</Link>
+            <Link href="/admin/project-x" className={styles.link} onClick={closeMenu}><Ticket size={20} /> Mystery Bookings</Link>
             <Link href="/admin/users" className={styles.link} onClick={closeMenu}><Users size={20} /> Users</Link>
             <Link href="/admin/settings" className={styles.link} onClick={closeMenu}><Settings size={20} /> Settings</Link>
           </nav>

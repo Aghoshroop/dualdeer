@@ -120,6 +120,9 @@ export default function Navbar() {
             >
               <Link href="/shop" className={styles.link}>COLLECTION</Link>
             </div>
+            <div className={styles.navItem}>
+              <Link href="/project-x" className={styles.link} style={{ color: 'var(--red-500)', textShadow: '0 0 10px rgba(239,68,68,0.5)', fontWeight: 600 }}>MYSTERY</Link>
+            </div>
           </div>
 
           {/* Logo Placeholder to maintain flex space */}
@@ -245,6 +248,16 @@ export default function Navbar() {
                 <span className={styles.cartBadge}>{cartCount}</span>
               )}
             </Link>
+
+            {/* Mobile Menu Trigger */}
+            <button 
+              aria-label="Open Menu" 
+              className={`${styles.iconBtn} ${styles.mobileSubBtn || ''}`}
+              onClick={() => setIsDrawerOpen(true)}
+              style={{ display: isMobile ? 'flex' : 'none', paddingLeft: '5px' }}
+            >
+              <Menu size={20} strokeWidth={1.5} />
+            </button>
           </div>
         </div>
 
@@ -323,6 +336,7 @@ export default function Navbar() {
                         {cat}
                       </Link>
                    ))}
+                   <Link href="/project-x" onClick={() => setIsDrawerOpen(false)} style={{ color: 'var(--red-500)' }}>MYSTERY (LOCKED)</Link>
                    <div className={styles.drawerDivider} />
                    <Link href="/auth" onClick={() => setIsDrawerOpen(false)}>MY ACCOUNT</Link>
                    <Link href="/cart" onClick={() => setIsDrawerOpen(false)}>MY BAG ({cartCount})</Link>

@@ -1,0 +1,49 @@
+.container {
+  padding: 20px;
+  color: #fff;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.tableContainer {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+.table th {
+  background: #2a2a2a;
+  color: #aaa;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.table tr:hover {
+  background: #252525;
+}
+
+.table td {
+  color: #eee;
+}
+
+.emptyState {
+  color: #888;
+  text-align: center;
+  padding: 40px;
+}
