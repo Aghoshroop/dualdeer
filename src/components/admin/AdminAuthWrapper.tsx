@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 
 const ALLOWED_ADMINS = [
   'aviroopghosh283@gmail.com', 
+  'abirdey2007@gmail.com',
   'hello@dualdeer.com'
 ];
 
