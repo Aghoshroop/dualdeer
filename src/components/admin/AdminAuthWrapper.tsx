@@ -6,8 +6,7 @@ import { notFound } from 'next/navigation';
 
 const ALLOWED_ADMINS = [
   'aviroopghosh283@gmail.com', 
-  'abirdey2007@gmail.com',
-  'hello@dualdeer.com'
+  'abirdey2007@gmail.com'
 ];
 
 export default function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
@@ -18,7 +17,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (currentUser && currentUser.email && ALLOWED_ADMINS.includes(currentUser.email)) {
+      if (currentUser && currentUser.email && ALLOWED_ADMINS.includes(currentUser.email.trim().toLowerCase())) {
         setIsAdmin(true);
       } else {
         setIsAdmin(false);
