@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, ShoppingBag, User, Home, Grip, Zap } from 'lucide-react';
+import { Search, ShoppingBag, User, Home, Grip, Zap, Flame } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import styles from './BottomNav.module.css';
 
@@ -42,7 +42,7 @@ export default function BottomNav() {
       </Link>
       
       <Link href="/project-x" className={`${styles.navItem} ${pathname?.startsWith('/project-x') ? styles.active : ''}`} style={{ color: 'var(--red-500)' }}>
-        <Zap size={22} strokeWidth={pathname?.startsWith('/project-x') ? 2 : 1.5} />
+        <Flame size={22} strokeWidth={pathname?.startsWith('/project-x') ? 2 : 1.5} />
         <span>DROP</span>
       </Link>
       

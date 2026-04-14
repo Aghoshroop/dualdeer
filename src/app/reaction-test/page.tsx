@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 
 type TestState = 'auth_check' | 'unauthorized' | 'rules' | 'playing' | 'result' | 'leaderboard';
-type PlayState = 'idle' | 'waiting' | 'ready' | 'false_start' | 'scored';
+type PlayState = 'idle' | 'get_ready' | 'waiting' | 'ready' | 'false_start' | 'scored';
 
 export default function ReactionTestV2() {
   const router = useRouter();
@@ -86,16 +86,22 @@ export default function ReactionTestV2() {
   };
 
   const beginAttempt = () => {
-    setPlayState('waiting');
-    const delay = Math.random() * 2500 + 1500; // 1.5 to 4 seconds
+    setPlayState('get_ready');
     
-    timeoutRef.current = setTimeout(() => {
-      setPlayState('ready');
-      startTimeRef.current = performance.now();
-    }, delay);
+    // Safety buffer: ignores any residual double clicks or finger lifts
+    setTimeout(() => {
+      setPlayState('waiting');
+      const delay = Math.random() * 2500 + 1500; // 1.5 to 4 seconds
+      
+      timeoutRef.current = setTimeout(() => {
+        setPlayState('ready');
+        startTimeRef.current = performance.now();
+      }, delay);
+    }, 1500); // Wait 1.5s then turn red (Waiting)
   };
 
-  const handleTapAreaClick = () => {
+  const handleTapAreaClick = (e?: React.MouseEvent | React.TouchEvent) => {
+    // Only process taps when game is actively waiting for input
     if (playState === 'idle') {
       beginAttempt();
     } else if (playState === 'waiting') {
@@ -106,7 +112,7 @@ export default function ReactionTestV2() {
       // Valid hit!
       const elapsed = performance.now() - startTimeRef.current;
       
-      // Too fast to be human (<80ms) is treated as a false start / anticipation by professional standards
+      // Too fast to be human (<80ms) is treated as a false start
       if (elapsed < 80) {
         setPlayState('false_start');
         return;
@@ -122,11 +128,18 @@ export default function ReactionTestV2() {
           finishGame(newAttempts);
         }, 1500);
       }
-    } else if (playState === 'false_start' || playState === 'scored') {
-      // Reset for next attempt or do nothing if finished
-      if (attempts.length < 3) {
-         beginAttempt();
-      }
+    }
+  };
+
+  const handleRetry = (e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    
+    // Strict State Reset
+    setPlayState('idle');
+    
+    if (attempts.length < 3) {
+       setTimeout(() => beginAttempt(), 50);
     }
   };
 
@@ -225,18 +238,37 @@ export default function ReactionTestV2() {
                <div style={{ position: 'absolute', top: '1rem', left: '1rem', fontSize: '1.2rem', fontWeight: 800 }}>ATTEMPT {Math.min(attempts.length + 1, 3)}/3</div>
                
                {playState === 'idle' && <h2 className={styles.hugeText} style={{ fontSize: '3rem' }}>TAP TO START</h2>}
+               {playState === 'get_ready' && <h2 className={styles.hugeText} style={{ fontSize: '3rem', opacity: 0.6 }}>GET READY...</h2>}
                {playState === 'waiting' && <h2 className={styles.hugeText} style={{ fontSize: '4rem', color: 'var(--red-500)' }}>WAIT...</h2>}
                {playState === 'ready' && <h2 className={styles.hugeText} style={{ fontSize: '6rem', color: '#fff' }}>TAP!</h2>}
                {playState === 'false_start' && (
                   <>
                      <h2 className={styles.hugeText} style={{ fontSize: '4rem', color: '#fff' }}>FALSE START</h2>
-                     <p>Tap to retry</p>
+                     <button 
+                        onClick={handleRetry} 
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={handleRetry}
+                        className={styles.champagneBtnOutline} 
+                        style={{ marginTop: '2rem', padding: '1rem 3rem', background: '#000', color: '#fff', border: 'none' }}
+                     >
+                        RETRY
+                     </button>
                   </>
                )}
                {playState === 'scored' && (
                   <>
                      <h2 className={styles.resultTime}>{currentAttemptTime?.toFixed(0)} <span style={{fontSize: '2rem'}}>ms</span></h2>
-                     {attempts.length < 3 && <p>Tap to continue</p>}
+                     {attempts.length < 3 && (
+                        <button 
+                           onClick={handleRetry} 
+                           onMouseDown={(e) => e.stopPropagation()}
+                           onTouchStart={handleRetry}
+                           className={styles.champagneBtn} 
+                           style={{ marginTop: '2rem' }}
+                        >
+                           CONTINUE
+                        </button>
+                     )}
                   </>
                )}
             </motion.div>
