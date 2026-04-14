@@ -21,6 +21,8 @@ export default function Navbar() {
   const [liveCategories, setLiveCategories] = useState<string[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
+  const [unreadNotifIds, setUnreadNotifIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -54,6 +56,13 @@ export default function Navbar() {
       
       getActiveNotifications().then(notifs => {
         setNotifications(notifs);
+        const stored = localStorage.getItem('dualdeer_read_notif_ids');
+        const readIds: string[] = stored ? JSON.parse(stored) : [];
+        
+        const currentUnreadIds = notifs.map(n => n.id).filter(id => id && !readIds.includes(id)) as string[];
+        
+        setUnreadNotifIds(currentUnreadIds);
+        setUnreadNotifCount(currentUnreadIds.length);
       }).catch(err => console.error(err));
     });
 
@@ -302,12 +311,28 @@ export default function Navbar() {
               <button 
                 aria-label="Notifications" 
                 className={styles.iconBtn} 
-                onClick={() => setIsNotifOpen(!isNotifOpen)}
+                onClick={() => {
+                   setIsNotifOpen(!isNotifOpen);
+                   if (!isNotifOpen) {
+                     setUnreadNotifCount(0); // Drops external red bell counter immediately
+                     
+                     // Registers all currently loaded IDs as "Read" forever in storage
+                     const allKnownIds = notifications.map(n => n.id).filter(id => !!id);
+                     // Safely retrieve existing to not overwrite old reads
+                     const stored = localStorage.getItem('dualdeer_read_notif_ids');
+                     const readIds: string[] = stored ? JSON.parse(stored) : [];
+                     const combinedReads = Array.from(new Set([...readIds, ...allKnownIds]));
+                     
+                     localStorage.setItem('dualdeer_read_notif_ids', JSON.stringify(combinedReads));
+                     // Note: We DO NOT clear `unreadNotifIds` state here! 
+                     // This allows the NEW tags to stay visibly locked on for this current session view!
+                   }
+                }}
                 style={{ position: 'relative' }}
               >
                 <Bell size={20} strokeWidth={1.5} />
-                {mounted && notifications.length > 0 && (
-                  <span className={styles.cartBadge} style={{ background: 'var(--red-500)' }}>{notifications.length}</span>
+                {mounted && unreadNotifCount > 0 && (
+                  <span className={styles.cartBadge} style={{ background: '#ef4444', color: '#fff' }}>{unreadNotifCount}</span>
                 )}
               </button>
               
@@ -356,10 +381,10 @@ export default function Navbar() {
                             {notifications.map((notif) => {
                               const NotificationContent = () => (
                                 <>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span className={styles.notificationOverlayItemTitle}>{notif.title}</span>
-                                    {notif.createdAt && Date.now() - notif.createdAt.toMillis() < 86400000 && <span className={styles.newBadgeOverlay}>NEW</span>}
-                                  </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                      <span className={styles.notificationOverlayItemTitle}>{notif.title}</span>
+                                      {notif.id && unreadNotifIds.includes(notif.id) && <span className={styles.newBadgeOverlay}>NEW</span>}
+                                    </div>
                                   <span className={styles.notificationOverlayItemMessage}>{notif.message}</span>
                                   {notif.createdAt && <span className={styles.notificationOverlayItemTime}>{new Date(notif.createdAt.toMillis()).toLocaleDateString()}</span>}
                                 </>
