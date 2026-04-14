@@ -15,7 +15,7 @@ export default function AdminCouponsPage() {
     discountType: 'percentage' as 'percentage' | 'fixed',
     discountValue: 0,
     active: true,
-    usageLimitType: 'unlimited' as 'single_use' | 'once_per_user' | 'unlimited',
+    usageLimitType: 'once_per_user' as 'single_use' | 'once_per_user' | 'unlimited',
   });
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function AdminCouponsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ code: '', discountType: 'percentage', discountValue: 0, active: true, usageLimitType: 'unlimited' });
+    setFormData({ code: '', discountType: 'percentage', discountValue: 0, active: true, usageLimitType: 'once_per_user' });
     setEditingId(null);
     setShowModal(true);
   };

@@ -44,7 +44,9 @@ export default function AuthPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        router.push('/profile');
+        const url = sessionStorage.getItem('dualdeer_return_url') || '/profile';
+        sessionStorage.removeItem('dualdeer_return_url');
+        router.push(url);
       }
     });
 
@@ -321,7 +323,11 @@ export default function AuthPage() {
           >
             <TypewriterText 
               text={`Hello ${localStorage.getItem('dualdeer_active_user') || 'Elite'}. Welcome. I am your personal intelligence agent, Deer. I will be stationed at the right bottom corner of your screen from now on.`} 
-              onComplete={() => router.push('/')} 
+              onComplete={() => {
+                const url = sessionStorage.getItem('dualdeer_return_url') || '/';
+                sessionStorage.removeItem('dualdeer_return_url');
+                router.push(url);
+              }} 
             />
           </motion.div>
         )}

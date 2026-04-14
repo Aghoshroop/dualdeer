@@ -80,16 +80,16 @@ export const ReactionOverlay: React.FC<ReactionOverlayProps> = ({ state, errorMs
             )}
 
             {state === 'ready' && (
-              <motion.div key="ready" className={styles.instructionBox} initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ opacity: 0 }}>
-                 <p className={styles.hugeText} style={{ color: '#D4AF37' }}>SET...</p>
-                 <p style={{ marginTop: '1rem', color: '#ff4444', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '2px' }}>Do not move</p>
+              <motion.div key="ready" className={styles.centerCircle} initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ opacity: 0 }}>
+                 <p className={styles.title} style={{ color: 'var(--accent-color)', margin: 0, fontSize: '4rem' }}>SET</p>
+                 <p style={{ marginTop: '0.5rem', color: '#ff4444', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '2px', fontSize: '0.8rem' }}>Do not move</p>
               </motion.div>
             )}
 
             {state === 'reacting' && (
               <motion.div key="reacting" className={styles.instructionBox} exit={{ opacity: 0 }}>
                 <div className={styles.signalBox + " " + styles.flash} />
-                <p className={styles.hugeText} style={{ color: '#fff' }}>EXPLODE GO!</p>
+                <p className={styles.hugeText} style={{ color: 'var(--text-color)' }}>EXPLODE GO!</p>
               </motion.div>
             )}
           </AnimatePresence>

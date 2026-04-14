@@ -6,7 +6,7 @@ import { getProduct, Product, getReviews, Review, addReview, checkInWishlist, ad
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
-import { Heart, Minus, Plus, ShoppingBag, CheckCircle, ChevronDown, User, Star, ChevronLeft, Lock, X } from 'lucide-react';
+import { Heart, Minus, Plus, ShoppingBag, CheckCircle, ChevronDown, User, Star, ChevronLeft, Lock, X, Share2 } from 'lucide-react';
 import RelatedProducts from '@/components/sections/RelatedProducts';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -119,6 +119,25 @@ export default function ProductDetailsPage() {
       console.error(e);
     }
     setIsWishlistLoading(false);
+  };
+
+  const handleShare = async () => {
+    if (!product) return;
+    const shareData = {
+      title: product.name,
+      text: `Check out the incredible ${product.name} at DualDeer!`,
+      url: window.location.href,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Product Link safely copied to your clipboard!');
+      }
+    } catch (e) {
+      console.error('Share action failed', e);
+    }
   };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -456,14 +475,26 @@ export default function ProductDetailsPage() {
             >
               {!canPerformAction ? (isOutOfStock ? 'Unavailable' : 'Limit Reached') : 'Buy Now'}
             </button>
-            <button 
-              className={styles.wishlistBtn}
-              onClick={toggleWishlist}
-              disabled={isWishlistLoading}
-              style={{ background: isInWishlist ? 'var(--color-primary)' : 'transparent', color: isInWishlist ? 'var(--color-background)' : 'inherit', border: isInWishlist ? '1px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)' }}
-            >
-              <Heart size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
-            </button>
+            <div className={styles.actionIconGroup}>
+              <button 
+                className={styles.wishlistBtn}
+                onClick={toggleWishlist}
+                disabled={isWishlistLoading}
+                title="Add to Wishlist"
+                style={{ background: isInWishlist ? 'var(--color-primary)' : 'transparent', color: isInWishlist ? 'var(--color-background)' : 'inherit', border: isInWishlist ? '1px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)' }}
+              >
+                <Heart size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
+              </button>
+              
+              <button 
+                className={styles.wishlistBtn}
+                onClick={handleShare}
+                title="Share this Elite Product"
+                style={{ background: 'transparent', color: 'inherit', border: '1px solid rgba(255,255,255,0.1)' }}
+              >
+                <Share2 size={20} />
+              </button>
+            </div>
           </div>
 
           <div className={styles.metaData}>

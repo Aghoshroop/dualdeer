@@ -25,7 +25,7 @@ export default function ProjectXClient() {
   const yBg = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
   useEffect(() => {
-    const targetDate = new Date('2026-05-01T00:00:00').getTime();
+    const targetDate = new Date('2026-05-10T00:00:00').getTime();
     const calculateTime = () => Math.max(0, Math.floor((targetDate - new Date().getTime()) / 1000));
     
     setTimeLeft(calculateTime());

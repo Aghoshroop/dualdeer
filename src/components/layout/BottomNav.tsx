@@ -43,7 +43,7 @@ export default function BottomNav() {
       
       <Link href="/project-x" className={`${styles.navItem} ${pathname?.startsWith('/project-x') ? styles.active : ''}`} style={{ color: 'var(--red-500)' }}>
         <Zap size={22} strokeWidth={pathname?.startsWith('/project-x') ? 2 : 1.5} />
-        <span>[DROP]</span>
+        <span>DROP</span>
       </Link>
       
       <Link href="/cart" className={`${styles.navItem} ${pathname?.startsWith('/cart') ? styles.active : ''} ${styles.cartTab}`}>

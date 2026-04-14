@@ -516,3 +516,161 @@ export const submitReactionScore = async (score: Omit<ReactionScore, 'id'>) => {
     console.error("Leaderboard write error:", e);
   }
 };
+
+// ========================
+// Reaction Test V2 (Auth + Tap)
+// ========================
+export interface ReactionTestSetting {
+  id?: string;
+  gameActive: boolean;
+  activeCycleId: string;
+  updatedAt?: Timestamp;
+}
+
+export interface ReactionScoreV2 {
+  id?: string;
+  userId: string;
+  name: string;
+  attempt1?: number | null;
+  attempt2?: number | null;
+  attempt3?: number | null;
+  bestTime: number;
+  cycleId: string;
+  createdAt?: Timestamp;
+}
+
+export const getReactionTestSetting = async (): Promise<ReactionTestSetting | null> => {
+  try {
+    const docSnap = await getDoc(doc(db, 'settings', 'reactionTest'));
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as ReactionTestSetting;
+    }
+  } catch (e) {
+    console.error("Settings read error:", e);
+  }
+  return null;
+};
+
+export const updateReactionTestSetting = async (data: Partial<ReactionTestSetting>) => {
+  try {
+    await setDoc(doc(db, 'settings', 'reactionTest'), {
+      ...data,
+      updatedAt: Timestamp.now()
+    }, { merge: true });
+  } catch (e) {
+    console.error("Settings write error:", e);
+  }
+};
+
+export const getUserReactionScore = async (userId: string, cycleId: string): Promise<ReactionScoreV2 | null> => {
+  try {
+    const q = query(
+      collection(db, 'reaction_scores_v2'),
+      where('userId', '==', userId),
+      where('cycleId', '==', cycleId)
+    );
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return { id: snap.docs[0].id, ...snap.docs[0].data() } as ReactionScoreV2;
+    }
+  } catch (e) {
+    console.error("Score read error:", e);
+  }
+  return null;
+};
+
+export const getReactionScoresForCycle = async (cycleId: string): Promise<ReactionScoreV2[]> => {
+  try {
+    const q = query(
+      collection(db, 'reaction_scores_v2'),
+      where('cycleId', '==', cycleId),
+      orderBy('bestTime', 'asc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ReactionScoreV2));
+  } catch (e) {
+    console.error("Leaderboard read error:", e);
+    return [];
+  }
+};
+
+export const submitReactionScoreV2 = async (score: Omit<ReactionScoreV2, 'id' | 'createdAt'>) => {
+  try {
+    await addDoc(collection(db, 'reaction_scores_v2'), {
+      ...score,
+      createdAt: Timestamp.now()
+    });
+  } catch (e) {
+    console.error("Score write error:", e);
+  }
+};
+
+export const deleteReactionScoreV2 = async (id: string) => {
+  try {
+    await deleteDoc(doc(db, 'reaction_scores_v2', id));
+  } catch (e) {
+    console.error("Score delete error:", e);
+  }
+};
+
+
+// ========================
+// Global Notifications
+// ========================
+export interface AppNotification {
+  id?: string;
+  title: string;
+  message: string;
+  url?: string;
+  active: boolean;
+  createdAt?: Timestamp;
+}
+
+export const getActiveNotifications = async (): Promise<AppNotification[]> => {
+  try {
+    const q = query(collection(db, 'notifications'), where('active', '==', true), orderBy('createdAt', 'desc'), limit(10));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as AppNotification));
+  } catch (e) {
+    console.error("Notifications read error:", e);
+    return [];
+  }
+};
+
+export const getAllNotifications = async (): Promise<AppNotification[]> => {
+  try {
+    const q = query(collection(db, 'notifications'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as AppNotification));
+  } catch (e) {
+    console.error("Notifications read error:", e);
+    return [];
+  }
+}
+
+export const addNotification = async (notif: Omit<AppNotification, 'id' | 'createdAt'>) => {
+  try {
+    await addDoc(collection(db, 'notifications'), {
+      ...notif,
+      createdAt: Timestamp.now()
+    });
+  } catch (e) {
+    console.error("Notification write error:", e);
+  }
+};
+
+export const updateNotification = async (id: string, data: Partial<AppNotification>) => {
+  try {
+    await updateDoc(doc(db, 'notifications', id), data);
+  } catch (e) {
+    console.error("Notification update error:", e);
+  }
+};
+
+export const deleteNotification = async (id: string) => {
+  try {
+    await deleteDoc(doc(db, 'notifications', id));
+  } catch (e) {
+    console.error("Notification delete error:", e);
+  }
+};

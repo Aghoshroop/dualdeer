@@ -36,7 +36,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ state, reactionTim
               ) : (
                 <>
                   <h3 className={styles.resultTitle}>Your Reaction Speed</h3>
-                  <div className={styles.resultTime}>{reactionTime.toFixed(0)} <span style={{ fontSize: '2rem', color: '#888' }}>ms</span></div>
+                  <div className={styles.resultTime}>{reactionTime.toFixed(0)} <span style={{ fontSize: '2rem', color: 'var(--text-muted)' }}>ms</span></div>
                   <div className={styles.resultControls}>
                      <button className={styles.champagneBtnOutline} onClick={resetTest}>RETRY</button>
                      <button className={styles.champagneBtn} onClick={() => setState('submit')}>SUBMIT SCORE</button>
@@ -79,9 +79,9 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ state, reactionTim
                        <div className={styles.playerTime}>{lb.reactionTime.toFixed(0)} ms</div>
                     </div>
                  ))}
-                 {leaderboard.length === 0 && <p style={{ textAlign: 'center', color: '#999', padding: '2rem 0' }}>No verified scores yet.</p>}
+                 {leaderboard.length === 0 && <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem 0' }}>No verified scores yet.</p>}
                </div>
-               <button className={styles.champagneBtnOutline} onClick={resetTest} style={{ marginTop: '2rem', background: '#000' }}>GO TO TEST</button>
+               <button className={styles.champagneBtnOutline} onClick={resetTest} style={{ marginTop: '2rem', background: 'var(--bg-color)' }}>GO TO TEST</button>
             </motion.div>
           )}
         </AnimatePresence>

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Users, ShoppingBag, Tags, Settings, LogOut, Ticket, FileText, Package, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, ShoppingBag, Tags, Settings, LogOut, Ticket, FileText, Package, Menu, X, Bell, Zap } from 'lucide-react';
 import styles from './AdminLayout.module.css';
 import AdminAuthWrapper from '@/components/admin/AdminAuthWrapper';
 import { auth } from '@/lib/firebase';
@@ -42,6 +42,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin/banners" className={styles.link} onClick={closeMenu}><LayoutDashboard size={20} /> Hero Slider</Link>
             <Link href="/admin/project-x" className={styles.link} onClick={closeMenu}><Ticket size={20} /> Mystery Bookings</Link>
             <Link href="/admin/users" className={styles.link} onClick={closeMenu}><Users size={20} /> Users</Link>
+            <Link href="/admin/notifications" className={styles.link} onClick={closeMenu}><Bell size={20} /> Notifications</Link>
+            <Link href="/admin/reaction-test" className={styles.link} onClick={closeMenu}><Zap size={20} /> Reaction Test</Link>
             <Link href="/admin/settings" className={styles.link} onClick={closeMenu}><Settings size={20} /> Settings</Link>
           </nav>
           <button className={styles.logoutBtn} onClick={handleLogout}><LogOut size={20} /> Logout</button>
