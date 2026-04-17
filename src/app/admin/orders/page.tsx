@@ -139,13 +139,19 @@ export default function AdminOrdersPage() {
                   </td>
                   
                   <td className={styles.manifestCol}>
-                    <div className={styles.revenueCol}>Total: ${order.total.toFixed(2)}</div>
+                    <div className={styles.revenueCol}>Total: ₹{order.total.toFixed(2)}</div>
+                    {(order.appliedCoupon || order.discountAmount) && (
+                      <div style={{ fontSize: '0.8rem', color: '#ffcc00', marginBottom: '0.5rem', fontWeight: 600, display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        {order.appliedCoupon && <span style={{ background: 'rgba(255, 204, 0, 0.2)', padding: '2px 6px', borderRadius: '4px' }}>CODE: {order.appliedCoupon}</span>}
+                        {order.discountAmount ? <span>(Saved ₹{order.discountAmount.toFixed(2)})</span> : null}
+                      </div>
+                    )}
                     <div className={styles.itemList}>
                       {order.items.map((item: any, idx) => (
                         <div key={idx} className={styles.manifestItem}>
                           • {item.quantity}x {item.name} 
                           {item.size && <span className={styles.itemSize}>Size: {item.size}</span>}
-                          <span className={styles.itemMeta}> (${item.pricePaid || item.price})</span>
+                          <span className={styles.itemMeta}> (₹{item.pricePaid || item.price})</span>
                         </div>
                       ))}
                     </div>

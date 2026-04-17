@@ -31,6 +31,7 @@ export interface Product {
   isSeasonal?: boolean;
   isNew?: boolean;
   colors?: string[];
+  status?: 'active' | 'deleted';
   createdAt?: Timestamp;
 }
 
@@ -97,6 +98,7 @@ export interface Order {
   items: OrderItem[];
   total: number;
   discountAmount?: number;
+  appliedCoupon?: string;
   status: 'processing' | 'shipped' | 'delivered';
   paymentMethod?: string;
   utrNumber?: string;
@@ -135,7 +137,15 @@ const deleteDocument = async (collectionName: string, id: string) => {
 // ========================
 // Products
 // ========================
-export const getProducts = () => getCollectionData<Product>('products');
+export const getProducts = async (): Promise<Product[]> => {
+  const all = await getCollectionData<Product>('products');
+  return all.filter(p => p.status !== 'deleted');
+};
+
+export const getDeletedProducts = async (): Promise<Product[]> => {
+  const all = await getCollectionData<Product>('products');
+  return all.filter(p => p.status === 'deleted');
+};
 
 export const getProduct = async (id: string): Promise<Product | null> => {
   try {
@@ -149,9 +159,20 @@ export const getProduct = async (id: string): Promise<Product | null> => {
   return null;
 };
 
-export const addProduct = (data: Omit<Product, 'id'>) => addDocument('products', data);
+export const addProduct = (data: Omit<Product, 'id'>) => addDocument('products', { ...data, status: 'active' });
 export const updateProduct = (id: string, data: Partial<Product>) => updateDocument('products', id, data);
-export const deleteProduct = (id: string) => deleteDocument('products', id);
+
+// Soft delete
+export const deleteProduct = async (id: string) => {
+  await updateDocument('products', id, { status: 'deleted' });
+};
+
+// Permanent delete
+export const hardDeleteProduct = async (id: string) => deleteDocument('products', id);
+
+export const restoreProduct = async (id: string, data?: Product) => {
+  await updateDocument('products', id, { status: 'active' });
+};
 
 // ========================
 // Reviews

@@ -54,19 +54,17 @@ function SplashScreenContent() {
           }}
           style={{
             position: 'fixed',
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
+            inset: 0, // Shorthand for top 0, right 0, bottom 0, left 0
             zIndex: 9999999,
-            backgroundColor: '#ffffff', // BRIGHT fully white background
+            backgroundColor: 'var(--color-background)', // Supports dark/light mode
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             overflow: 'hidden',
             margin: 0,
-            padding: 0
+            padding: 0,
+            willChange: 'opacity' // Hardware acceleration hint
           }}
         >
           {/* Extremely Bright & Animated Ambient Glows */}
@@ -82,11 +80,12 @@ function SplashScreenContent() {
               position: 'absolute',
               top: '15%',
               right: '15%',
-              width: '50vh',
-              height: '50vh',
+              width: '50vmin',
+              height: '50vmin',
               borderRadius: '50%',
               background: 'radial-gradient(circle, rgba(123, 47, 247, 0.2) 0%, rgba(255,255,255,0) 70%)',
-              filter: 'blur(60px)'
+              filter: 'blur(40px)',
+              willChange: 'transform, opacity'
             }}
           />
           <motion.div
@@ -101,11 +100,12 @@ function SplashScreenContent() {
               position: 'absolute',
               bottom: '15%',
               left: '15%',
-              width: '60vh',
-              height: '60vh',
+              width: '60vmin',
+              height: '60vmin',
               borderRadius: '50%',
               background: 'radial-gradient(circle, rgba(90, 15, 200, 0.15) 0%, rgba(255,255,255,0) 70%)',
-              filter: 'blur(80px)'
+              filter: 'blur(50px)',
+              willChange: 'transform, opacity'
             }}
           />
 
@@ -160,7 +160,7 @@ function SplashScreenContent() {
               animate={{ opacity: 1, y: 0, letterSpacing: "0.3em" }}
               transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
               style={{
-                color: '#111111', // Stark black for high contrast brightness
+                color: 'var(--color-text)', // Adaptive contrast instead of hardcoded stark black
                 fontSize: 'clamp(2rem, 5vw, 4rem)',
                 fontWeight: '900',
                 textTransform: 'uppercase',
@@ -178,7 +178,7 @@ function SplashScreenContent() {
               animate={{ opacity: 0.8, filter: "blur(0px)" }}
               transition={{ duration: 1, delay: 0.8 }}
               style={{
-                color: '#5A0FC8', // Deep Violet accent
+                color: 'var(--color-primary)', // Adaptive primary color instead of hardcoded violet
                 fontSize: 'clamp(0.75rem, 2vw, 1.1rem)',
                 fontWeight: '600',
                 letterSpacing: '0.4em',
@@ -215,8 +215,8 @@ function SplashScreenContent() {
                   bottom: 0,
                   left: 0,
                   width: '50%',
-                  background: 'linear-gradient(90deg, transparent, #7B2FF7, transparent)',
-                  boxShadow: '0 0 10px #7B2FF7',
+                  background: 'linear-gradient(90deg, transparent, var(--color-primary), transparent)',
+                  boxShadow: '0 0 10px var(--color-primary)',
                   filter: 'blur(1px)'
                 }}
               />

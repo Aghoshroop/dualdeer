@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, RotateCcw, AlertTriangle, ArchiveRestore } from 'lucide-react';
 import styles from './ProductsPage.module.css';
-import { getProducts, addProduct, updateProduct, deleteProduct, Product, getContentBlock, updateContentBlock, getCategories } from '@/lib/firebaseUtils';
+import { getProducts, getDeletedProducts, addProduct, updateProduct, deleteProduct, restoreProduct, hardDeleteProduct, Product, getContentBlock, updateContentBlock, getCategories } from '@/lib/firebaseUtils';
 import { uploadImageToImgBB } from '@/lib/uploadUtils';
 
 export default function AdminProductsPage() {
@@ -11,6 +11,11 @@ export default function AdminProductsPage() {
   const [filterCategory, setFilterCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [categoriesList, setCategoriesList] = useState<any[]>([]);
+  const [lastDeleted, setLastDeleted] = useState<{ id: string, product: Product } | null>(null);
+  
+  // Trash State
+  const [viewingTrash, setViewingTrash] = useState(false);
+  const [deletedProducts, setDeletedProducts] = useState<Product[]>([]);
 
   // Shop Backdrop & Hero State
   const [backdropImage, setBackdropImage] = useState('');
@@ -46,13 +51,15 @@ export default function AdminProductsPage() {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const [data, backdropRes, heroRes, catsRes] = await Promise.all([
+      const [data, trashData, backdropRes, heroRes, catsRes] = await Promise.all([
         getProducts(),
+        getDeletedProducts(),
         getContentBlock('shop-backdrop'),
         getContentBlock('shop-hero'),
         getCategories()
       ]);
       setProducts(data);
+      setDeletedProducts(trashData);
       if (backdropRes) setBackdropImage(backdropRes.imageUrl || '');
       if (heroRes) {
         setHeroImage(heroRes.imageUrl || '');
@@ -153,12 +160,42 @@ export default function AdminProductsPage() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
+      const productToDelete = products.find(p => p.id === id);
+      if (productToDelete) {
+        setLastDeleted({ id, product: productToDelete });
+      }
       await deleteProduct(id);
+      loadProducts();
+
+      // Clear the undo state after 15 seconds
+      setTimeout(() => {
+        setLastDeleted(prev => prev?.id === id ? null : prev);
+      }, 15000);
+    }
+  };
+
+  const handleUndoDelete = async () => {
+    if (lastDeleted) {
+      await restoreProduct(lastDeleted.id, lastDeleted.product);
+      setLastDeleted(null);
       loadProducts();
     }
   };
 
-  const filteredProducts = products.filter(p => {
+  const handleRestoreFromTrash = async (id: string) => {
+    await restoreProduct(id);
+    loadProducts();
+  };
+
+  const handleHardDelete = async (id: string) => {
+    if (confirm("WARNING: This will permanently vaporize this product from the database. This action cannot be undone. Proceed?")) {
+      await hardDeleteProduct(id);
+      loadProducts();
+    }
+  };
+
+  const baseList = viewingTrash ? deletedProducts : products;
+  const filteredProducts = baseList.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'all' || p.category === filterCategory;
     return matchesSearch && matchesCategory;
@@ -170,10 +207,30 @@ export default function AdminProductsPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Products Management</h1>
-        <button className={styles.addBtn} onClick={openAddModal}>
-          <Plus size={20} /> Add Product
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <h1 className={styles.title}>{viewingTrash ? 'Recycle Bin' : 'Products Management'}</h1>
+          
+          <button 
+             onClick={() => setViewingTrash(!viewingTrash)}
+             style={{ background: viewingTrash ? '#333' : 'rgba(255,50,50,0.1)', color: viewingTrash ? '#fff' : '#ff3333', border: '1px solid ' + (viewingTrash ? '#444' : 'rgba(255,50,50,0.2)'), padding: '0.5rem 1rem', borderRadius: '50px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}
+          >
+             {viewingTrash ? <><Search size={16} /> Back to Products</> : <><Trash2 size={16} /> View Trash ({deletedProducts.length})</>}
+          </button>
+
+          {!viewingTrash && lastDeleted && (
+            <button 
+              onClick={handleUndoDelete}
+              style={{ background: '#ffcc00', color: '#000', border: 'none', padding: '0.5rem 1rem', borderRadius: '50px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', animation: 'fadeIn 0.3s ease' }}
+            >
+              <RotateCcw size={16} /> Undo Delete
+            </button>
+          )}
+        </div>
+        {!viewingTrash && (
+          <button className={styles.addBtn} onClick={openAddModal}>
+            <Plus size={20} /> Add Product
+          </button>
+        )}
       </header>
 
       {/* Shop Image Overrides */}
@@ -305,8 +362,17 @@ export default function AdminProductsPage() {
                   </td>
                   <td>
                     <div className={styles.actions}>
-                      <button className={styles.editBtn} aria-label="Edit" onClick={() => openEditModal(product)}><Edit2 size={16} /></button>
-                      <button className={styles.deleteBtn} aria-label="Delete" onClick={() => handleDelete(product.id!)}><Trash2 size={16} /></button>
+                      {viewingTrash ? (
+                         <>
+                           <button className={styles.editBtn} aria-label="Restore" onClick={() => handleRestoreFromTrash(product.id!)} style={{ background: '#22c55e', color: 'black' }}><ArchiveRestore size={16} /></button>
+                           <button className={styles.deleteBtn} aria-label="Permanent Delete" onClick={() => handleHardDelete(product.id!)}><AlertTriangle size={16} /></button>
+                         </>
+                      ) : (
+                         <>
+                           <button className={styles.editBtn} aria-label="Edit" onClick={() => openEditModal(product)}><Edit2 size={16} /></button>
+                           <button className={styles.deleteBtn} aria-label="Delete" onClick={() => handleDelete(product.id!)}><Trash2 size={16} /></button>
+                         </>
+                      )}
                     </div>
                   </td>
                 </tr>
