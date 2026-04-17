@@ -49,7 +49,7 @@ export default function FeaturedProducts() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.05 }}
               >
-                <Link href={`/product/${product.id}`} className={styles.imageBox}>
+                <Link href={`/product/${product.slug}`} className={styles.imageBox}>
                   {/* Primary Image */}
                   <img 
                     src={product.image}
@@ -95,7 +95,7 @@ export default function FeaturedProducts() {
                       <span style={{ fontWeight: 800 }}>{(product.rating || 5.0).toFixed(1)}</span>
                     </div>
                   </div>
-                  <Link href={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
+                  <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none' }}>
                     <h3 className={styles.name}>{product.name}</h3>
                   </Link>
                   <div className={styles.priceRow}>

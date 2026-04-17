@@ -7,7 +7,6 @@ import Footer from "@/components/layout/Footer";
 import SupportAgent from "@/components/chat/SupportAgent";
 import HideOnAdmin from "@/components/layout/HideOnAdmin";
 import NewsletterModal from "@/components/modals/NewsletterModal";
-import NewUserPopup from "@/components/modals/NewUserPopup";
 import BottomNav from "@/components/layout/BottomNav";
 import { ThemeProvider } from "next-themes";
 import { CartProvider } from '@/context/CartContext';
@@ -42,7 +41,7 @@ export const metadata: Metadata = {
   publisher: "DualDeer",
   metadataBase: new URL("https://dualdeer.com"),
   alternates: {
-    canonical: '/',
+    canonical: 'https://dualdeer.com',
   },
   verification: {
    google: "cvUp3ToWivbX7NaGg_l0-rNmvUI3JfmUJ-yeYR8BSBQ",
@@ -156,7 +155,6 @@ export default function RootLayout({
             <HideOnAdmin>
               <Navbar />
               <NewsletterModal />
-              <NewUserPopup />
             </HideOnAdmin>
             {children}
             <HideOnAdmin>

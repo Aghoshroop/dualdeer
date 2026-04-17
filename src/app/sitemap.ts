@@ -9,12 +9,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Sitemap generation error fetching products:", error);
   }
   
-  const productUrls: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `https://dualdeer.com/product/${product.id}`,
-    lastModified: product.createdAt ? new Date(product.createdAt.toMillis()) : new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
+  const productUrls: MetadataRoute.Sitemap = products
+    .filter(product => product.slug)
+    .map((product) => {
+      let lastMod = new Date();
+      if ((product as any).updatedAt) {
+        lastMod = new Date(((product as any).updatedAt).toMillis ? ((product as any).updatedAt).toMillis() : (product as any).updatedAt);
+      } else if (product.createdAt) {
+        lastMod = new Date((product.createdAt as any).toMillis ? (product.createdAt as any).toMillis() : product.createdAt);
+      }
+
+      return {
+        url: `https://dualdeer.com/product/${product.slug}`,
+        lastModified: lastMod,
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      };
+    });
 
   return [
     {
@@ -40,6 +51,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,
+    },
+    {
+      url: 'https://dualdeer.com/gym-wear-men-india',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: 'https://dualdeer.com/compression-tshirt-men',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: 'https://dualdeer.com/best-gym-clothes-india',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: 'https://dualdeer.com/speedsuits-india',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
     {
       url: 'https://dualdeer.com/contact',

@@ -47,7 +47,7 @@ export default function MysteryBookingsAdmin() {
             <tbody>
               {bookings.map((booking) => (
                 <tr key={booking.id}>
-                  <td>{booking.timestamp ? new Date(booking.timestamp.toDate()).toLocaleString() : 'N/A'}</td>
+                  <td>{booking.timestamp ? new Date((booking.timestamp as any).toMillis ? (booking.timestamp as any).toMillis() : typeof booking.timestamp === 'number' ? booking.timestamp : (booking.timestamp as any).toDate ? (booking.timestamp as any).toDate().getTime() : Date.now()).toLocaleString() : 'N/A'}</td>
                   <td>{booking.name}</td>
                   <td>{booking.email}</td>
                   <td>{booking.phone}</td>

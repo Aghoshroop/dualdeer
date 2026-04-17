@@ -124,7 +124,7 @@ export default function MenPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.8, delay: (Math.min(i % 8, 4)) * 0.1, ease: "easeOut" }}
-                onClick={() => router.push(`/product/${product.id}`)}
+                onClick={() => router.push(`/product/${product.slug}`)}
               >
                 <img 
                     src={product.image || '/speedsuit.png'} 

@@ -52,7 +52,7 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
         <div className={`${styles.grid} ${styles.mobileSlider}`}>
           {products.map((product, i) => (
             <Link 
-              href={`/product/${product.id}`} 
+              href={`/product/${product.slug}`} 
               key={`${product.id}-${i}`} 
               style={{ textDecoration: 'none' }}
               className={i >= originalCount || i >= 4 ? styles.desktopHidden : ''}

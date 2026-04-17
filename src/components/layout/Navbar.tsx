@@ -252,7 +252,7 @@ export default function Navbar() {
                             <div className={styles.marqueeTrack}>
                               {[...displayResults, ...displayResults].map((product, idx) => (
                                 <Link 
-                                  href={`/product/${product.id}`} 
+                                  href={`/product/${product.slug}`} 
                                   key={`${product.id}-${idx}`} 
                                   className={styles.marqueeResultCard}
                                   onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
@@ -272,7 +272,7 @@ export default function Navbar() {
                           <div className={styles.overlayResultsGrid}>
                             {displayResults.map(product => (
                               <Link 
-                                href={`/product/${product.id}`} 
+                                href={`/product/${product.slug}`} 
                                 key={product.id} 
                                 className={styles.overlayResultCard}
                                 onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
@@ -386,7 +386,7 @@ export default function Navbar() {
                                       {notif.id && unreadNotifIds.includes(notif.id) && <span className={styles.newBadgeOverlay}>NEW</span>}
                                     </div>
                                   <span className={styles.notificationOverlayItemMessage}>{notif.message}</span>
-                                  {notif.createdAt && <span className={styles.notificationOverlayItemTime}>{new Date(notif.createdAt.toMillis()).toLocaleDateString()}</span>}
+                                  {notif.createdAt && <span className={styles.notificationOverlayItemTime}>{new Date((notif.createdAt as any).toMillis ? (notif.createdAt as any).toMillis() : notif.createdAt).toLocaleDateString()}</span>}
                                 </>
                               );
 

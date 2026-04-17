@@ -1,13 +1,14 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { addSubscriber } from '@/lib/firebaseUtils';
-import { X, Mail, Tag, ArrowRight } from 'lucide-react';
+import { X, Mail, Tag, ArrowRight, Copy, CheckCircle2 } from 'lucide-react';
 import styles from './NewsletterModal.module.css';
 
 export default function NewsletterModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     // Only mount on client and only fire if they haven't seen it yet
@@ -40,6 +41,12 @@ export default function NewsletterModal() {
       setStatus('idle');
       alert('Network uplink failed. Try again.');
     }
+  };
+
+  const copyCode = () => {
+    navigator.clipboard.writeText('FIRST15');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (!isOpen) return null;
@@ -85,11 +92,14 @@ export default function NewsletterModal() {
             <h2 className={styles.successTitle}>Access Granted.</h2>
             <p className={styles.successSubtitle}>Your clearance has been established. Apply the following sequence at Checkout:</p>
             
-            <div className={styles.couponCodeWrapper}>
-               <code className={styles.couponCode}>FIRST15</code>
+            <div className={styles.couponCodeWrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '1rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
+               <code className={styles.couponCode} style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>FIRST15</code>
+               <button onClick={copyCode} className={styles.copyBtn} title="Copy Code" style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                 {copied ? <CheckCircle2 size={24} color="#10b981" /> : <Copy size={24} />}
+               </button>
             </div>
 
-            <button onClick={closeDrop} className={styles.continueBtn}>
+            <button onClick={closeDrop} className={styles.continueBtn} style={{ background: 'var(--color-primary)', color: 'var(--color-background)', border: 'none', padding: '0.8rem 2rem', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>
               Enter Protocol
             </button>
           </div>

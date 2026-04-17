@@ -23,6 +23,7 @@ export default function AdminProductsPage() {
   const [heroImage, setHeroImage] = useState('');
   const [heroText, setHeroText] = useState('');
   const [uploadingHero, setUploadingHero] = useState(false);
+  const [migratingSlugs, setMigratingSlugs] = useState(false);
 
   // Modal State
   const [showModal, setShowModal] = useState(false);
@@ -194,6 +195,34 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleMigrateSlugs = async () => {
+    if (!confirm("This will generate and save SEO slugs for all products that don't have one. Proceed?")) return;
+    setMigratingSlugs(true);
+    let updated = 0;
+    try {
+      for (const p of products) {
+        if (!p.slug) {
+          const generatedSlug = p.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+            
+          // Add random string for uniqueness
+          const finalSlug = `${generatedSlug}-${Math.random().toString(36).substring(2, 7)}`;
+          
+          await updateProduct(p.id!, { slug: finalSlug });
+          updated++;
+        }
+      }
+      alert(`Migration complete! Updated ${updated} products.`);
+      loadProducts();
+    } catch (err) {
+      console.error(err);
+      alert("Error migrating slugs. See console.");
+    }
+    setMigratingSlugs(false);
+  };
+
   const baseList = viewingTrash ? deletedProducts : products;
   const filteredProducts = baseList.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -227,9 +256,14 @@ export default function AdminProductsPage() {
           )}
         </div>
         {!viewingTrash && (
-          <button className={styles.addBtn} onClick={openAddModal}>
-            <Plus size={20} /> Add Product
-          </button>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button className={styles.addBtn} onClick={handleMigrateSlugs} disabled={migratingSlugs} style={{ background: '#333', color: 'white', border: '1px solid #555' }}>
+              {migratingSlugs ? 'Migrating...' : 'Migrate SEO Slugs'}
+            </button>
+            <button className={styles.addBtn} onClick={openAddModal}>
+              <Plus size={20} /> Add Product
+            </button>
+          </div>
         )}
       </header>
 

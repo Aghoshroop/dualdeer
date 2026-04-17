@@ -98,7 +98,7 @@ export default function ProfileCart() {
           <h3 className={styles.relatedTitle}>You Might Also Like</h3>
           <div className={styles.relatedGrid}>
             {relatedProducts.map(product => (
-              <Link href={`/product/${product.id}`} key={product.id} className={styles.relatedCard}>
+              <Link href={`/product/${product.slug}`} key={product.id} className={styles.relatedCard}>
                 <div className={styles.relatedImageWrapper}>
                    <img src={product.image} alt={product.name} />
                 </div>

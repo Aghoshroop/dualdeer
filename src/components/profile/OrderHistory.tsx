@@ -15,8 +15,8 @@ export default function OrderHistory({ user }: { user: any }) {
         const userOrders = await getUserOrders(user.uid);
         // Sort newest first
         const sorted = userOrders.sort((a, b) => {
-          const timeA = a.createdAt?.toMillis() || 0;
-          const timeB = b.createdAt?.toMillis() || 0;
+          const timeA = a.createdAt && (a.createdAt as any).toMillis ? (a.createdAt as any).toMillis() : typeof a.createdAt === 'number' ? a.createdAt : 0;
+          const timeB = b.createdAt && (b.createdAt as any).toMillis ? (b.createdAt as any).toMillis() : typeof b.createdAt === 'number' ? b.createdAt : 0;
           return timeB - timeA;
         });
         setOrders(sorted);

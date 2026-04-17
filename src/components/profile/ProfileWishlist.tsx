@@ -72,7 +72,7 @@ export default function ProfileWishlist({ user }: { user: any }) {
               transition={{ duration: 0.3 }}
             >
               <div className={styles.imageBox}>
-                <Link href={`/product/${product.id}`} style={{ display: 'block', width: '100%', height: '100%' }}>
+                <Link href={`/product/${product.slug}`} style={{ display: 'block', width: '100%', height: '100%' }}>
                   <img src={product.image} alt={product.name} />
                 </Link>
                 <button className={styles.removeBtn} onClick={() => handleRemove(id)}>
@@ -80,7 +80,7 @@ export default function ProfileWishlist({ user }: { user: any }) {
                 </button>
               </div>
               <div className={styles.infoBox}>
-                <Link href={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <h4>{product.name}</h4>
                 </Link>
                 <p className={styles.price}>₹{product.price.toFixed(2)}</p>

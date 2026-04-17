@@ -1,53 +1,44 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getProduct, Product, getReviews, Review, addReview, checkInWishlist, addToWishlist, removeFromWishlist } from '@/lib/firebaseUtils';
+import { Product, getReviews, Review, addReview, checkInWishlist, addToWishlist, removeFromWishlist } from '@/lib/firebaseUtils';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
-import { Heart, Minus, Plus, ShoppingBag, CheckCircle, ChevronDown, User, Star, ChevronLeft, Lock, X, Share2 } from 'lucide-react';
+import { Heart, CheckCircle, ChevronDown, Star, ChevronLeft, X, Share2 } from 'lucide-react';
 import RelatedProducts from '@/components/sections/RelatedProducts';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './ProductDetails.module.css';
 import QuantitySelector from '@/components/ui/QuantitySelector';
 import AnimatedCartButton from '@/components/ui/AnimatedCartButton';
 
-const MOCK_REVIEWS: Review[] = [
-  { id: 'mock1', productId: 'all', userName: 'Rajesh K.', userAvatar: 'https://ui-avatars.com/api/?name=Rajesh+K&background=random', rating: 5, text: 'Absolutely unparalleled craftsmanship. The material feels incredible during high-intensity training.', date: { toMillis: () => Date.now() - 86400000 * 2 } as any },
-  { id: 'mock2', productId: 'all', userName: 'Aisha S.', userAvatar: 'https://ui-avatars.com/api/?name=Aisha+S&background=random', rating: 5, text: 'The aerodynamic fit is completely true to size. Delivery was exceptionally fast.', date: { toMillis: () => Date.now() - 86400000 * 5 } as any },
-  { id: 'mock3', productId: 'all', userName: 'Vikram Mehta', userAvatar: 'https://ui-avatars.com/api/?name=Vikram+M&background=random', rating: 4, text: 'Very premium feel. It holds up perfectly in all weather conditions.', date: { toMillis: () => Date.now() - 86400000 * 12 } as any },
-  { id: 'mock4', productId: 'all', userName: 'Priya Desai', userAvatar: 'https://ui-avatars.com/api/?name=Priya+D&background=random', rating: 5, text: 'I own luxury brands across the globe, and DualDeer easily rivals them in quality and aesthetic.', date: { toMillis: () => Date.now() - 86400000 * 20 } as any },
-  { id: 'mock5', productId: 'all', userName: 'Aditya R.', userAvatar: 'https://ui-avatars.com/api/?name=Aditya+R&background=random', rating: 5, text: 'Flawless stitching and compression. Worth every single penny.', date: { toMillis: () => Date.now() - 86400000 * 35 } as any },
-  { id: 'mock6', productId: 'all', userName: 'Natasha B.', userAvatar: 'https://ui-avatars.com/api/?name=Natasha+B&background=random', rating: 4, text: 'Stunning design. The packaging alone was an experience.', date: { toMillis: () => Date.now() - 86400000 * 42 } as any },
-];
+// Removed MOCK_REVIEWS to adhere to real Review data constraints
 
-export default function ProductDetailsPage() {
-  const { id } = useParams();
+interface ProductClientProps {
+  initialProduct: Product;
+  initialReviews: Review[];
+}
+
+export default function ProductClient({ initialProduct, initialReviews }: ProductClientProps) {
   const router = useRouter();
   const { addToCart, cart } = useCart();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState<Product>(initialProduct);
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
 
-  // UI State
-  const [mainImage, setMainImage] = useState<string>('');
+  const [mainImage, setMainImage] = useState<string>(initialProduct?.image || '');
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState<string>('M');
-  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string>(initialProduct?.sizes?.[0] || 'OSFA');
+  const [selectedColor, setSelectedColor] = useState<string>(initialProduct?.colors?.[0] || '');
   const [isZoomed, setIsZoomed] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
-  const [activeImage, setActiveImage] = useState(0);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
   
-  // Review Form State
   const [reviewName, setReviewName] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewText, setReviewText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Authentication & Wishlist State
   const [authLoading, setAuthLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -59,31 +50,13 @@ export default function ProductDetailsPage() {
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       setAuthLoading(false);
-      if (user && typeof id === 'string') {
-        const wid = await checkInWishlist(user.uid, id);
+      if (user && product?.id) {
+        const wid = await checkInWishlist(user.uid, product.id);
         if (wid) {
           setIsInWishlist(true);
           setWishlistRecordId(wid);
         }
       }
-    });
-
-    if (typeof id !== 'string') return;
-    Promise.all([getProduct(id), getReviews(id)]).then(([prodData, revData]) => {
-      setProduct(prodData as Product);
-      setReviews(revData);
-      if (prodData) {
-        setMainImage(prodData.image);
-        if (prodData.sizes && prodData.sizes.length > 0) {
-           setSelectedSize(prodData.sizes[0]);
-        } else {
-           setSelectedSize('OSFA');
-        }
-        if (prodData.colors && prodData.colors.length > 0) {
-           setSelectedColor(prodData.colors[0]);
-        }
-      }
-      setLoading(false);
     });
 
     const handleScroll = () => {
@@ -95,7 +68,7 @@ export default function ProductDetailsPage() {
       window.removeEventListener('scroll', handleScroll);
       unsubscribeAuth();
     };
-  }, [id]);
+  }, [product?.id]);
 
   const toggleWishlist = async () => {
     if (!currentUser) return router.push('/auth');
@@ -142,22 +115,20 @@ export default function ProductDetailsPage() {
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reviewName || !reviewText || typeof id !== 'string') return;
+    if (!reviewName || !reviewText || !product?.id) return;
     setIsSubmitting(true);
     
-    // Simulating user avatar based on first letter
     const avatar = `https://ui-avatars.com/api/?name=${reviewName}&background=random&color=fff`;
 
     await addReview({
-      productId: id,
+      productId: product.id,
       userName: reviewName,
       userAvatar: avatar,
       rating: reviewRating,
       text: reviewText
     });
 
-    // Refresh reviews
-    const freshReviews = await getReviews(id);
+    const freshReviews = await getReviews(product.id);
     setReviews(freshReviews);
     
     setReviewName('');
@@ -166,64 +137,51 @@ export default function ProductDetailsPage() {
     setIsSubmitting(false);
   };
 
-  if (loading || authLoading) {
-    return <div className={styles.loadingWrapper}>Decrypting Secure Payload...</div>;
-  }
-
-
   if (!product) {
     return <div className={styles.loadingWrapper}>Product not found.</div>;
   }
 
-  // Combine Real Reviews with Luxury Mock Reviews
-  const combinedReviews = [...reviews, ...MOCK_REVIEWS];
+  const combinedReviews = [...reviews];
 
-  // Rating: use admin-set product.rating as the source of truth.
-  // Fall back to live review average only if admin never set one.
   const reviewAvg = combinedReviews.length > 0
     ? (combinedReviews.reduce((acc, r) => acc + r.rating, 0) / combinedReviews.length)
-    : 5;
+    : 5.0;
   const avgRating = product.rating
     ? Number(product.rating).toFixed(1)
     : reviewAvg.toFixed(1);
 
-  // Dynamic Stock Calculation
   const getAvailableStock = (size: string) => {
     if (!product) return 0;
     if (product.sizeUnits && product.sizeUnits[size] !== undefined) {
       return product.sizeUnits[size];
     }
-    return product.stock;
+    return product.stock || 0;
   };
 
   const currentAvailableStock = getAvailableStock(selectedSize);
   const isOutOfStock = currentAvailableStock <= 0;
 
-  // Real-time Cart Limit calculation
   const cartItemInfo = cart.find(c => c.id === product?.id && c.size === selectedSize);
   const qtyInCart = cartItemInfo ? cartItemInfo.quantity : 0;
   const maxAddable = Math.max(0, currentAvailableStock - qtyInCart);
   const isMaxInCart = maxAddable <= 0 && !isOutOfStock;
   const canPerformAction = !isOutOfStock && maxAddable > 0;
 
-  // Calculate Star Distro dynamically so the graph perfectly reflects the rating
-  const starCounts = [0, 0, 0, 0, 0]; // 1-star to 5-star
+  const starCounts = [0, 0, 0, 0, 0];
   const targetScore = Number(avgRating);
   
-  // Fill the graph distribution logically based on the final rating
   if (targetScore >= 4.8) {
-    starCounts[0] = 0; starCounts[1] = 1; starCounts[2] = 4; starCounts[3] = 15; starCounts[4] = 80; // 95% 5-star
+    starCounts[0] = 0; starCounts[1] = 1; starCounts[2] = 4; starCounts[3] = 15; starCounts[4] = 80;
   } else if (targetScore >= 4.3) {
-    starCounts[0] = 1; starCounts[1] = 3; starCounts[2] = 6; starCounts[3] = 30; starCounts[4] = 60; // 60% 5-star, 30% 4-star
+    starCounts[0] = 1; starCounts[1] = 3; starCounts[2] = 6; starCounts[3] = 30; starCounts[4] = 60;
   } else if (targetScore >= 3.8) {
-    starCounts[0] = 2; starCounts[1] = 5; starCounts[2] = 15; starCounts[3] = 50; starCounts[4] = 28; // Mostly 4-star
+    starCounts[0] = 2; starCounts[1] = 5; starCounts[2] = 15; starCounts[3] = 50; starCounts[4] = 28;
   } else if (targetScore >= 3.0) {
-    starCounts[0] = 5; starCounts[1] = 15; starCounts[2] = 50; starCounts[3] = 20; starCounts[4] = 10; // Mostly 3-star
+    starCounts[0] = 5; starCounts[1] = 15; starCounts[2] = 50; starCounts[3] = 20; starCounts[4] = 10;
   } else {
-    starCounts[0] = 50; starCounts[1] = 30; starCounts[2] = 10; starCounts[3] = 5; starCounts[4] = 5; // Low
+    starCounts[0] = 50; starCounts[1] = 30; starCounts[2] = 10; starCounts[3] = 5; starCounts[4] = 5;
   }
   
-  // Add real reviews on top of the dynamic base
   combinedReviews.forEach(r => {
     if (r.rating >= 1 && r.rating <= 5) {
       starCounts[r.rating - 1]++;
@@ -232,63 +190,12 @@ export default function ProductDetailsPage() {
 
   const totalReviews = starCounts.reduce((a, b) => a + b, 0);
 
-  // Render Custom Gallery or Fallback Context
   const alternateImages = product.images && product.images.length > 0 
     ? product.images 
-    : [product.image, product.image, product.image, product.image];
-
-  // Advanced Product SEO Schema
-  const productJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": product.name,
-    "image": product.image,
-    "description": product.description || "Premium DualDeer activewear product.",
-    "sku": `DUALDEER-${product.id?.slice(0, 8).toUpperCase()}`,
-    "brand": {
-      "@type": "Brand",
-      "name": "DualDeer"
-    },
-    "category": product.category,
-    "offers": {
-      "@type": "Offer",
-      "url": `https://dualdeer.com/product/${product.id}`,
-      "priceCurrency": "INR",
-      "price": product.price,
-      "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-      "itemCondition": "https://schema.org/NewCondition",
-      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "DualDeer"
-      }
-    },
-    "aggregateRating": combinedReviews.length > 0 ? {
-      "@type": "AggregateRating",
-      "ratingValue": avgRating,
-      "reviewCount": totalReviews
-    } : undefined,
-    "review": combinedReviews.map(r => ({
-      "@type": "Review",
-      "reviewRating": {
-        "@type": "Rating",
-        "ratingValue": r.rating,
-        "bestRating": "5"
-      },
-      "author": {
-        "@type": "Person",
-        "name": r.userName
-      }
-    }))
-  };
+    : [product.image, product.image, product.image, product.image].filter(Boolean);
 
   return (
     <div className={styles.pageContainer}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-      />
-      
       <button 
         onClick={() => router.back()} 
         className={styles.backBtn}
@@ -297,7 +204,6 @@ export default function ProductDetailsPage() {
         <ChevronLeft size={20} /> Back to Collection
       </button>
 
-      {/* Product Zoom Lightbox */}
       <AnimatePresence>
         {isZoomed && (
           <motion.div 
@@ -312,7 +218,7 @@ export default function ProductDetailsPage() {
             </button>
             <motion.img 
               src={mainImage} 
-              alt={`${product.name} zoomed`}
+              alt={`${product.name} – Premium ${product.category || 'workout wear'} designed for high-intensity training`}
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
@@ -323,34 +229,50 @@ export default function ProductDetailsPage() {
         )}
       </AnimatePresence>
 
-      {/* Top Section - Product Presentation */}
       <section className={styles.heroSection}>
         <div className={styles.imageGallery}>
            <div className={styles.mainImageContainer} onClick={() => setIsZoomed(true)} style={{ cursor: 'zoom-in' }}>
-             <img src={mainImage} alt={product.name} className={styles.mainImage} />
+             <img src={mainImage} alt={`${product.name} - top rated gym wear in India`} className={styles.mainImage} />
            </div>
            <div className={styles.thumbnailList}>
              {alternateImages.map((img, idx) => (
                 <div 
                   key={idx} 
                   className={`${styles.thumbnail} ${mainImage === img && idx === 0 ? styles.activeThumb : ''}`}
-                  onClick={() => setMainImage(img)}
+                  onClick={() => setMainImage(img as string)}
                 >
-                  <img src={img} alt={`${product.name} view ${idx+1}`} />
+                  <img src={img as string} alt={`${product.name} angle ${idx+1} - premium activewear`} loading="lazy" decoding="async" />
                 </div>
              ))}
            </div>
         </div>
 
         <div className={styles.productInfo}>
-          <div className={styles.breadcrumbs}>
-            <span>{product.category || 'High Performance'}</span>
+          <div className={styles.breadcrumbs} style={{ fontSize: '0.85rem', marginBottom: '1rem', opacity: 0.8, display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Home</Link>
+            <span>&gt;</span>
+            <Link href="/shop" style={{ color: 'inherit', textDecoration: 'none' }}>Shop</Link>
+            <span>&gt;</span>
+            <Link href={`/shop?category=${encodeURIComponent(product.category || '')}`} style={{ color: 'inherit', textDecoration: 'none' }}>{product.category || 'Category'}</Link>
+            <span>&gt;</span>
+            <span style={{ color: 'var(--color-primary)' }}>{product.name}</span>
           </div>
 
           <div className={styles.titleHeader}>
+            <div className={styles.productBadges} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px' }}>
+              <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', color: '#fff' }}>🔥 Popular Choice</span>
+              <span style={{ padding: '4px 8px', background: 'var(--color-primary)', color: 'var(--color-background)', borderRadius: '4px' }}>⚡ Performance Gear</span>
+              <span style={{ padding: '4px 8px', border: '1px solid var(--color-primary)', borderRadius: '4px', color: 'var(--color-primary)' }}>✓ Indian Climate Tested</span>
+            </div>
+            
             <h1 className={styles.productTitle}>{product.name}</h1>
             {!isOutOfStock ? (
-              <span className={styles.stockBadge}>{currentAvailableStock} In Stock ({selectedSize})</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem' }}>
+                 <span className={styles.stockBadge}>{currentAvailableStock} In Stock ({selectedSize})</span>
+                 {currentAvailableStock <= 10 && (
+                    <span style={{ color: '#ff4444', fontSize: '0.8rem', fontWeight: 600, animation: 'pulse 2s infinite' }}>Hurry! Only {currentAvailableStock} left!</span>
+                 )}
+              </div>
             ) : (
               <span className={styles.stockBadge} style={{ background: '#ff3333' }}>Out of Stock</span>
             )}
@@ -366,7 +288,7 @@ export default function ProductDetailsPage() {
           </div>
 
           <div className={styles.pricing}>
-            <span className={styles.offerPrice}>₹{product.price.toFixed(2)}</span>
+            <span className={styles.offerPrice}>₹{(product.price || 0).toFixed(2)}</span>
             {product.mrp && product.mrp > product.price && (
               <del className={styles.mrpPrice}>₹{product.mrp.toFixed(2)}</del>
             )}
@@ -456,7 +378,7 @@ export default function ProductDetailsPage() {
                       image: product.image,
                       size: selectedSize,
                       color: selectedColor || undefined,
-                      quantity: Math.min(quantity, maxAddable) // ensuring safety
+                      quantity: Math.min(quantity, maxAddable)
                     });
                   }
                 }}
@@ -469,7 +391,7 @@ export default function ProductDetailsPage() {
               style={{ opacity: !canPerformAction ? 0.5 : 1, cursor: !canPerformAction ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if(product && canPerformAction) {
-                  router.push(`/checkout?buyNow=${product.id}&size=${encodeURIComponent(selectedSize)}&qty=${Math.min(quantity, maxAddable)}`);
+                  router.push(`/checkout?product=${product.slug || ''}&id=${product.id}&size=${encodeURIComponent(selectedSize)}&qty=${Math.min(quantity, maxAddable)}`);
                 }
               }}
             >
@@ -485,7 +407,6 @@ export default function ProductDetailsPage() {
               >
                 <Heart size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
               </button>
-              
               <button 
                 className={styles.wishlistBtn}
                 onClick={handleShare}
@@ -498,54 +419,71 @@ export default function ProductDetailsPage() {
           </div>
 
           <div className={styles.metaData}>
-            <p><strong>SKU:</strong> DUALDEER-{product.id?.slice(0, 8).toUpperCase()}</p>
+            <p><strong>SKU:</strong> DUALDEER-{(product.id || "").slice(0, 8).toUpperCase()}</p>
             <p><strong>Tags:</strong> Elite, Performance, {product.category}</p>
           </div>
         </div>
       </section>
 
-      {/* 300+ Words SEO Content Section */}
       <section className={styles.seoProductSection}>
         <div className={styles.seoProductContainer}>
           <div className={isDescExpanded ? styles.contentExpanded : styles.contentCollapsed}>
             <h2>Why Choose the {product.name}</h2>
             <p>
-              Experience the absolute apex of modern athletic engineering with the exclusively designed <strong>{product.name}</strong>. At DualDeer, we critically recognize that true high-intensity performance strictly requires specialized apparel that actively and instinctively works alongside your body&apos;s natural biomechanical movements. As part of our signature <Link href="/shop?category=speedsuit" style={{ textDecoration: 'underline', color: 'inherit' }}>SpeedSuit lineup</Link>, this expertly crafted garment is meticulously built from the ground up to decisively deliver unprecedented aerodynamic efficiency, supreme long-lasting comfort, and an unmistakable, commanding luxury aesthetic that is incredibly rare to find in modern performance activewear. Whether you are relentlessly pushing your physical boundaries in the gym, logging exhaustive endurance miles on the track, or simply navigating a demanding and dynamic urban lifestyle, the {product.name} seamlessly acts as your ultimate, supportive armor.
+              Experience a new standard in athletic comfort with the <strong>{product.name}</strong>. At <Link href="/" style={{ textDecoration: 'underline', color: 'inherit' }}>DualDeer</Link>, we understand that your workouts require apparel that moves with you. If you are searching for the <Link href="/best-gym-clothes-india" style={{ textDecoration: 'underline', color: 'inherit' }}>best gym clothes in India</Link>, this garment is designed specifically to provide excellent breathability, lasting comfort, and a clean, modern aesthetic. 
             </p>
-
-            <h3>Revolutionary Fabric Technology</h3>
+            
             <p>
-              The fundamental core of this exceptional piece, consistent with our entire signature SpeedSuit collection, lies directly within our proprietary, state-of-the-art fabric blend. This incredibly advanced textile actively incorporates intelligent four-way kinetic stretch capabilities, allowing for an entire, unrestricted range of rapid multi-directional movement without ever spontaneously losing essential structural integrity. Furthermore, the specialized synthetic hydrophobic micro-fibers are precision-engineered to rapidly and continuously wick away heavy sweat and moisture. This advanced moisture-management system ensures you remain remarkably cool, entirely dry, and intensely focused even during the most grueling, high-temperature athletic training conditions.
+              Standard gym clothes often lose their shape or hold onto sweat during longer sessions. Our engineered fabric blend, found in collections like our <Link href="/speedsuits-india" style={{ textDecoration: 'underline', color: 'inherit' }}>SpeedSuits lineup</Link>, offers a fresh approach to your daily training. Whether you are lifting weights, running, or stretching, the {product.name} provides natural support without feeling restrictive.
             </p>
 
-            <h3>Elite Performance Benefits</h3>
-            <p>Every single technical detail of the {product.name} is rigorously and thoroughly tested to forcefully elevate your physical potential and output to the next level:</p>
+            <h3>Fabric Technology & Features</h3>
             <ul>
-              <li><strong>Advanced Muscle Stabilization:</strong> Strategically integrated, targeted compression zones effectively reduce muscular vibration, enhance critical blood flow, and significantly accelerate your vital post-workout recovery times.</li>
-              <li><strong>Chafe-Free Construction:</strong> The precision flatlock seams alongside intelligent, body-mapped ergonomic paneling practically eliminate uncomfortable chafing, allowing for seamless, prolonged physical exertion without subsequent irritation.</li>
-              <li><strong>Dynamic Climate Control:</strong> State-of-the-art responsive weaving naturally and efficiently regulates your core body temperature, keeping you consistently warm in the harsh, biting cold and incredibly cool under intense, radiating heat.</li>
-              <li><strong>Unmatched Durability:</strong> Substantially reinforced, heavy-duty stitching specifically guarantees that the piece effortlessly and repeatedly withstands the rigorous, daily demands of relentless elite athletic training without rapidly degrading.</li>
+              <li><strong>Comfortable Compression:</strong> Gentle, supportive zones help reduce muscle fatigue and encourage better circulation, acting as ideal <Link href="/compression-tshirt-men" style={{ textDecoration: 'underline', color: 'inherit' }}>compression gear for men</Link> during heavy workouts.</li>
+              <li><strong>Designed for the Indian Climate:</strong> Our moisture-wicking technology actively pulls sweat away from the skin, keeping you cool even during intense humidity.</li>
+              <li><strong>Smooth, Flat Seams:</strong> We've utilized careful flatlock stitching to prevent chafing, so you can focus entirely on your movement rather than adjusting your clothing.</li>
+              <li><strong>Built to Last:</strong> High-quality durability ensures this piece remains a staple in your closet wash after wash.</li>
             </ul>
 
-            <h3>Versatile Luxury Use Cases</h3>
-            <p>
-              While undeniably and explicitly engineered for the highest echelons of professional physical performance, the inherently sleek, minimalist visual aesthetic of this piece effortlessly transitions straight into your elevated daily lifestyle routine. The {product.name} is purposefully built for:
-            </p>
+            <h3>Usage: How to Get the Most from the {product.name}</h3>
             <ul>
-              <li><strong>High-Intensity Gym Training:</strong> Experience the profound, supportive confidence required to safely conquer heavy compound lifts, grueling CrossFit regimens, and aggressive high-intensity interval circuits.</li>
-              <li><strong>Endurance Running and Track:</strong> Benefit immensely from the ultra-lightweight, highly breathable aerodynamic profile that decisively shaves invaluable seconds off your personal best times while effortlessly managing wind resistance.</li>
-              <li><strong>Sophisticated Lifestyle Wear:</strong> Seamlessly pair this distinctively elegant luxury piece with your existing contemporary wardrobe for a sharp, refined, and distinctly powerful athleisure look outside the studio or directly on the sophisticated city streets.</li>
+              <li><strong>Gym Wear for Men in India:</strong> Perfectly suited for indoor weight training, CrossFit, or high-intensity interval training (HIIT).</li>
+              <li><strong>Running & Outdoors:</strong> Lightweight and highly breathable, making it a great companion for track days or morning jogs.</li>
+              <li><strong>Everyday Athleisure:</strong> With its minimal branding and tailored fit, it transitions smoothly into casual wear for your daily routine.</li>
             </ul>
+
+            <h3>DualDeer vs. Other Brands</h3>
             <p>
-              Invest today in the remarkable {product.name} and firmly secure your rightful place among the dedicated athletic elite who simply refuse to ever settle for anything less than absolute sportswear perfection. <Link href="/speedsuit" style={{ textDecoration: 'underline', color: 'inherit' }}>Explore related luxury pieces within our signature SpeedSuit lineup</Link> to systematically and intelligently build the ultimate, highly versatile performance wardrobe.
+              Unlike standard activewear that relies heavily on 100% cotton or generic polyester, DualDeer garments use a custom hydrophobic blend. We prioritize actual performance metrics—like breathability and stretch—over flashy logos. Our focus is providing reliable, long-lasting gear tailored specifically for athletes who need clothing that works as hard as they do.
             </p>
+
+            <h3>Frequently Asked Questions</h3>
+            <div className={styles.faqBlock} style={{ marginTop: '1.5rem' }}>
+              <div style={{ marginBottom: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.3rem' }}>Q: Is this suitable for intense workouts?</strong>
+                <p style={{ margin: 0, opacity: 0.8 }}>Yes, the {product.name} is built with four-way stretch fabric and moisture-wicking technology, making it incredibly comfortable for intense workouts.</p>
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.3rem' }}>Q: How do I wash and care for this item?</strong>
+                <p style={{ margin: 0, opacity: 0.8 }}>Machine wash cold with like colors inside out. Do not use fabric softeners or bleach. We highly recommend air drying or tumble drying on low to preserve the elasticity.</p>
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.3rem' }}>Q: How is the sizing?</strong>
+                <p style={{ margin: 0, opacity: 0.8 }}>It features an athletic, slightly compressive fit designed to sit close to the skin. If you prefer a looser, more casual <Link href="/gym-wear-men-india" style={{ textDecoration: 'underline', color: 'inherit' }}>gym wear</Link> style, please order one size up.</p>
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.3rem' }}>Q: Will it lose its shape over time?</strong>
+                <p style={{ margin: 0, opacity: 0.8 }}>No, our kinetic stretch fabric has strong shape-retention memory, meaning it snaps back to its original tailored fit even after repeated high-stress movement.</p>
+              </div>
+            </div>
+            
           </div>
           <button 
             className={styles.readMoreBtn} 
             onClick={() => setIsDescExpanded(!isDescExpanded)}
             aria-expanded={isDescExpanded}
           >
-            {isDescExpanded ? 'Show Less' : 'Read More'}
+            {isDescExpanded ? 'Show Less' : 'Read Full Description'}
             <ChevronDown size={16} style={{ 
               transform: isDescExpanded ? 'rotate(180deg)' : 'none', 
               transition: 'transform 0.3s ease' 
@@ -554,12 +492,9 @@ export default function ProductDetailsPage() {
         </div>
       </section>
 
-      {/* Reviews Section strictly bound below */}
       <section className={styles.tabsSection}>
         <div className={styles.tabContent}>
           <div className={styles.reviewTab}>
-                
-                {/* Aggregate Review Stats */}
                 <div className={styles.reviewAggregate}>
                   <div className={styles.bigScore}>
                     <h2>{avgRating}</h2>
@@ -588,7 +523,6 @@ export default function ProductDetailsPage() {
                   </div>
                 </div>
 
-                {/* Reviews List */}
                 <div className={styles.reviewListHeader}>
                   <h3>Review List</h3>
                   <div className={styles.sortBox}>
@@ -608,14 +542,14 @@ export default function ProductDetailsPage() {
                       <div key={rev.id} className={styles.reviewCard}>
                         <div className={styles.revHeader}>
                           <div className={styles.revUser}>
-                            <img src={rev.userAvatar || `https://ui-avatars.com/api/?name=${rev.userName}&background=random`} alt={rev.userName} className={styles.avatar} />
+                            <img src={rev.userAvatar || `https://ui-avatars.com/api/?name=${rev.userName}&background=random`} alt={rev.userName} className={styles.avatar} loading="lazy" decoding="async" />
                             <div>
                               <h4 className={styles.revName}>{rev.userName}</h4>
                               <span className={styles.verified}><CheckCircle size={12} /> Verified</span>
                             </div>
                           </div>
                           <span className={styles.revDate}>
-                            {new Date(rev.date.toMillis()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                            {new Date((rev.date as unknown as number) || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                           </span>
                         </div>
                         <p className={styles.revText}>{rev.text}</p>
@@ -630,7 +564,6 @@ export default function ProductDetailsPage() {
                   )}
                 </div>
 
-                {/* Provide a Review Form */}
                 <div className={styles.submitReviewArea}>
                   <h3>Leave Your Verdict</h3>
                   <p>Share your precise experience regarding fit, aerodynamic feel, and luxury quality.</p>
@@ -674,8 +607,7 @@ export default function ProductDetailsPage() {
         </div>
       </section>
 
-      {/* Dynamic Related Products */}
-      <RelatedProducts category={product.category} excludeId={product.id} />
+      <RelatedProducts category={product.category} excludeId={product.id!} />
     </div>
   );
 }

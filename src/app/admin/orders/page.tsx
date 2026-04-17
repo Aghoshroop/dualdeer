@@ -118,7 +118,7 @@ export default function AdminOrdersPage() {
                   <td>
                     <div className={styles.traceCode}>{order.id}</div>
                     <div className={styles.timeLabel}>
-                      {order.createdAt ? new Date(order.createdAt.toMillis()).toLocaleString() : 'N/A'}
+                      {order.createdAt ? new Date((order.createdAt as any).toMillis ? (order.createdAt as any).toMillis() : typeof order.createdAt === 'number' ? order.createdAt : Date.now()).toLocaleString() : 'N/A'}
                     </div>
                   </td>
                   

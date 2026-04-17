@@ -57,7 +57,7 @@ export default function AdminUsersPage() {
               {users.map((u, i) => {
                 // Handle different date formats (statically injected vs Firestore Timestamps)
                 let dateStr = "Unknown";
-                if (u.createdAt?.toDate) dateStr = u.createdAt.toDate().toLocaleString();
+                if (u.createdAt) dateStr = new Date((u.createdAt as any).toMillis ? (u.createdAt as any).toMillis() : typeof u.createdAt === 'number' ? u.createdAt : (u.createdAt as any).toDate ? (u.createdAt as any).toDate().getTime() : Date.now()).toLocaleString();
                 else if (u.createdAt) dateStr = new Date(u.createdAt).toLocaleString();
                 else if (u.joinDate) dateStr = new Date(u.joinDate).toLocaleString();
 
@@ -112,7 +112,7 @@ export default function AdminUsersPage() {
             <tbody>
               {subscribers.map((s, i) => {
                 let dateStr = "Unknown";
-                if (s.createdAt?.toDate) dateStr = s.createdAt.toDate().toLocaleString();
+                if (s.createdAt) dateStr = new Date((s.createdAt as any).toMillis ? (s.createdAt as any).toMillis() : typeof s.createdAt === 'number' ? s.createdAt : (s.createdAt as any).toDate ? (s.createdAt as any).toDate().getTime() : Date.now()).toLocaleString();
                 else if (s.createdAt) dateStr = new Date(s.createdAt).toLocaleString();
                 else dateStr = "N/A - Direct Injection";
                 return (

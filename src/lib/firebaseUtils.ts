@@ -16,6 +16,7 @@ export interface ContentBlock {
 
 export interface Product {
   id?: string;
+  slug?: string;
   name: string;
   description?: string;
   sizes?: string[];
@@ -158,6 +159,20 @@ export const getProduct = async (id: string): Promise<Product | null> => {
   }
   return null;
 };
+
+export const getProductBySlug = async (slug: string): Promise<Product | null> => {
+  try {
+    const q = query(collection(db, 'products'), where('slug', '==', slug), limit(1));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return { id: snap.docs[0].id, ...snap.docs[0].data() } as Product;
+    }
+  } catch(e) {
+    console.error("Error fetching single product by slug", e);
+  }
+  return null;
+};
+
 
 export const addProduct = (data: Omit<Product, 'id'>) => addDocument('products', { ...data, status: 'active' });
 export const updateProduct = (id: string, data: Partial<Product>) => updateDocument('products', id, data);

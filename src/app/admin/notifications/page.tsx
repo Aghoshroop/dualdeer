@@ -94,7 +94,7 @@ export default function AdminNotifications() {
               <p style={{ color: 'var(--color-text-muted)', marginBottom: '1rem' }}>{n.message}</p>
               {n.url && <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)' }}>Link: {n.url}</p>}
               <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                Status: {n.active ? <span style={{ color: '#10b981' }}>Active</span> : 'Inactive'} | Created: {n.createdAt?.toDate().toLocaleDateString()}
+                Status: {n.active ? <span style={{ color: '#10b981' }}>Active</span> : 'Inactive'} | Created: {new Date((n.createdAt as any).toMillis ? (n.createdAt as any).toMillis() : typeof n.createdAt === 'number' ? n.createdAt : n.createdAt?.toDate ? n.createdAt.toDate().getTime() : Date.now()).toLocaleDateString()}
               </div>
             </div>
           ))}

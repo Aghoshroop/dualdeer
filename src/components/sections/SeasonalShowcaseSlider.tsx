@@ -9,6 +9,7 @@ import { useCart } from "@/context/CartContext";
 
 interface Product {
   id: string;
+  slug?: string;
   name: string;
   price: number;
   mrp?: number;
@@ -117,7 +118,7 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
                 <span className={styles.categorySpan}>{title} / {activeProduct.category || "Featured"}</span>
                 <h2 className={styles.title}>{activeProduct.name}</h2>
                 <div className={styles.price}>₹{activeProduct.price?.toLocaleString()}</div>
-                <Link href={`/product/${activeProduct.id.replace('-dup', '')}`} className={styles.shopButton}>
+                <Link href={`/product/${activeProduct.slug || activeProduct.id.replace('-dup', '')}`} className={styles.shopButton}>
                   Shop Now
                 </Link>
               </motion.div>
@@ -175,7 +176,7 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
                   <div className={styles.mobileInfo}>
                      <h3 className={styles.mobileName}>{product.name}</h3>
                      <div className={styles.mobilePrice}>₹{product.price?.toLocaleString()}</div>
-                     <Link href={`/product/${product.id}`} className={styles.mobileShopBtn}>
+                     <Link href={`/product/${product.slug}`} className={styles.mobileShopBtn}>
                         Shop Now
                      </Link>
                   </div>
