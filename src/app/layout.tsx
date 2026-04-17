@@ -13,6 +13,7 @@ import { ThemeProvider } from "next-themes";
 import { CartProvider } from '@/context/CartContext';
 import Script from "next/script";
 import SplashScreen from "@/components/layout/SplashScreen";
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -165,6 +166,7 @@ export default function RootLayout({
             </HideOnAdmin>
           </CartProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
