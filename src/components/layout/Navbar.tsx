@@ -147,7 +147,7 @@ export default function Navbar() {
     expandedTop: {
       width: "100%",
       borderRadius: "0px",
-      y: 40, // Under promo bar
+      y: 0, // Lifted completely to the top on all pages!
       backgroundColor: isHome ? "rgba(0,0,0,0)" : (theme === 'dark' ? "var(--color-background)" : "var(--color-background)"),
       backdropFilter: "blur(0px)",
       border: "1px solid transparent",
@@ -198,15 +198,6 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.div 
-        className={styles.promoBar} 
-        style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 101 }}
-        animate={{ y: isDocked ? -40 : 0, opacity: isDocked ? 0 : 1 }}
-        transition={{ duration: 0.4, ease: "easeInOut" }}
-      >
-        <span>COMPLIMENTARY SHIPPING & RETURNS ON ALL ORDERS</span>
-      </motion.div>
-
       <motion.header 
         className={styles.header} 
         onMouseEnter={() => setIsHovered(true)}
@@ -217,6 +208,19 @@ export default function Navbar() {
         transition={{ type: "spring", stiffness: 400, damping: 35, mass: 0.8 }}
         style={{ left: 0, right: 0, margin: "0 auto", position: 'fixed', zIndex: 100 }}
       >
+        {/* Collapsible Promo Bar nested inside header to prevent overlapping and allow clean docking */}
+        <motion.div 
+          className={styles.promoBar}
+          animate={{ 
+            height: isDocked ? 0 : (isMobile ? 25 : 40), 
+            opacity: isDocked ? 0 : 1 
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          style={{ overflow: 'hidden', width: '100%' }}
+        >
+          <span>COMPLIMENTARY SHIPPING & RETURNS ON ALL ORDERS</span>
+        </motion.div>
+
         <motion.div className={styles.mainNav} variants={mainNavVariants} transition={{ type: "spring", stiffness: 400, damping: 35 }}>
           <motion.div className={styles.leftLinks} variants={linksVariants} transition={{ type: "spring", stiffness: 400, damping: 35 }}>
             <div className={styles.navItem}>
