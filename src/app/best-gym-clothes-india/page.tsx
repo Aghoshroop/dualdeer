@@ -3,7 +3,7 @@ import { getProducts } from '@/lib/firebaseUtils';
 import { serializeProduct } from '@/lib/serialize';
 import BestGymClient from './BestGymClient';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Best Gym Clothes in India (2026) – Premium Workout Wear for Men | DualDeer',

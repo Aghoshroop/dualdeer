@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     product = await getProduct(slug); // fallback for ID
   }
   
-  if (!product) {
+  if (!product || product.status === 'deleted') {
     return {
       title: 'Product Not Found | DualDeer',
     };
@@ -67,7 +67,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     }
   }
 
-  if (!product) {
+  if (!product || product.status === 'deleted') {
     return (
       <div style={{ display: 'flex', minHeight: '60vh', alignItems: 'center', justifyContent: 'center' }}>
         <h2>Product not found or has been removed.</h2>

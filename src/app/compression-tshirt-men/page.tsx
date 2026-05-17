@@ -3,7 +3,7 @@ import { getProducts } from '@/lib/firebaseUtils';
 import { serializeProduct } from '@/lib/serialize';
 import CompressionClient from './CompressionClient';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Best Compression T-Shirt for Men in India (2026) – Gym & Workout Wear | DualDeer',

@@ -3,7 +3,7 @@ import { serializeProduct, serializeCategory } from '@/lib/serialize';
 import ShopClient from './ShopClient';
 import type { Metadata } from 'next';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Luxury Activewear Store (2026) | Premium Collections | DualDeer',

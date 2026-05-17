@@ -3,7 +3,7 @@ import { serializeProduct } from '@/lib/serialize';
 import SpeedSuitsIndiaClient from './SpeedsuitsClient';
 import type { Metadata } from 'next';
 
-export const revalidate = 3600; // SSG revalidate every hour
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Premium Speedsuits in India (2026) | Elite Aerodynamic Gear | DualDeer',

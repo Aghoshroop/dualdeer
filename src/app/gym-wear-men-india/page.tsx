@@ -3,7 +3,7 @@ import { serializeProduct } from '@/lib/serialize';
 import GymWearClient from './GymWearClient';
 import type { Metadata } from 'next';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Gym Wear For Men in India (2026) | Premium Activewear | DualDeer',
