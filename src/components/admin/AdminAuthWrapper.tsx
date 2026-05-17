@@ -35,7 +35,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
 
   if (!isAdmin) {
     return (
-      <div style={{ padding: '3rem', textAlign: 'center', color: 'white' }}>
+      <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text)' }}>
         <h2>Access Denied</h2>
         <p>Your current Firebase Auth Session State:</p>
         <pre style={{ background: '#222', padding: '1rem', marginTop: '1rem', textAlign: 'left', display: 'inline-block' }}>

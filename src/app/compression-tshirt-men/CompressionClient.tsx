@@ -16,7 +16,7 @@ export default function CompressionClient({ initialProducts }: { initialProducts
 
   return (
     <main className={styles.main}>
-      <section className={styles.hero} style={{ background: '#111', minHeight: '60vh' }}>
+      <section className={styles.hero} style={{ background: 'var(--color-surface)', minHeight: '60vh' }}>
         <div className={styles.heroContent}>
           <motion.h1 
             className={styles.heroTitle} 
@@ -75,12 +75,12 @@ export default function CompressionClient({ initialProducts }: { initialProducts
       <section className={styles.darkSection} style={{ padding: '4rem 2rem' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <h2 className={styles.sectionTitle} style={{ textAlign: 'center', marginBottom: '3rem' }}>Frequently Asked Questions</h2>
-            <div style={{ marginBottom: '2rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '8px' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#fff' }}>Should I size down to establish maximum compression?</h3>
+            <div style={{ marginBottom: '2rem', background: 'rgba(var(--foreground-rgb), 0.05)', padding: '2rem', borderRadius: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--color-text)' }}>Should I size down to establish maximum compression?</h3>
                 <p style={{ opacity: 0.8, lineHeight: '1.6' }}>No, our garments are rigorously pre-engineered specifically for maximum targeted pressure at true-to-size dimensions. Simply selecting your standard chest dimensions will flawlessly deliver the optimal, scientifically calculated compression feedback required.</p>
             </div>
-            <div style={{ marginBottom: '2rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '8px' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#fff' }}>How does it strictly compare to standard athletic t-shirts?</h3>
+            <div style={{ marginBottom: '2rem', background: 'rgba(var(--foreground-rgb), 0.05)', padding: '2rem', borderRadius: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--color-text)' }}>How does it strictly compare to standard athletic t-shirts?</h3>
                 <p style={{ opacity: 0.8, lineHeight: '1.6' }}>Unlike highly porous, loose-fitting standard cotton or basic polyester which absorbs sweat and drags heavily, our <Link href="/shop" style={{ textDecoration: 'underline', color: 'inherit' }}>elite compression gear</Link> decisively forms a highly supportive secondary skin, actively mitigating friction while immensely boosting vital neuromuscular proprioception.</p>
             </div>
         </div>

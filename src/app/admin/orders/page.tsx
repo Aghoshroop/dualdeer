@@ -83,7 +83,7 @@ export default function AdminOrdersPage() {
 
       <div className={styles.filterBar}>
         <div className={styles.filterGroup}>
-          <Filter size={16} color="var(--color-primary)" /> <span style={{ fontWeight: 600, color: '#fff', marginRight: '1rem' }}>SORT BY:</span>
+          <Filter size={16} color="var(--color-primary)" /> <span style={{ fontWeight: 600, color: 'var(--color-text)', marginRight: '1rem' }}>SORT BY:</span>
           <button onClick={() => setActiveFilter('recent')} className={`${styles.filterBtn} ${activeFilter === 'recent' ? styles.activeF : ''}`}>Most Recent</button>
           <button onClick={() => setActiveFilter('price_high')} className={`${styles.filterBtn} ${activeFilter === 'price_high' ? styles.activeF : ''}`}>Highest Price</button>
           <button onClick={() => setActiveFilter('price_low')} className={`${styles.filterBtn} ${activeFilter === 'price_low' ? styles.activeF : ''}`}>Lowest Price</button>

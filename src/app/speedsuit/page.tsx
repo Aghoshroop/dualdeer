@@ -20,9 +20,9 @@ export default function SpeedSuitSeoPage() {
           100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes glowPulse {
-          0% { box-shadow: 0 0 10px rgba(255,255,255,0.05); }
-          50% { box-shadow: 0 0 30px rgba(255,255,255,0.15); }
-          100% { box-shadow: 0 0 10px rgba(255,255,255,0.05); }
+          0% { box-shadow: 0 0 10px rgba(var(--foreground-rgb), 0.05); }
+          50% { box-shadow: 0 0 30px rgba(var(--foreground-rgb), 0.15); }
+          100% { box-shadow: 0 0 10px rgba(var(--foreground-rgb), 0.05); }
         }
         .animate-block {
           animation: fadeUpReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -39,7 +39,7 @@ export default function SpeedSuitSeoPage() {
         }
         .premium-card:hover {
           transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+          box-shadow: 0 20px 40px rgba(var(--background-rgb), 0.4);
         }
         
         @media (max-width: 350px) {
@@ -134,10 +134,10 @@ export default function SpeedSuitSeoPage() {
           </p>
         </div>
 
-        <div className="premium-card animate-block opacity-0 delay-4 compact-card" style={{ textAlign: 'center', marginTop: 'clamp(2rem, 12vw, 6rem)', padding: 'clamp(1rem, 8vw, 4rem) clamp(0.5rem, 4vw, 2rem)', background: 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(0,0,0,0.5))', borderRadius: '12px', border: '1px solid var(--color-border)', backdropFilter: 'blur(10px)', width: '100%', boxSizing: 'border-box' }}>
+        <div className="premium-card animate-block opacity-0 delay-4 compact-card" style={{ textAlign: 'center', marginTop: 'clamp(2rem, 12vw, 6rem)', padding: 'clamp(1rem, 8vw, 4rem) clamp(0.5rem, 4vw, 2rem)', background: 'linear-gradient(135deg, rgba(var(--foreground-rgb), 0.03), rgba(var(--background-rgb), 0.5))', borderRadius: '12px', border: '1px solid var(--color-border)', backdropFilter: 'blur(10px)', width: '100%', boxSizing: 'border-box' }}>
           <h3 className="compact-title" style={{ fontFamily: 'var(--font-logo), serif', fontSize: 'clamp(1rem, 8vw, 2rem)', marginBottom: 'clamp(0.5rem, 2vw, 1rem)', background: 'linear-gradient(90deg, #fff, #aaa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>Ready to Experience the SpeedSuit?</h3>
           <p className="compact-text" style={{ opacity: 0.8, marginBottom: 'clamp(1rem, 5vw, 2rem)', fontSize: 'clamp(0.7rem, 4vw, 1.1rem)', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>Shop the most highly-rated, affordable SpeedSuits directly in the DualDeer catalog today.</p>
-          <Link href="/shop?category=speedsuit" className="compact-btn" style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', padding: 'clamp(0.5rem, 3vw, 1rem) clamp(0.8rem, 6vw, 3rem)', background: 'var(--color-foreground)', color: 'var(--color-background)', textDecoration: 'none', fontWeight: 600, borderRadius: '30px', textTransform: 'uppercase', letterSpacing: 'clamp(1px, 1.5vw, 2px)', fontSize: 'clamp(0.6rem, 3.5vw, 0.95rem)', boxShadow: '0 10px 20px rgba(255,255,255,0.1)', transition: 'transform 0.3s ease, box-shadow 0.3s ease', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}>
+          <Link href="/shop?category=speedsuit" className="compact-btn" style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', padding: 'clamp(0.5rem, 3vw, 1rem) clamp(0.8rem, 6vw, 3rem)', background: 'var(--color-foreground)', color: 'var(--color-background)', textDecoration: 'none', fontWeight: 600, borderRadius: '30px', textTransform: 'uppercase', letterSpacing: 'clamp(1px, 1.5vw, 2px)', fontSize: 'clamp(0.6rem, 3.5vw, 0.95rem)', boxShadow: '0 10px 20px rgba(var(--foreground-rgb), 0.1)', transition: 'transform 0.3s ease, box-shadow 0.3s ease', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}>
             Shop The Collection
           </Link>
         </div>

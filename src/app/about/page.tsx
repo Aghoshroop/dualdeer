@@ -36,7 +36,7 @@ export default function AboutPage() {
       </div>
       
       <div style={{ textAlign: 'center', marginTop: '4rem' }}>
-        <Link href="/shop" style={{ display: 'inline-block', padding: '1rem 3rem', background: 'var(--color-primary)', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '30px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+        <Link href="/shop" style={{ display: 'inline-block', padding: '1rem 3rem', background: 'var(--color-primary)', color: 'var(--color-text)', textDecoration: 'none', fontWeight: 600, borderRadius: '30px', textTransform: 'uppercase', letterSpacing: '1px' }}>
           Explore Our Collection
         </Link>
       </div>

@@ -22,7 +22,7 @@
   align-items: center;
   gap: 0.5rem;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text);
   padding: 0.8rem 1.5rem;
   border-radius: 8px;
   font-weight: 600;
@@ -53,12 +53,12 @@
 .table th, .table td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(var(--background-rgb), 0.05);
   vertical-align: middle;
 }
 
 [data-theme='dark'] .table th, [data-theme='dark'] .table td {
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .table th {
@@ -69,7 +69,7 @@
 }
 
 .codeBadge {
-  background: rgba(0,0,0,0.05);
+  background: rgba(var(--background-rgb), 0.05);
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
   font-family: monospace;
@@ -80,7 +80,7 @@
 }
 
 [data-theme='dark'] .codeBadge {
-  background: rgba(255,255,255,0.05);
+  background: var(--color-border);
 }
 
 .discount {
@@ -139,7 +139,7 @@
 
 .editBtn:hover {
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text);
 }
 
 .deleteBtn {
@@ -149,7 +149,7 @@
 
 .deleteBtn:hover {
   background: #ef4444;
-  color: white;
+  color: var(--color-text);
 }
 
 /* Modal Styles */
@@ -159,7 +159,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(var(--background-rgb), 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -173,7 +173,7 @@
   border-radius: 12px;
   width: 100%;
   max-width: 500px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 25px rgba(var(--background-rgb), 0.2);
   margin: 1rem;
   max-height: 90vh;
   overflow-y: auto;
@@ -230,7 +230,7 @@
   border-radius: 8px;
   border: none;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text);
   font-weight: 600;
   cursor: pointer;
 }

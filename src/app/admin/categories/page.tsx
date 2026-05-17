@@ -119,12 +119,12 @@ export default function AdminCategoriesPage() {
               {categories.map((category) => (
                 <tr key={category.id}>
                   <td>
-                    {category.image ? <img src={category.image} alt={category.name} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} /> : <div style={{ width: '40px', height: '40px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)' }} />}
+                    {category.image ? <img src={category.image} alt={category.name} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} /> : <div style={{ width: '40px', height: '40px', borderRadius: '6px', background: 'rgba(var(--foreground-rgb), 0.05)' }} />}
                   </td>
                   <td><span className={styles.nameBadge}>{category.name}</span></td>
                   <td>
                     {category.subcategories && category.subcategories.length > 0 
-                      ? <span style={{ fontSize: '0.8rem', opacity: 0.8, background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>{category.subcategories.join(', ')}</span> 
+                      ? <span style={{ fontSize: '0.8rem', opacity: 0.8, background: 'rgba(var(--foreground-rgb), 0.05)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>{category.subcategories.join(', ')}</span> 
                       : <span style={{ fontSize: '0.8rem', opacity: 0.4 }}>None</span>}
                   </td>
                   <td>

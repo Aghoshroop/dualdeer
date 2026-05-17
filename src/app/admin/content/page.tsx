@@ -78,9 +78,9 @@ export default function AdminContentPage() {
               key={section.id}
               onClick={() => setActiveTab(section.id)}
               style={{
-                background: activeTab === section.id ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
+                background: activeTab === section.id ? 'var(--color-primary)' : 'rgba(var(--foreground-rgb), 0.05)',
                 color: activeTab === section.id ? '#fff' : 'var(--color-text)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                border: '1px solid var(--color-border)',
                 padding: '1rem',
                 borderRadius: '8px',
                 textAlign: 'left',
@@ -100,7 +100,7 @@ export default function AdminContentPage() {
             <p>Loading Content Block Data...</p>
           ) : (
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.2rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <h2 style={{ fontSize: '1.2rem', paddingBottom: '1rem', borderBottom: '1px solid var(--color-border)' }}>
                 Editing: {SECTION_KEYS.find(s => s.id === activeTab)?.name}
               </h2>
 

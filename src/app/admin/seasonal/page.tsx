@@ -212,7 +212,7 @@ export default function AdminSeasonalPage() {
       </header>
 
       {/* Global Season Title Settings */}
-      <div className={styles.controls} style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.02)', padding: '1rem 1.5rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.8rem' }}>
+      <div className={styles.controls} style={{ marginBottom: '1.5rem', background: 'rgba(var(--foreground-rgb), 0.02)', padding: '1rem 1.5rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.8rem' }}>
         <h3 style={{ fontSize: '1rem', margin: 0 }}>Front Page Season Title</h3>
         <p style={{ fontSize: '0.8rem', opacity: 0.6, margin: 0 }}>Modify the title of the grid displayed natively on the home page.</p>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', width: '100%', maxWidth: '400px' }}>
@@ -224,7 +224,7 @@ export default function AdminSeasonalPage() {
             placeholder="e.g. The Spring Collection"
           />
           <button onClick={saveSeasonTitle} disabled={savingTitle} style={{
-              background: 'var(--color-primary)', border: 'none', color: '#fff', borderRadius: '8px', padding: '0.6rem 1rem', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center'
+              background: 'var(--color-primary)', border: 'none', color: 'var(--color-text)', borderRadius: '8px', padding: '0.6rem 1rem', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center'
           }}>
             <Save size={16} /> {savingTitle ? "Saving..." : "Save Title"}
           </button>
@@ -232,7 +232,7 @@ export default function AdminSeasonalPage() {
       </div>
 
       {/* Global Section 4 (Brand Story) Settings */}
-      <div className={styles.controls} style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.8rem' }}>
+      <div className={styles.controls} style={{ marginBottom: '1.5rem', background: 'rgba(var(--foreground-rgb), 0.02)', padding: '1.5rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.8rem' }}>
         <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Section 4 (Brand Story) Dynamic Content</h3>
         <p style={{ fontSize: '0.85rem', opacity: 0.6, margin: 0, marginBottom: '1rem' }}>Fully control the text, titles, and backdrop image for the 4th section of the Home Page.</p>
         
@@ -292,7 +292,7 @@ export default function AdminSeasonalPage() {
                 style={{ flex: 1, marginTop: '0.4rem' }}
               />
               <button onClick={saveSection4Text} disabled={savingSection4} style={{
-                  background: 'var(--color-primary)', border: 'none', color: '#fff', borderRadius: '8px', padding: '0 1.5rem', cursor: 'pointer', marginTop: '0.4rem'
+                  background: 'var(--color-primary)', border: 'none', color: 'var(--color-text)', borderRadius: '8px', padding: '0 1.5rem', cursor: 'pointer', marginTop: '0.4rem'
               }}>
                 {savingSection4 ? "Saving..." : "Save Text"}
               </button>
@@ -382,7 +382,7 @@ export default function AdminSeasonalPage() {
                   value={formData.description} 
                   onChange={e => setFormData({ ...formData, description: e.target.value })} 
                   required 
-                  style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.4)', color: 'var(--color-text)', minHeight: '80px', fontFamily: 'inherit' }}
+                  style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'rgba(var(--background-rgb), 0.4)', color: 'var(--color-text)', minHeight: '80px', fontFamily: 'inherit' }}
                 />
               </div>
 
@@ -444,7 +444,7 @@ export default function AdminSeasonalPage() {
                       <button 
                          type="button"
                          onClick={() => setFormData(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
-                         style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ff3333', color: 'white', border: 'none', borderRadius: '50%', width: '22px', height: '22px', cursor: 'pointer' }}
+                         style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ff3333', color: 'var(--color-text)', border: 'none', borderRadius: '50%', width: '22px', height: '22px', cursor: 'pointer' }}
                       >×</button>
                     </div>
                   ))}
@@ -456,7 +456,7 @@ export default function AdminSeasonalPage() {
 
               <div className={styles.formActions} style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className={styles.saveBtn} disabled={isUploading || uploadingImage} style={{ flex: 1, background: 'var(--color-primary)', border: 'none', color: '#fff', borderRadius: '8px', padding: '0.8rem' }}>
+                <button type="submit" className={styles.saveBtn} disabled={isUploading || uploadingImage} style={{ flex: 1, background: 'var(--color-primary)', border: 'none', color: 'var(--color-text)', borderRadius: '8px', padding: '0.8rem' }}>
                   {isUploading ? 'Saving...' : 'Save Product'}
                 </button>
               </div>

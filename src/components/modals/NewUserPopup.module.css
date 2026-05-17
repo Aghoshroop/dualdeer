@@ -4,7 +4,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(var(--background-rgb), 0.7);
   backdrop-filter: blur(10px);
   z-index: 9999;
   display: flex;
@@ -21,13 +21,13 @@
 
 .modal {
   background: rgba(10, 10, 10, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   width: 100%;
   max-width: 480px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  box-shadow: 0 20px 50px rgba(var(--background-rgb), 0.8);
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   color: var(--color-text);
   font-family: var(--font-primary);
@@ -42,9 +42,9 @@
   position: absolute;
   top: 15px;
   right: 15px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -58,7 +58,7 @@
 
 .closeBtn:hover {
   background: #ff3333;
-  color: #fff;
+  color: var(--color-text);
   border-color: #ff3333;
 }
 
@@ -69,7 +69,7 @@
   align-items: center;
   justify-content: center;
   color: #10b981;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .content {
@@ -82,12 +82,12 @@
   font-size: 2rem;
   letter-spacing: 1px;
   margin-bottom: 1rem;
-  color: #fff;
+  color: var(--color-text);
 }
 
 .subtitle {
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.6);
+  color: var(--color-border);
   line-height: 1.6;
   margin-bottom: 2rem;
 }
@@ -114,7 +114,7 @@
 .copyBtn {
   background: transparent;
   border: none;
-  color: rgba(255,255,255,0.5);
+  color: var(--color-border);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -125,8 +125,8 @@
 }
 
 .copyBtn:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.1);
+  color: var(--color-text);
+  background: var(--color-border);
 }
 
 .actions {
@@ -137,7 +137,7 @@
 
 .primaryBtn {
   background: var(--color-primary);
-  color: #000;
+  color: var(--color-background);
   text-decoration: none;
   padding: 1rem;
   border-radius: 8px;
@@ -152,6 +152,6 @@
 }
 
 .primaryBtn:hover {
-  background: #fff;
-  box-shadow: 0 0 20px rgba(255,255,255,0.2);
+  background: var(--color-foreground);
+  box-shadow: 0 0 20px var(--color-border);
 }

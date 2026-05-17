@@ -1,0 +1,128 @@
+.sectionContainer {
+  position: relative;
+  width: 100%;
+  background-color: #05050a; /* Deep navy / rich black */
+  /* Do not set explicit height; GSAP pin spacer manages total distance */
+}
+
+.stickyWrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #020205; /* Solid rich black fallback */
+}
+
+.canvasElement {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* CRITICAL: No CSS transforms, scaling, or animations to preserve raw pixel clarity */
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  /* Cinematic lighting: very subtle dark vignette */
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.3) 100%),
+              linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 30%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.overlayContent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-bottom: 18vh;
+  padding-right: 12vw;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0; /* Animated by GSAP */
+  will-change: opacity, transform;
+}
+
+.ctaButton {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 4rem;
+  background: linear-gradient(135deg, rgba(90, 24, 154, 0.85) 0%, rgba(157, 78, 221, 0.95) 100%);
+  color: #ffffff;
+  font-family: var(--font-sans, "Inter", sans-serif);
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  text-decoration: none;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 15px 40px rgba(90, 24, 154, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.ctaButton:hover {
+  background: linear-gradient(135deg, rgba(123, 44, 191, 0.95) 0%, rgba(199, 125, 255, 1) 100%);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(123, 44, 191, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.mobileStaticWrapper {
+  display: none;
+}
+
+.mobileStaticImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mobileOverlayContent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 4rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .mobileStaticWrapper {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    min-height: 400px;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #000;
+  }
+  
+  .stickyWrapper {
+    display: none;
+  }
+
+  .ctaButton {
+    padding: 1rem 2.5rem;
+    font-size: 0.8rem;
+    width: auto;
+    min-width: 250px;
+    text-align: center;
+    letter-spacing: 0.15em;
+    pointer-events: auto;
+  }
+}

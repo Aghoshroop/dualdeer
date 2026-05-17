@@ -33,7 +33,7 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
   if (loading || products.length === 0) return null; // Hide the section if no related items found
 
   return (
-    <section className={styles.section} style={{ paddingTop: '4rem', paddingBottom: '4rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+    <section className={styles.section} style={{ paddingTop: '4rem', paddingBottom: '4rem', borderTop: '1px solid rgba(var(--foreground-rgb), 0.05)' }}>
       <div className={styles.container}>
         <div className={styles.header}>
           <motion.h2 

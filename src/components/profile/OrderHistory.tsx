@@ -88,8 +88,8 @@ export default function OrderHistory({ user }: { user: any }) {
       <h2 className={styles.sectionTitle} style={{ marginTop: '4rem' }}><ShoppingBag size={28} color="var(--color-primary)"/> Order History</h2>
       
       {orders.length === 0 ? (
-        <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
-          <PackageSearch size={48} color="rgba(255,255,255,0.1)" style={{ margin: '0 auto 1rem' }} />
+        <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(var(--foreground-rgb), 0.02)', borderRadius: '12px' }}>
+          <PackageSearch size={48} color="rgba(var(--foreground-rgb), 0.1)" style={{ margin: '0 auto 1rem' }} />
           <p style={{ color: 'var(--color-text-muted)' }}>You have not made any purchases yet.</p>
         </div>
       ) : (
@@ -100,12 +100,12 @@ export default function OrderHistory({ user }: { user: any }) {
                 <h4>Order #{order.id?.substring(0, 8).toUpperCase()}</h4>
                 <p>Status: <span style={{ textTransform: 'capitalize', color: order.status === 'delivered' ? '#10b981' : 'var(--color-primary)' }}>{order.status}</span> • {order.items.length} Items</p>
                 {/* Embedded Items List */}
-                <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1rem' }}>
+                <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(var(--foreground-rgb), 0.05)', paddingTop: '1rem' }}>
                   {order.items.map((item, idx) => (
                     <div key={idx} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.8rem', fontSize: '0.9rem' }}>
                       <span style={{ color: 'var(--color-text)', flex: '1 1 auto', wordBreak: 'break-word', minWidth: '120px' }}>
                         {item.quantity}x {item.name}
-                        {item.size && <span style={{ marginLeft: '8px', padding: '2px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 700 }}>Size: {item.size}</span>}
+                        {item.size && <span style={{ marginLeft: '8px', padding: '2px 6px', background: 'rgba(var(--foreground-rgb), 0.05)', borderRadius: '4px', color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 700 }}>Size: {item.size}</span>}
                       </span>
                       <div className={styles.itemPrices}>
                         {item.mrp > item.pricePaid && <span className={styles.mrp}>₹{item.mrp.toFixed(2)}</span>}

@@ -92,9 +92,9 @@ export default function NewsletterModal() {
             <h2 className={styles.successTitle}>Access Granted.</h2>
             <p className={styles.successSubtitle}>Your clearance has been established. Apply the following sequence at Checkout:</p>
             
-            <div className={styles.couponCodeWrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '1rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
+            <div className={styles.couponCodeWrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '1rem', marginBottom: '1.5rem', background: 'rgba(var(--foreground-rgb), 0.05)', padding: '1rem', borderRadius: '8px' }}>
                <code className={styles.couponCode} style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>FIRST15</code>
-               <button onClick={copyCode} className={styles.copyBtn} title="Copy Code" style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+               <button onClick={copyCode} className={styles.copyBtn} title="Copy Code" style={{ background: 'transparent', border: 'none', color: 'var(--color-text)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                  {copied ? <CheckCircle2 size={24} color="#10b981" /> : <Copy size={24} />}
                </button>
             </div>

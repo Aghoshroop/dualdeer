@@ -108,7 +108,7 @@ export default function TestimonialSlider() {
                       key={i} 
                       size={18} 
                       fill={i < testimonials[currentIndex].rating ? "#eab308" : "none"} 
-                      color={i < testimonials[currentIndex].rating ? "#eab308" : "rgba(255,255,255,0.2)"} 
+                      color={i < testimonials[currentIndex].rating ? "#eab308" : "rgba(var(--foreground-rgb), 0.2)"} 
                     />
                   ))}
                 </div>

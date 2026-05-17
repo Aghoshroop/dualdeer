@@ -2,11 +2,11 @@
   padding: 8rem 5%;
   background-color: var(--color-background);
   color: var(--color-text);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--color-border);
 }
 
 [data-theme='light'] .section {
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(var(--background-rgb), 0.05);
 }
 
 .container {
@@ -68,8 +68,8 @@
 
 .testimonialCard {
   width: 100%;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
   backdrop-filter: blur(12px);
   padding: 3.5rem;
   border-radius: 20px;
@@ -77,13 +77,13 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(var(--background-rgb), 0.2);
 }
 
 [data-theme='light'] .testimonialCard {
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  background: rgba(var(--background-rgb), 0.02);
+  border: 1px solid rgba(var(--background-rgb), 0.08);
+  box-shadow: 0 20px 40px rgba(var(--background-rgb), 0.05);
 }
 
 @media (max-width: 600px) {
@@ -130,12 +130,12 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--color-border);
   object-fit: cover;
 }
 
 [data-theme='light'] .avatar {
-  border: 2px solid rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(var(--background-rgb), 0.1);
 }
 
 .clientInfo {
@@ -158,8 +158,8 @@
 
 /* Controls */
 .arrowBtn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
   color: var(--color-text);
   width: 50px;
   height: 50px;
@@ -180,13 +180,13 @@
 }
 
 [data-theme='light'] .arrowBtn {
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(var(--background-rgb), 0.05);
+  border: 1px solid rgba(var(--background-rgb), 0.1);
 }
 
 [data-theme='light'] .arrowBtn:hover {
-  background: #000;
-  color: #fff;
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 @media (max-width: 768px) {
@@ -213,7 +213,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--color-border);
   border: none;
   cursor: pointer;
   transition: all 0.3s;
@@ -221,7 +221,7 @@
 }
 
 [data-theme='light'] .dot {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(var(--background-rgb), 0.2);
 }
 
 .activeDot {

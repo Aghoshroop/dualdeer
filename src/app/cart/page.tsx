@@ -1,23 +1,26 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Trash2, Lock, ArrowRight, ShieldCheck, ShoppingBag, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import styles from './CartPage.module.css';
-import { validateCoupon } from '@/lib/firebaseUtils';
+import { validateCoupon, getProducts, Product } from '@/lib/firebaseUtils';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
 import QuantitySelector from '@/components/ui/QuantitySelector';
 
 export default function CartPage() {
-  const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
+  const router = useRouter();
+  const { cart, updateQuantity, removeFromCart, cartTotal, addToCart } = useCart();
   const [mounted, setMounted] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [couponError, setCouponError] = useState('');
   const [couponSuccess, setCouponSuccess] = useState('');
   const [isApplying, setIsApplying] = useState(false);
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
 
   const [currentUser, setCurrentUser] = useState<any>(null);
 
@@ -26,6 +29,12 @@ export default function CartPage() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
     });
+    
+    // Fetch top 2 products for empty state recommendations
+    getProducts().then(prods => {
+      setRecommendedProducts(prods.slice(0, 2));
+    });
+
     return () => unsubscribe();
   }, []);
 
@@ -83,10 +92,64 @@ export default function CartPage() {
       </div>
 
       {cart.length === 0 ? (
-        <div className={styles.emptyCart}>
-          <p>Your bag is currently empty.</p>
-          <Link href="/" className={styles.shopBtn}>CONTINUE SHOPPING</Link>
-        </div>
+        <motion.div 
+          className={styles.emptyCartCinematic}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <div className={styles.emptyCartHero}>
+            <div className={styles.glowAura}></div>
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 1, type: "spring" }}
+            >
+              <ShoppingBag size={80} strokeWidth={0.5} className={styles.emptyBagIcon} />
+            </motion.div>
+            <h2 className={styles.emptyCartTitle}>THE ARCHIVE IS EMPTY</h2>
+            <p className={styles.emptyCartSubtitle}>Your curated collection awaits. Add pieces to unlock your signature style.</p>
+            <Link href="/shop" className={styles.shopBtnCinematic}>
+              ENTER COLLECTION <ArrowRight size={16} />
+            </Link>
+          </div>
+
+          {recommendedProducts.length > 0 && (
+            <div className={styles.quickAddSection}>
+              <h3 className={styles.quickAddTitle}>Curated For You</h3>
+              <div className={styles.quickAddGrid}>
+                {recommendedProducts.map((prod, i) => (
+                  <motion.div 
+                    key={prod.id} 
+                    className={styles.quickAddCard}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + (i * 0.2), duration: 0.8 }}
+                  >
+                    <div className={styles.quickAddImageWrap} onClick={() => router.push(`/product/${prod.slug}`)}>
+                      <img src={prod.image} alt={prod.name} />
+                      <div className={styles.quickAddOverlay}>
+                        <span>View Details</span>
+                      </div>
+                    </div>
+                    <div className={styles.quickAddInfo}>
+                      <div className={styles.quickAddText}>
+                        <h4 className={styles.quickAddName}>{prod.name}</h4>
+                        <span className={styles.quickAddPrice}>₹{prod.price.toFixed(2)}</span>
+                      </div>
+                      <button 
+                        className={styles.quickAddBtn}
+                        onClick={() => addToCart({ id: prod.id as string, name: prod.name, price: prod.price, mrp: prod.mrp, image: prod.image, size: 'M', quantity: 1 })}
+                      >
+                        <Plus size={20} />
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+        </motion.div>
       ) : (
         <div className={styles.cartContent}>
           {/* Items List */}
@@ -175,7 +238,7 @@ export default function CartPage() {
                   <button 
                     onClick={handleApplyCoupon}
                     disabled={isApplying || !couponCode}
-                    style={{ padding: '0.6rem 1rem', background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                    style={{ padding: '0.6rem 1rem', background: 'var(--color-primary)', color: 'var(--color-text)', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                   >
                     {isApplying ? '...' : 'Apply'}
                   </button>
@@ -186,7 +249,7 @@ export default function CartPage() {
               
               <div className={styles.totalRow}>
                 <span>Total</span>
-                <span>${total.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                <span>₹{total.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
               </div>
 
               <Link href="/checkout" className={styles.checkoutBtn} style={{ textDecoration: 'none', display: 'flex' }}>

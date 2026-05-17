@@ -107,8 +107,8 @@ export default function RewardGame({ user }: { user: any }) {
       <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }}>Exclusive promotional codes actively unlocked for your account.</p>
 
       {coupons.length === 0 ? (
-        <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
-          <Ticket size={48} color="rgba(255,255,255,0.1)" style={{ margin: '0 auto 1rem' }} />
+        <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(var(--foreground-rgb), 0.02)', borderRadius: '12px' }}>
+          <Ticket size={48} color="rgba(var(--foreground-rgb), 0.1)" style={{ margin: '0 auto 1rem' }} />
           <p>You have no active coupons in your wallet.</p>
         </div>
       ) : (

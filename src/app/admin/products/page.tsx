@@ -249,7 +249,7 @@ export default function AdminProductsPage() {
           {!viewingTrash && lastDeleted && (
             <button 
               onClick={handleUndoDelete}
-              style={{ background: '#ffcc00', color: '#000', border: 'none', padding: '0.5rem 1rem', borderRadius: '50px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', animation: 'fadeIn 0.3s ease' }}
+              style={{ background: '#ffcc00', color: 'var(--color-background)', border: 'none', padding: '0.5rem 1rem', borderRadius: '50px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', animation: 'fadeIn 0.3s ease' }}
             >
               <RotateCcw size={16} /> Undo Delete
             </button>
@@ -257,7 +257,7 @@ export default function AdminProductsPage() {
         </div>
         {!viewingTrash && (
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button className={styles.addBtn} onClick={handleMigrateSlugs} disabled={migratingSlugs} style={{ background: '#333', color: 'white', border: '1px solid #555' }}>
+            <button className={styles.addBtn} onClick={handleMigrateSlugs} disabled={migratingSlugs} style={{ background: '#333', color: 'var(--color-text)', border: '1px solid #555' }}>
               {migratingSlugs ? 'Migrating...' : 'Migrate SEO Slugs'}
             </button>
             <button className={styles.addBtn} onClick={openAddModal}>
@@ -270,7 +270,7 @@ export default function AdminProductsPage() {
       {/* Shop Image Overrides */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
         {/* Backdrop Override */}
-        <div className={styles.controls} style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem 1.5rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.8rem' }}>
+        <div className={styles.controls} style={{ background: 'rgba(var(--foreground-rgb), 0.02)', padding: '1rem 1.5rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.8rem' }}>
           <h3 style={{ fontSize: '1rem', margin: 0 }}>Store Backdrop Override</h3>
           <p style={{ fontSize: '0.8rem', opacity: 0.6, margin: 0 }}>Upload a dynamic image to override the dark cinematic backdrop on the Collections page.</p>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', width: '100%' }}>
@@ -295,12 +295,12 @@ export default function AdminProductsPage() {
         </div>
 
         {/* Hero Override */}
-        <div className={styles.controls} style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem 1.5rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.8rem' }}>
+        <div className={styles.controls} style={{ background: 'rgba(var(--foreground-rgb), 0.02)', padding: '1rem 1.5rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.8rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
             <h3 style={{ fontSize: '1rem', margin: 0 }}>Shop Half-Screen Banner</h3>
             <button 
               onClick={() => updateContentBlock('shop-hero', { imageUrl: heroImage, title: heroText, body: '' })}
-              style={{ background: 'var(--color-primary)', color: 'white', border: 'none', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer' }}
+              style={{ background: 'var(--color-primary)', color: 'var(--color-text)', border: 'none', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer' }}
             >
               Save Text
             </button>
@@ -312,7 +312,7 @@ export default function AdminProductsPage() {
             value={heroText}
             onChange={(e) => setHeroText(e.target.value)}
             placeholder="Motivational Overlay Text..."
-            style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}
+            style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', background: 'rgba(var(--background-rgb), 0.2)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
           />
 
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', width: '100%', marginTop: '0.4rem' }}>
@@ -398,7 +398,7 @@ export default function AdminProductsPage() {
                     <div className={styles.actions}>
                       {viewingTrash ? (
                          <>
-                           <button className={styles.editBtn} aria-label="Restore" onClick={() => handleRestoreFromTrash(product.id!)} style={{ background: '#22c55e', color: 'black' }}><ArchiveRestore size={16} /></button>
+                           <button className={styles.editBtn} aria-label="Restore" onClick={() => handleRestoreFromTrash(product.id!)} style={{ background: '#22c55e', color: 'var(--color-background)' }}><ArchiveRestore size={16} /></button>
                            <button className={styles.deleteBtn} aria-label="Permanent Delete" onClick={() => handleHardDelete(product.id!)}><AlertTriangle size={16} /></button>
                          </>
                       ) : (
@@ -479,7 +479,7 @@ export default function AdminProductsPage() {
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   required
                   placeholder="Product description and details..."
-                  style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.4)', color: 'var(--color-text)', minHeight: '80px', fontFamily: 'inherit' }}
+                  style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'rgba(var(--background-rgb), 0.4)', color: 'var(--color-text)', minHeight: '80px', fontFamily: 'inherit' }}
                 />
               </div>
 
@@ -494,7 +494,7 @@ export default function AdminProductsPage() {
               </div>
 
               {formData.sizes && formData.sizes.split(',').filter(s => s.trim()).length > 0 && (
-                <div className={styles.formGroup} style={{ gridColumn: '1 / -1', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px' }}>
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1', background: 'rgba(var(--foreground-rgb), 0.02)', padding: '1rem', borderRadius: '8px' }}>
                   <label>Stock per Size</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.5rem' }}>
                     {formData.sizes.split(',').map(s => s.trim()).filter(Boolean).map(size => (
@@ -509,7 +509,7 @@ export default function AdminProductsPage() {
                             setFormData({...formData, sizeUnits: updatedUnits});
                           }}
                           min="0"
-                          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.4)', color: 'white' }}
+                          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--color-border)', background: 'rgba(var(--background-rgb), 0.4)', color: 'var(--color-text)' }}
                         />
                       </div>
                     ))}
@@ -606,7 +606,7 @@ export default function AdminProductsPage() {
                     <button 
                        type="button"
                        onClick={() => setFormData(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
-                       style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ff3333', color: 'white', border: 'none', borderRadius: '50%', width: '22px', height: '22px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}
+                       style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ff3333', color: 'var(--color-text)', border: 'none', borderRadius: '50%', width: '22px', height: '22px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}
                     >
                       ×
                     </button>

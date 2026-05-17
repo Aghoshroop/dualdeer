@@ -21,7 +21,7 @@
   border: 1px solid var(--color-border);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+  box-shadow: 0 10px 40px rgba(var(--background-rgb), 0.03);
 }
 .emptyState {
   padding: 6rem 2rem;
@@ -51,10 +51,10 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--color-text-muted);
-  background: rgba(0,0,0,0.02);
+  background: rgba(var(--background-rgb), 0.02);
 }
 [data-theme='dark'] .table th {
-  background: rgba(255,255,255,0.02);
+  background: var(--color-border);
 }
 .row {
   transition: background-color 0.2s ease;

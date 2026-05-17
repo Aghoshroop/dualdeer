@@ -75,16 +75,16 @@ export default function BestGymClient({ initialProducts }: { initialProducts: Pr
       <section className={styles.darkSection} style={{ padding: '4rem 2rem' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <h2 className={styles.sectionTitle} style={{ textAlign: 'center', marginBottom: '3rem' }}>Frequently Asked Questions</h2>
-            <div style={{ marginBottom: '2rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '8px' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#fff' }}>Why is DualDeer considered the best activewear in the country?</h3>
+            <div style={{ marginBottom: '2rem', background: 'rgba(var(--foreground-rgb), 0.05)', padding: '2rem', borderRadius: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--color-text)' }}>Why is DualDeer considered the best activewear in the country?</h3>
                 <p style={{ opacity: 0.8, lineHeight: '1.6' }}>We completely bypass standard fast-fashion methodologies, explicitly choosing to meticulously engineered our garments using heavily guarded proprietary hydrophobic textiles, extreme stress-tested flatlock seams, and visually striking architectural designs that seamlessly execute both in the combat gym and upon sophisticated city streets.</p>
             </div>
-            <div style={{ marginBottom: '2rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '8px' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#fff' }}>Do these garments actively assist in workout recovery?</h3>
+            <div style={{ marginBottom: '2rem', background: 'rgba(var(--foreground-rgb), 0.05)', padding: '2rem', borderRadius: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--color-text)' }}>Do these garments actively assist in workout recovery?</h3>
                 <p style={{ opacity: 0.8, lineHeight: '1.6' }}>Yes, extensively. Our highly specialized compression pieces intuitively stabilize rapidly firing muscle fibers, strongly minimizing internal connective micro-trauma. This actively boosts immediate venous return, rapidly flushing devastating lactic acid to substantially lower mandatory recovery timeframes.</p>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '8px' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#fff' }}>How extensively are the fabrics tested?</h3>
+            <div style={{ background: 'rgba(var(--foreground-rgb), 0.05)', padding: '2rem', borderRadius: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--color-text)' }}>How extensively are the fabrics tested?</h3>
                 <p style={{ opacity: 0.8, lineHeight: '1.6' }}>Every structural silhouette, prominently including our highly sought-after <Link href="/shop" style={{ textDecoration: 'underline', color: 'inherit' }}>core collection pieces</Link>, undergoes violently rigorous friction, stretch, and thermal dynamic stress testing before it ever approaches the public market.</p>
             </div>
         </div>

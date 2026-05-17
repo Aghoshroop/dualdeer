@@ -26,17 +26,17 @@
   height: 90px;
   border-radius: 50%;
   background: var(--color-background);
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid rgba(var(--background-rgb), 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+  box-shadow: 0 4px 10px rgba(var(--background-rgb), 0.02);
 }
 
 [data-theme='dark'] .iconCircle {
-  border: 1px solid rgba(255,255,255,0.05);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 10px rgba(var(--background-rgb), 0.2);
 }
 
 .activeCircle {
@@ -46,12 +46,12 @@
 }
 
 .activeCircle .svgIcon {
-  color: white;
+  color: var(--color-text);
 }
 
 .iconItem:hover .iconCircle {
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text);
   box-shadow: 0 8px 20px rgba(90, 15, 200, 0.4);
 }
 
@@ -65,7 +65,7 @@
 
 .iconItem:hover .svgIcon {
   transform: scale(1.1);
-  color: white;
+  color: var(--color-text);
 }
 
 .name {

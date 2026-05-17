@@ -295,7 +295,7 @@ export default function AuthPage() {
               type="button"
               onClick={handleGoogleSignIn}
               className={styles.googleBtn}
-              whileHover={{ scale: 1.02, background: 'rgba(255, 255, 255, 0.1)' }}
+              whileHover={{ scale: 1.02, background: 'rgba(var(--foreground-rgb), 0.1)' }}
               whileTap={{ scale: 0.98 }}
             >
               <svg className={styles.googleIcon} width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

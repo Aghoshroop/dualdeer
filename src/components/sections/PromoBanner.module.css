@@ -33,8 +33,8 @@
 }
 
 .right {
-  background: #111;
-  color: white;
+  background: var(--color-surface);
+  color: var(--color-text);
   align-items: flex-start;
 }
 
@@ -75,7 +75,7 @@
 }
 
 [data-theme='dark'] .left .title {
-  color: #fff;
+  color: var(--color-text);
 }
 
 .imageBoxLeft {
@@ -94,7 +94,7 @@
   height: 100%;
   border-radius: 200px 200px 0 0;
   overflow: hidden;
-  background: rgba(0,0,0,0.05);
+  background: rgba(var(--background-rgb), 0.05);
 }
 
 .imageBox {

@@ -90,16 +90,16 @@ export default function GymWearClient({ initialProducts }: { initialProducts: Pr
       <section className={styles.darkSection} style={{ padding: '4rem 2rem' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <h2 className={styles.sectionTitle} style={{ textAlign: 'center', marginBottom: '3rem' }}>Frequently Asked Questions</h2>
-            <div style={{ marginBottom: '2rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '8px' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#fff' }}>What constitutes the best gym wear for men in India?</h3>
+            <div style={{ marginBottom: '2rem', background: 'rgba(var(--foreground-rgb), 0.05)', padding: '2rem', borderRadius: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--color-text)' }}>What constitutes the best gym wear for men in India?</h3>
                 <p style={{ opacity: 0.8, lineHeight: '1.6' }}>The finest gym wear strictly requires advanced moisture-wicking synthetic blends, aggressive four-way kinetic stretch capability, friction-resistant flatlock stitching, and an inherently sleek, highly tailored architectural fit—all of which precisely define the DualDeer core collection.</p>
             </div>
-            <div style={{ marginBottom: '2rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '8px' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#fff' }}>How does compression gear enhance performance?</h3>
+            <div style={{ marginBottom: '2rem', background: 'rgba(var(--foreground-rgb), 0.05)', padding: '2rem', borderRadius: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--color-text)' }}>How does compression gear enhance performance?</h3>
                 <p style={{ opacity: 0.8, lineHeight: '1.6' }}>Compression gear directly stabilizes major muscle groups to actively reduce painful vibration, effectively increasing critical blood flow and drastically reducing immediate post-workout fatigue, highly evident within our meticulously engineered <Link href="/compression-tshirt-men" style={{ textDecoration: 'underline', color: 'inherit' }}>compression t-shirt line</Link>.</p>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '8px' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#fff' }}>Can DualDeer activewear be worn outside the gym?</h3>
+            <div style={{ background: 'rgba(var(--foreground-rgb), 0.05)', padding: '2rem', borderRadius: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--color-text)' }}>Can DualDeer activewear be worn outside the gym?</h3>
                 <p style={{ opacity: 0.8, lineHeight: '1.6' }}>Absolutely. DualDeer pieces are precisely designed with a strictly minimalist, highly refined luxury aesthetic, ensuring they seamlessly and confidently transition into sophisticated casual athleisure wear on the contemporary city streets.</p>
             </div>
         </div>

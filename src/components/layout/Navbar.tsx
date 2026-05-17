@@ -93,7 +93,7 @@ export default function Navbar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
-    return scrollY.onChange((latest) => {
+    return scrollY.on("change", (latest) => {
       if (latest > dockEnd) setIsDocked(true);
       else setIsDocked(false);
     });
@@ -140,55 +140,108 @@ export default function Navbar() {
         return nName.includes(normalizedQuery) || nCat.includes(normalizedQuery) || nSub.includes(normalizedQuery);
       }).slice(0, 6);
 
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Adaptive cinematic variants
+  const navContainerVariants = {
+    expandedTop: {
+      width: "100%",
+      borderRadius: "0px",
+      y: 40, // Under promo bar
+      backgroundColor: isHome ? "rgba(0,0,0,0)" : (theme === 'dark' ? "var(--color-background)" : "var(--color-background)"),
+      backdropFilter: "blur(0px)",
+      border: "1px solid transparent",
+      borderBottomColor: isHome ? "transparent" : "var(--color-border)",
+    },
+    expandedScrolled: {
+      width: "100%",
+      borderRadius: "0px",
+      y: 0,
+      backgroundColor: theme === 'dark' ? "rgba(10,10,10,0.85)" : "rgba(255,255,255,0.9)",
+      backdropFilter: "blur(16px)",
+      border: "1px solid transparent",
+      borderBottomColor: "var(--color-border)",
+    },
+    compact: {
+      width: isMobile ? "92%" : "65%",
+      borderRadius: "50px",
+      y: 20,
+      backgroundColor: theme === 'dark' ? "rgba(15,15,20,0.7)" : "rgba(255,255,255,0.75)",
+      backdropFilter: "blur(24px)",
+      border: theme === 'dark' ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.06)",
+      borderBottomColor: theme === 'dark' ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+    }
+  };
+
+  const mainNavVariants = {
+    expandedTop: { height: isMobile ? "50px" : "80px", padding: isMobile ? "0 5px" : "0 3rem" },
+    expandedScrolled: { height: isMobile ? "50px" : "80px", padding: isMobile ? "0 5px" : "0 3rem" },
+    compact: { height: "60px", padding: "0 2rem" }
+  };
+
+  const linksVariants = {
+    expandedTop: { gap: "2.5rem" },
+    expandedScrolled: { gap: "2.5rem" },
+    compact: { gap: "1.2rem" }
+  };
+
+  let navState = "expandedTop";
+  if (isDocked) {
+    // Prevent capsule shrinking on mobile
+    navState = (isHovered || isMobile) ? "expandedScrolled" : "compact";
+  }
+
   // This check is AFTER all hooks — safe per Rules of Hooks.
-  // Early returns before hooks cause Turbopack's "static flag" panic.
   if (!mounted) {
     return null;
   }
 
   return (
     <>
-      <header className={`${styles.header} ${!isDocked && isHome ? styles.transparentHeader : ''}`} onMouseLeave={() => setHoveredMenu(null)}>
-        {/* Promo Bar */}
-        <div className={styles.promoBar}>
-          <span>COMPLIMENTARY SHIPPING & RETURNS ON ALL ORDERS</span>
-        </div>
-        
-        {/* Main Nav */}
-        <div className={styles.mainNav}>
-          <div className={styles.leftLinks}>
-            <div 
-              className={styles.navItem}
-              onMouseEnter={() => setHoveredMenu('COLLECTION')}
-            >
+      <motion.div 
+        className={styles.promoBar} 
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 101 }}
+        animate={{ y: isDocked ? -40 : 0, opacity: isDocked ? 0 : 1 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+      >
+        <span>COMPLIMENTARY SHIPPING & RETURNS ON ALL ORDERS</span>
+      </motion.div>
+
+      <motion.header 
+        className={styles.header} 
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => { setIsHovered(false); setHoveredMenu(null); }}
+        variants={navContainerVariants}
+        initial="expandedTop"
+        animate={navState}
+        transition={{ type: "spring", stiffness: 400, damping: 35, mass: 0.8 }}
+        style={{ left: 0, right: 0, margin: "0 auto", position: 'fixed', zIndex: 100 }}
+      >
+        <motion.div className={styles.mainNav} variants={mainNavVariants} transition={{ type: "spring", stiffness: 400, damping: 35 }}>
+          <motion.div className={styles.leftLinks} variants={linksVariants} transition={{ type: "spring", stiffness: 400, damping: 35 }}>
+            <div className={styles.navItem}>
               <Link href="/shop" className={styles.link}>COLLECTION</Link>
             </div>
-            <div className={styles.navItem}>
-              <Link href="/project-x" className={styles.link} style={{ color: 'var(--red-500)', textShadow: '0 0 10px rgba(239,68,68,0.5)', fontWeight: 600 }}>MYSTERY</Link>
-            </div>
-          </div>
-
-          {/* Logo Placeholder to maintain flex space */}
-          {isHome && mounted ? <div className={styles.logoPlaceholder}></div> : null}
+          </motion.div>
 
           <motion.div 
-            className={`${styles.brandContainer} ${isHome && mounted ? styles.animatedLogo : ''} ${isDocked || !isHome ? styles.docked : styles.floating}`}
-            style={isHome && mounted ? { 
-              y: isMobile ? logoYMobile : logoYDesktop, 
-              x: isMicro ? logoXMicro : (isMobile ? logoXMobile : logoXDesktop),
-              scale: isMobile ? logoScaleMobile : logoScaleDesktop,
-              transformOrigin: isMobile ? 'left top' : 'center center'
+            className={`${styles.brandContainer} ${isDocked || !isHome ? styles.docked : styles.floating}`}
+            style={isHome && !isMobile ? { 
+              y: logoYDesktop, 
+              x: logoXDesktop,
+              scale: logoScaleDesktop,
+              transformOrigin: 'center center'
             } : {}}
+            animate={navState === "compact" ? { scale: 0.9 } : { scale: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 35 }}
           >
             <Link href="/" className={styles.brand}>
-              <span>DUAL</span>
+              <span style={!isDocked && isHome ? { color: 'white', textShadow: '0 4px 20px rgba(0,0,0,0.5)' } : {}}>DUAL</span>
               <span className={styles.brandAccent}>DEER</span>
             </Link>
           </motion.div>
 
-
-
-          <div className={styles.rightIcons}>
+          <motion.div className={styles.rightIcons} variants={linksVariants} transition={{ type: "spring", stiffness: 400, damping: 35 }}>
             <div className={styles.searchContainer} ref={searchRef}>
               <button 
                 aria-label="Search" 
@@ -252,7 +305,7 @@ export default function Navbar() {
                             <div className={styles.marqueeTrack}>
                               {[...displayResults, ...displayResults].map((product, idx) => (
                                 <Link 
-                                  href={`/product/${product.slug}`} 
+                                  href={`/product/${product.slug || product.id}`} 
                                   key={`${product.id}-${idx}`} 
                                   className={styles.marqueeResultCard}
                                   onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
@@ -272,7 +325,7 @@ export default function Navbar() {
                           <div className={styles.overlayResultsGrid}>
                             {displayResults.map(product => (
                               <Link 
-                                href={`/product/${product.slug}`} 
+                                href={`/product/${product.slug || product.id}`} 
                                 key={product.id} 
                                 className={styles.overlayResultCard}
                                 onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
@@ -300,7 +353,7 @@ export default function Navbar() {
               className={styles.iconBtn}
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
-              {mounted && theme === 'dark' ? <Sun size={20} strokeWidth={1.5} /> : <Moon size={20} strokeWidth={1.5} />}
+              {theme === 'dark' ? <Sun size={20} strokeWidth={1.5} /> : <Moon size={20} strokeWidth={1.5} />}
             </button>
 
             <Link href="/auth" className={styles.desktopOnly}>
@@ -314,25 +367,19 @@ export default function Navbar() {
                 onClick={() => {
                    setIsNotifOpen(!isNotifOpen);
                    if (!isNotifOpen) {
-                     setUnreadNotifCount(0); // Drops external red bell counter immediately
-                     
-                     // Registers all currently loaded IDs as "Read" forever in storage
+                     setUnreadNotifCount(0); 
                      const allKnownIds = notifications.map(n => n.id).filter(id => !!id);
-                     // Safely retrieve existing to not overwrite old reads
                      const stored = localStorage.getItem('dualdeer_read_notif_ids');
                      const readIds: string[] = stored ? JSON.parse(stored) : [];
                      const combinedReads = Array.from(new Set([...readIds, ...allKnownIds]));
-                     
                      localStorage.setItem('dualdeer_read_notif_ids', JSON.stringify(combinedReads));
-                     // Note: We DO NOT clear `unreadNotifIds` state here! 
-                     // This allows the NEW tags to stay visibly locked on for this current session view!
                    }
                 }}
                 style={{ position: 'relative' }}
               >
                 <Bell size={20} strokeWidth={1.5} />
-                {mounted && unreadNotifCount > 0 && (
-                  <span className={styles.cartBadge} style={{ background: '#ef4444', color: '#fff' }}>{unreadNotifCount}</span>
+                {unreadNotifCount > 0 && (
+                  <span className={styles.cartBadge} style={{ background: '#ef4444', color: 'var(--color-text)' }}>{unreadNotifCount}</span>
                 )}
               </button>
               
@@ -411,12 +458,12 @@ export default function Navbar() {
 
             <Link href="/cart" style={{ position: 'relative' }} className={styles.desktopOnly}>
               <button aria-label="Cart" className={styles.iconBtn}><ShoppingBag size={20} strokeWidth={1.5} /></button>
-              {mounted && cartCount > 0 && (
+              {cartCount > 0 && (
                 <span className={styles.cartBadge}>{cartCount}</span>
               )}
             </Link>
 
-            {/* Mobile Menu Trigger (Disabled from Top Nav) */}
+            {/* Mobile Menu Trigger */}
             <button 
               aria-label="Open Menu" 
               className={`${styles.iconBtn} ${styles.mobileSubBtn || ''}`}
@@ -425,50 +472,9 @@ export default function Navbar() {
             >
               <Menu size={20} strokeWidth={1.5} />
             </button>
-          </div>
-        </div>
-
-        {/* Mega Menu Dropdown */}
-        <AnimatePresence>
-          {hoveredMenu && (
-            <motion.div 
-              className={styles.megaMenu}
-              style={{ transformOrigin: 'top center' }}
-              initial={{ opacity: 0, y: -40, scaleY: 0.5, scaleX: 1.05, filter: 'blur(15px)' }}
-              animate={{ opacity: 1, y: 0, scaleY: 1, scaleX: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -20, scaleY: 0.8, scaleX: 1.02, filter: 'blur(10px)' }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 150, 
-                damping: 10, 
-                mass: 1.5
-              }}
-            >
-              <div className={styles.megaMenuContainer}>
-                <div className={styles.menuLinks}>
-                  <div className={styles.menuCol}>
-                    <h4>SHOP BY CATEGORY</h4>
-                    <Link href="/shop" onClick={() => setHoveredMenu(null)}>All Collections</Link>
-                    {liveCategories.map((cat, i) => (
-                      <Link key={i} href="/shop" onClick={() => setHoveredMenu(null)} style={{ textTransform: 'capitalize' }}>
-                        {cat}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-                <div className={styles.menuImage}>
-                  <img 
-                    src={hoveredMenu === 'MEN' 
-                      ? "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop" 
-                      : "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop"} 
-                    alt={`${hoveredMenu} featured`} 
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
+          </motion.div>
+        </motion.div>
+      </motion.header>
 
       {/* Global Storefront Traffic Badge */}
       {/* Mobile Drawer */}
@@ -503,7 +509,6 @@ export default function Navbar() {
                         {cat}
                       </Link>
                    ))}
-                   <Link href="/project-x" onClick={() => setIsDrawerOpen(false)} style={{ color: 'var(--red-500)' }}>MYSTERY (LOCKED)</Link>
                    <div className={styles.drawerDivider} />
                    <Link href="/auth" onClick={() => setIsDrawerOpen(false)}>MY ACCOUNT</Link>
                    <Link href="/cart" onClick={() => setIsDrawerOpen(false)}>MY BAG ({cartCount})</Link>

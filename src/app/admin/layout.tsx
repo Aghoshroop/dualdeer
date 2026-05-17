@@ -35,12 +35,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin" className={styles.link} onClick={closeMenu}><LayoutDashboard size={20} /> Dashboard</Link>
             <Link href="/admin/orders" className={styles.link} onClick={closeMenu}><Package size={20} /> Orders</Link>
             <Link href="/admin/products" className={styles.link} onClick={closeMenu}><ShoppingBag size={20} /> Products</Link>
-            <Link href="/admin/seasonal" className={styles.link} onClick={closeMenu}><Tags size={20} /> Season/Home</Link>
+
             <Link href="/admin/categories" className={styles.link} onClick={closeMenu}><Tags size={20} /> Categories</Link>
             <Link href="/admin/coupons" className={styles.link} onClick={closeMenu}><Ticket size={20} /> Coupons</Link>
             <Link href="/admin/content" className={styles.link} onClick={closeMenu}><FileText size={20} /> Site Content</Link>
             <Link href="/admin/banners" className={styles.link} onClick={closeMenu}><LayoutDashboard size={20} /> Hero Slider</Link>
-            <Link href="/admin/project-x" className={styles.link} onClick={closeMenu}><Ticket size={20} /> Mystery Bookings</Link>
             <Link href="/admin/users" className={styles.link} onClick={closeMenu}><Users size={20} /> Users</Link>
             <Link href="/admin/notifications" className={styles.link} onClick={closeMenu}><Bell size={20} /> Notifications</Link>
             <Link href="/admin/reaction-test" className={styles.link} onClick={closeMenu}><Zap size={20} /> Reaction Test</Link>

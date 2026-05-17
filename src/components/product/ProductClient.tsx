@@ -152,8 +152,11 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
 
   const getAvailableStock = (size: string) => {
     if (!product) return 0;
-    if (product.sizeUnits && product.sizeUnits[size] !== undefined) {
-      return product.sizeUnits[size];
+    if (product.sizes && product.sizes.length > 0) {
+      if (product.sizeUnits && product.sizeUnits[size] !== undefined) {
+        return product.sizeUnits[size];
+      }
+      return 0;
     }
     return product.stock || 0;
   };
@@ -260,7 +263,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
 
           <div className={styles.titleHeader}>
             <div className={styles.productBadges} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px' }}>
-              <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', color: '#fff' }}>🔥 Popular Choice</span>
+              <span style={{ padding: '4px 8px', background: 'rgba(var(--foreground-rgb), 0.1)', borderRadius: '4px', color: 'var(--color-text)' }}>🔥 Popular Choice</span>
               <span style={{ padding: '4px 8px', background: 'var(--color-primary)', color: 'var(--color-background)', borderRadius: '4px' }}>⚡ Performance Gear</span>
               <span style={{ padding: '4px 8px', border: '1px solid var(--color-primary)', borderRadius: '4px', color: 'var(--color-primary)' }}>✓ Indian Climate Tested</span>
             </div>
@@ -281,7 +284,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
           <div className={styles.quickRating}>
             <div className={styles.starsRow}>
               {[1,2,3,4,5].map(star => (
-                <Star key={star} size={16} className={styles.starIcon} fill={star <= Number(avgRating) ? "var(--color-primary)" : "none"} color={star <= Number(avgRating) ? "var(--color-primary)" : "rgba(255,255,255,0.2)"} />
+                <Star key={star} size={16} className={styles.starIcon} fill={star <= Number(avgRating) ? "var(--color-primary)" : "none"} color={star <= Number(avgRating) ? "var(--color-primary)" : "rgba(var(--foreground-rgb), 0.2)"} />
               ))}
             </div>
             <span className={styles.reviewCount}>{avgRating} ({totalReviews} Review{totalReviews !== 1 && 's'})</span>
@@ -403,7 +406,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                 onClick={toggleWishlist}
                 disabled={isWishlistLoading}
                 title="Add to Wishlist"
-                style={{ background: isInWishlist ? 'var(--color-primary)' : 'transparent', color: isInWishlist ? 'var(--color-background)' : 'inherit', border: isInWishlist ? '1px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)' }}
+                style={{ background: isInWishlist ? 'var(--color-primary)' : 'transparent', color: isInWishlist ? 'var(--color-background)' : 'inherit', border: isInWishlist ? '1px solid var(--color-primary)' : '1px solid rgba(var(--foreground-rgb), 0.1)' }}
               >
                 <Heart size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
               </button>
@@ -411,7 +414,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                 className={styles.wishlistBtn}
                 onClick={handleShare}
                 title="Share this Elite Product"
-                style={{ background: 'transparent', color: 'inherit', border: '1px solid rgba(255,255,255,0.1)' }}
+                style={{ background: 'transparent', color: 'inherit', border: '1px solid var(--color-border)' }}
               >
                 <Share2 size={20} />
               </button>
@@ -501,7 +504,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                     <span>out of 5</span>
                     <div className={styles.starsRow}>
                        {[1,2,3,4,5].map(star => (
-                         <Star key={star} size={18} className={styles.starIcon} fill={star <= Number(avgRating) ? "var(--color-primary)" : "none"} color={star <= Number(avgRating) ? "var(--color-primary)" : "rgba(255,255,255,0.2)"} />
+                         <Star key={star} size={18} className={styles.starIcon} fill={star <= Number(avgRating) ? "var(--color-primary)" : "none"} color={star <= Number(avgRating) ? "var(--color-primary)" : "rgba(var(--foreground-rgb), 0.2)"} />
                        ))}
                     </div>
                     <small>({totalReviews} Review{totalReviews !== 1 && 's'})</small>

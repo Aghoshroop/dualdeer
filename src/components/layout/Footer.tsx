@@ -1,72 +1,104 @@
 "use client";
+import { useRef, useEffect, useState } from "react";
+import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { CreditCard, ShieldCheck } from "lucide-react";
 import styles from "./Footer.module.css";
 
 export default function Footer() {
   return (
     <footer className={styles.footer}>
-      <div className={styles.container}>
+      
+
+
+      {/* Massive Cinematic Panning Typography */}
+      <div className={styles.heroSection}>
+        <h1 className={styles.massiveText}>DUALDEER</h1>
+        <div className={styles.taglineContainer}>
+          <span className={styles.tagline}>THE VANGUARD OF HUMAN PERFORMANCE</span>
+          <span className={styles.taglineLine}></span>
+        </div>
+      </div>
+
+      {/* Razor-Sharp Editorial Grid */}
+      <div className={styles.gridMatrix}>
         
-        <div className={styles.newsletter}>
-          <span className={styles.label}>NEXUS LOYALTY</span>
-          <h3 className={styles.heading}>Stay Optimized</h3>
-          <p className={styles.subtext}>Join the elite for exclusive drops, performance briefs, and tactical updates.</p>
-          <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
-            <input type="email" placeholder="COMM LINK @ EMAIL" required className={styles.input} />
-            <button type="submit" className={styles.submitBtn}>JOIN</button>
+        {/* Left: Syndicate Terminal */}
+        <div className={styles.matrixColumn}>
+          <span className={styles.matrixTitle}>01 // SYNDICATE NETWORK</span>
+          <p className={styles.matrixDesc}>
+            Intercept classified prototype drops and elite performance briefs. No spam.
+          </p>
+          <form className={styles.sleekForm} onSubmit={e => e.preventDefault()}>
+            <input 
+              type="email" 
+              placeholder="ENTER COMM LINK..." 
+              className={styles.sleekInput} 
+            />
+            <button className={styles.sleekBtn}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
           </form>
         </div>
 
-        <div className={styles.linksGrid}>
-          <div className={styles.column}>
-            <h4 className={styles.colHeading}>Inventory</h4>
-            <Link href="/shop" className={styles.link}>All Equipment</Link>
-            <Link href="/shop" className={styles.link}>New Arrivals</Link>
-            <Link href="/shop" className={styles.link}>Elite Series</Link>
-            <Link href="/shop" className={styles.link}>Sale Components</Link>
-          </div>
-          
-          <div className={styles.column}>
-            <h4 className={styles.colHeading}>Support</h4>
-            <Link href="#" className={styles.link}>Logistics & Shipping</Link>
-            <Link href="#" className={styles.link}>Returns Nexus</Link>
-            <Link href="#" className={styles.link}>Payment Security</Link>
-            <Link href="/profile" className={styles.link}>Account Portal</Link>
-          </div>
-          
-          <div className={styles.column}>
-            <h4 className={styles.colHeading}>Nexus</h4>
-            <Link href="#" className={styles.link}>Our Story</Link>
-            <Link href="#" className={styles.link}>Sustainability</Link>
-            <Link href="#" className={styles.link}>Store Locator</Link>
-            <Link href="/admin" className={styles.link}>Central Command</Link>
+        {/* Right: Magnetic Hover Links */}
+        <div className={styles.matrixColumn}>
+          <span className={styles.matrixTitle}>02 // DIRECTIVES</span>
+          <div className={styles.linkList}>
+            <MagneticHoverLink href="/shop" label="THE COLLECTION" />
+            <MagneticHoverLink href="/reaction-test" label="REACTION ARENA" />
+            <MagneticHoverLink href="/profile" label="OPERATIVE PORTAL" />
           </div>
         </div>
 
       </div>
-      
-      <div className={styles.bottomBar}>
-        <div className={styles.legal}>
-           <span className={styles.brand}>DUALDEER &copy; {new Date().getFullYear()}</span>
-           <div className={styles.legalLinks}>
-             <Link href="#">Privacy Directive</Link>
-             <Link href="#">Terms of Engagement</Link>
-           </div>
-        </div>
 
-        <div className={styles.paymentIcons}>
-           <div className={styles.paymentStrip}>
-              <ShieldCheck size={16} /> <span>SSL SECURED</span>
-           </div>
-           <div className={styles.cards}>
-              <CreditCard size={24} />
-              <div className={styles.miniCard}>VISA</div>
-              <div className={styles.miniCard}>MC</div>
-              <div className={styles.miniCard}>UPI</div>
-           </div>
+      {/* Extreme Minimal Bottom Bar */}
+      <div className={styles.bottomBar}>
+        <div className={styles.copyright}>© {new Date().getFullYear()} DUALDEER. SYSTEM ACTIVE.</div>
+        <div className={styles.socials}>
+          <Link href="#" className={styles.socialLink}>INSTAGRAM</Link>
+          <Link href="#" className={styles.socialLink}>TWITTER</Link>
         </div>
       </div>
     </footer>
+  );
+}
+
+// Magnetic Link 
+function MagneticHoverLink({ href, label }: { href: string, label: string }) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 150, damping: 15, mass: 0.1 });
+  const springY = useSpring(y, { stiffness: 150, damping: 15, mass: 0.1 });
+
+  const handleMouse = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+    x.set((e.clientX - centerX) * 0.2); // Subtle magnetic pull
+    y.set((e.clientY - centerY) * 0.2);
+  };
+
+  const handleLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.a 
+      href={href}
+      ref={ref}
+      className={styles.magneticHoverLink}
+      onMouseMove={handleMouse}
+      onMouseLeave={handleLeave}
+      style={{ x: springX, y: springY }}
+    >
+      <span className={styles.linkArrow}>↗</span>
+      <span className={styles.linkLabel}>{label}</span>
+    </motion.a>
   );
 }

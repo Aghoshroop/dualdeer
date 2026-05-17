@@ -9,8 +9,8 @@ export const revalidate = 60; // SSG with ISR revalidation
 // Fallback generateStaticParams (Wait, firebase client sdk in build time might need configuration)
 // If not using generateStaticParams, it will server side render on demand and then cache it because of the revalidate.
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   
   let product = await getProductBySlug(slug);
   if (!product) {
@@ -51,8 +51,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   
   let product = await getProductBySlug(slug);
   let isRedirectingId = false;

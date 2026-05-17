@@ -70,7 +70,7 @@ export default function AdminReactionTest() {
             </span>
             <button 
               onClick={handleToggleGame}
-              style={{ background: gameActive ? 'var(--red-500)' : '#10b981', color: '#fff', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              style={{ background: gameActive ? 'var(--red-500)' : '#10b981', color: 'var(--color-text)', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
               {gameActive ? <XCircle size={18} /> : <Power size={18} />} {gameActive ? 'Stop Game' : 'Start Game'}
             </button>
@@ -86,7 +86,7 @@ export default function AdminReactionTest() {
             </span>
             <button 
               onClick={handleNewCycle}
-              style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              style={{ background: 'var(--color-primary)', color: 'var(--color-text)', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
               <RefreshCw size={18} /> Start New Cycle
             </button>
@@ -113,7 +113,7 @@ export default function AdminReactionTest() {
               </thead>
               <tbody>
                 {scores.map((s, index) => (
-                  <tr key={s.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <tr key={s.id} style={{ borderBottom: '1px solid rgba(var(--foreground-rgb), 0.05)' }}>
                     <td style={{ padding: '1rem 0', fontWeight: 800, color: 'var(--color-text-muted)' }}>#{index + 1}</td>
                     <td style={{ padding: '1rem 0', fontWeight: 600 }}>{s.name}</td>
                     <td style={{ padding: '1rem 0' }}>{s.attempt1 ? s.attempt1 + 'ms' : '-'}</td>

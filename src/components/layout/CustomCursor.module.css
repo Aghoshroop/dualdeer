@@ -1,0 +1,33 @@
+.cursorWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 99999999; /* Higher than everything, including modal overlays and header */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+}
+
+.customCursor {
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.cursorText {
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  font-family: var(--font-inter), sans-serif;
+  text-transform: uppercase;
+  pointer-events: none;
+  white-space: nowrap;
+}

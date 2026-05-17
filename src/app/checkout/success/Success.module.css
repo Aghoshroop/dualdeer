@@ -134,7 +134,7 @@
 .completedStep .stepIcon {
   background: #10b981;
   border-color: #10b981;
-  color: #fff;
+  color: var(--color-text);
 }
 
 .stepLabel {
@@ -233,7 +233,7 @@
 
 .primaryBtn {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-text);
   padding: 1.2rem 3rem;
   border-radius: 50px;
   font-weight: 700;
@@ -250,7 +250,7 @@
   background: var(--color-text);
   color: var(--color-background);
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(var(--background-rgb), 0.2);
 }
 
 .secondaryBtn {

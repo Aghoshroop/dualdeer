@@ -15,14 +15,14 @@
     background: rgba(20, 20, 20, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--color-border);
     z-index: 1000;
     padding-bottom: env(safe-area-inset-bottom, 0px); /* iPhone notch buffer */
   }
 
   [data-theme='light'] .bottomNav {
-    background: rgba(255, 255, 255, 0.95);
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    background: var(--color-border);
+    border-top: 1px solid rgba(var(--background-rgb), 0.1);
   }
 
   .navItem {
@@ -58,7 +58,7 @@
     right: 50%;
     transform: translateX(18px);
     background: #ff4b4b;
-    color: #fff;
+    color: var(--color-text);
     font-size: 0.55rem;
     font-weight: 800;
     border-radius: 10px;
@@ -69,7 +69,7 @@
   }
   
   [data-theme='light'] .cartBadge {
-    border-color: #ffffff;
+    border-color: var(--color-text);
   }
 }
 

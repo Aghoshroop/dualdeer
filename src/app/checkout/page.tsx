@@ -11,7 +11,7 @@ import styles from './Checkout.module.css';
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div style={{ padding: '100px', color: '#fff', textAlign: 'center' }}>Loading Secure Gateway...</div>}>
+    <Suspense fallback={<div style={{ padding: '100px', color: 'var(--color-text)', textAlign: 'center' }}>Loading Secure Gateway...</div>}>
       <CheckoutEngine />
     </Suspense>
   );
@@ -62,7 +62,7 @@ function CheckoutEngine() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
 
-  const buyNowId = searchParams.get('buyNow');
+  const buyNowId = searchParams.get('buyNow') || searchParams.get('id');
   const buyNowSize = searchParams.get('size') || 'M';
   const buyNowQty = Number(searchParams.get('qty')) || 1;
 
@@ -147,7 +147,7 @@ function CheckoutEngine() {
       })),
       total: total,
       discountAmount: discountAmountCapped,
-      appliedCoupon: appliedCoupon ? appliedCoupon.code : undefined,
+      appliedCoupon: appliedCoupon ? appliedCoupon.code : null,
       status: 'processing' as const,
       paymentMethod: paymentMethod,
       utrNumber: paymentMethod === 'upi' ? utrNumber : '',
@@ -166,6 +166,17 @@ function CheckoutEngine() {
         });
       } catch (syncErr) {
         console.error("Shiprocket Background Sync Failed:", syncErr);
+      }
+
+      // Async Email Notification
+      try {
+        await fetch('/api/send-order-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, orderData: orderPayload })
+        });
+      } catch (emailErr) {
+        console.error("Email Notification Failed:", emailErr);
       }
 
       if (appliedCoupon && appliedCoupon.id) {
@@ -330,12 +341,12 @@ function CheckoutEngine() {
                 </button>
                 <h2>Verify UPI Payment</h2>
               </div>
-              <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--color-border)', textAlign: 'center' }}>
+              <div style={{ padding: '1.5rem', background: 'rgba(var(--foreground-rgb), 0.02)', borderRadius: '12px', border: '1px solid var(--color-border)', textAlign: 'center' }}>
                 <p style={{ marginBottom: '15px', fontSize: '1rem', color: 'var(--color-text)' }}>
                   Please transfer exactly <strong style={{color: 'var(--color-primary)', fontSize: '1.2rem'}}>₹{total.toFixed(2)}</strong> to proceed.
                 </p>
                 
-                <div style={{ background: '#fff', padding: '1rem', borderRadius: '12px', display: 'inline-block', marginBottom: '1.5rem' }}>
+                <div style={{ background: 'var(--color-foreground)', padding: '1rem', borderRadius: '12px', display: 'inline-block', marginBottom: '1.5rem' }}>
                    <img 
                       src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980105971@YBL&pn=DualDeer&am=${total.toFixed(2)}&tr=${upiTr}&mc=0000&cu=INR`} 
                       alt="UPI QR Code" 

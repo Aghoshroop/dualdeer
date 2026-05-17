@@ -3,8 +3,8 @@
   height: 100vh;
   position: relative;
   overflow: hidden;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-background);
+  color: var(--color-text);
   display: flex;
   align-items: center;
 }
@@ -31,7 +31,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.1) 100%);
+  background: linear-gradient(to right, rgba(var(--background-rgb), 0.8) 0%, rgba(var(--background-rgb), 0.3) 50%, rgba(var(--background-rgb), 0.1) 100%);
   z-index: 2;
   pointer-events: none;
 }
@@ -57,7 +57,7 @@
   text-transform: uppercase;
   letter-spacing: 3px;
   margin-bottom: 1rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-border);
   font-weight: 500;
 }
 
@@ -67,22 +67,22 @@
   line-height: 1.1;
   margin-bottom: 1rem;
   font-weight: 400;
-  color: #fff;
+  color: var(--color-text);
 }
 
 .price {
   font-size: 1.5rem;
   font-weight: 300;
   margin-bottom: 2rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-border);
 }
 
 .shopButton {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #fff;
-  color: #000;
+  background: var(--color-foreground);
+  color: var(--color-background);
   padding: 1rem 2rem;
   border-radius: 30px;
   font-weight: 600;
@@ -95,7 +95,7 @@
 }
 
 .shopButton:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--color-border);
   transform: translateY(-2px);
 }
 
@@ -111,23 +111,23 @@
 }
 
 .navButton {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-border);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   width: 50px;
   height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--color-text);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .navButton:hover {
-  background: #fff;
-  color: #000;
+  background: var(--color-foreground);
+  color: var(--color-background);
 }
 
 .previewStrip {
@@ -147,20 +147,20 @@
   overflow: hidden;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(var(--background-rgb), 0.3);
 }
 
 .previewCard::after {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(var(--background-rgb), 0.3);
   transition: background 0.3s ease;
   z-index: 2;
 }
 
 .previewCard:hover::after {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(var(--background-rgb), 0.1);
 }
 
 .previewImage {
@@ -240,7 +240,7 @@
   overflow: hidden;
   position: relative;
   background: #f5f5f5;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(var(--background-rgb), 0.05);
   display: flex;
   flex-direction: column;
 }

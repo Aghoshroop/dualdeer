@@ -1,16 +1,69 @@
 "use client";
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Filter, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import styles from './ShopPage.module.css';
 import { useCart } from '@/context/CartContext';
-import AnimatedCartButton from '@/components/ui/AnimatedCartButton';
-import SeoIntroBlock from '@/components/sections/SeoIntroBlock';
 import React from 'react';
 
-const filters = ["ALL", "SPECIAL", "BEST SELLER", "FEATURED PRODUCTS"];
+// UI Interaction Sound Generator (No external assets required)
+const playInteractionSound = (type: 'hover' | 'click' | 'ring') => {
+  if (typeof window === 'undefined') return;
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    if (type === 'hover') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.05);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.02, ctx.currentTime + 0.02);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.05);
+    } else if (type === 'click') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.15);
+    } else if (type === 'ring') {
+      // Cash register / notification bell ring
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1600, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+
+      // Higher harmonic for bright metallic chime
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1600, ctx.currentTime);
+      osc2.frequency.exponentialRampToValueAtTime(2400, ctx.currentTime + 0.1);
+      gain2.gain.setValueAtTime(0, ctx.currentTime);
+      gain2.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(ctx.currentTime);
+      osc2.stop(ctx.currentTime + 0.3);
+    }
+  } catch(e) {}
+};
 
 interface ShopClientProps {
   initialProducts: any[];
@@ -20,524 +73,151 @@ interface ShopClientProps {
   initialHeroText: string;
 }
 
-export default function ShopClient({ initialProducts, initialCategories, initialBackdrop, initialHeroUrl, initialHeroText }: ShopClientProps) {
+const filters = ["ALL", "T-SHIRTS", "SPEEDSUITS", "NEW ARRIVALS"];
+
+export default function ShopClient({ initialProducts, initialHeroUrl, initialHeroText }: ShopClientProps) {
   return (
-    <Suspense fallback={<div style={{ padding: '100px', textAlign: 'center', color: '#fff' }}>Loading Catalogue...</div>}>
-      <ShopEngine 
-        initialProducts={initialProducts} 
-        initialCategories={initialCategories} 
-        initialBackdrop={initialBackdrop} 
-        initialHeroUrl={initialHeroUrl} 
-        initialHeroText={initialHeroText} 
-      />
+    <Suspense fallback={<div style={{ padding: '100px', textAlign: 'center', color: '#fff', background: '#050505', minHeight: '100vh' }}>Initializing Elite Experience...</div>}>
+      <ShopEngine initialProducts={initialProducts} initialHeroUrl={initialHeroUrl} initialHeroText={initialHeroText} />
     </Suspense>
   );
 }
 
-function ShopEngine({ initialProducts, initialCategories, initialBackdrop, initialHeroUrl, initialHeroText }: ShopClientProps) {
-  const searchParams = useSearchParams();
+function ShopEngine({ initialProducts, initialHeroUrl, initialHeroText }: any) {
   const router = useRouter();
-  const initialGender = searchParams.get('gender') || searchParams.get('category');
-  const mappedGender = (initialGender?.toLowerCase().includes('men') && !initialGender?.toLowerCase().includes('women'))
-    ? 'Men'
-    : (initialGender?.toLowerCase().includes('women') ? 'Women' : null);
-
   const [activeFilter, setActiveFilter] = useState("ALL");
-  const [activeGender, setActiveGender] = useState<string | null>(mappedGender);
-  const [activeType, setActiveType] = useState<string | null>(null);
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [backdropUrl, setBackdropUrl] = useState(initialBackdrop);
-  const [heroUrl, setHeroUrl] = useState(initialHeroUrl);
-  const [heroText, setHeroText] = useState(initialHeroText);
-
-  let activeFiltersCount = 0;
-  if (activeGender) activeFiltersCount++;
-  if (activeType) activeFiltersCount++;
-  if (activeFilter !== "ALL") activeFiltersCount++;
-
-  const [liveProducts, setLiveProducts] = useState<any[]>(initialProducts);
-  const [liveCategories, setLiveCategories] = useState<any[]>(initialCategories);
-  const [loading, setLoading] = useState(false);
   const { addToCart } = useCart();
-  const sliderRef = React.useRef<HTMLDivElement>(null);
 
-  const scrollSlider = (direction: 'left' | 'right') => {
-    if (sliderRef.current) {
-      const scrollAmount = 324; // Card width 300px + some gap
-      if (direction === 'left') {
-        sliderRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      } else {
-        sliderRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    }
-  };
-
-  // Removed useEffect fetching since data comes from initial props
-
-  const displayProducts = liveProducts.filter(p => {
-    if (activeFilter === "SPECIAL" && !p.isSeasonal) return false;
-    if (activeFilter === "BEST SELLER" && (p.rating || 0) < 4.8) return false;
-    if (activeFilter === "FEATURED PRODUCTS" && ((p.stock || 0) <= 0 || (p.rating || 0) < 4.5)) return false;
-    if (activeFilter === "DISCOUNT" && (!p.mrp || p.mrp <= p.price)) return false;
-
-    if (activeGender || activeType) {
-      const searchString = `${p.category || ''} ${p.subcategory || ''} ${p.name || ''}`.toLowerCase();
-      if (activeGender && !searchString.includes(activeGender.toLowerCase())) return false;
-      if (activeType && !searchString.includes(activeType.toLowerCase().replace('-', ''))) return false;
-    } else if (activeFilter !== "ALL" && !["SPECIAL", "BEST SELLER", "FEATURED PRODUCTS", "NEW ARRIVAL", "DISCOUNT"].includes(activeFilter)) {
-      if (p.category?.toLowerCase() !== activeFilter.toLowerCase()) return false;
+  // Process live products
+  const displayProducts = initialProducts.filter((p: any) => {
+    if (activeFilter === "NEW ARRIVALS" && !p.isNew) return false;
+    if (activeFilter !== "ALL" && activeFilter !== "NEW ARRIVALS") {
+      const searchStr = `${p.category || ''} ${p.name || ''}`.toLowerCase();
+      if (activeFilter === "T-SHIRTS" && !searchStr.includes("t-shirt") && !searchStr.includes("tshirt") && !searchStr.includes("tee")) return false;
+      if (activeFilter === "SPEEDSUITS" && !searchStr.includes("speedsuit")) return false;
     }
     return true;
-  }).sort((a, b) => {
-    // Force SpeedSuit items to the very top
-    const aIsSpeed = (a.category || '').toLowerCase() === 'speedsuit' || (a.name || '').toLowerCase().includes('speedsuit');
-    const bIsSpeed = (b.category || '').toLowerCase() === 'speedsuit' || (b.name || '').toLowerCase().includes('speedsuit');
-    if (aIsSpeed && !bIsSpeed) return -1;
-    if (!aIsSpeed && bIsSpeed) return 1;
-    return 0;
   });
 
   return (
     <div className={styles.shopContainer}>
-
-      {/* 1. Hero Banner */}
-      <section className={styles.halfScreenHero}>
-        <img
-          src={heroUrl || "https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?q=80&w=2600&auto=format&fit=crop"}
-          alt="Shop Collection"
+      
+      {/* 1. Ultra-Cinematic Dark Hero Section */}
+      <section className={styles.heroSection}>
+        <img 
+          src={initialHeroUrl || "https://images.unsplash.com/photo-1558222218-b7b54eede3f3?q=80&w=2600&auto=format&fit=crop"} 
+          alt="Collection" 
+          className={styles.heroImage} 
         />
-        <div className={styles.halfScreenOverlay}></div>
-        <div className={styles.halfScreenText}>
-          <h2>{heroText || "ELEVATE YOUR PERFORMANCE"}</h2>
-        </div>
+        <div className={styles.heroOverlay} />
+        
+        <motion.div 
+          className={styles.heroContent}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
+        >
+          <span className={styles.heroSubtitle}>Dual Deer Collection</span>
+          <h1 className={styles.heroTitle}>{initialHeroText || "THE ARSENAL"}</h1>
+        </motion.div>
       </section>
 
-      <SeoIntroBlock
-        h1="Explore the Best Premium Activewear in India"
-        h2="Unrivaled Luxury Athleisure and Performance Gear"
-        paragraphs={[
-          <React.Fragment key="1">
-            Discover the absolute pinnacle of athletic fashion with DualDeer&apos;s extensive shop collection. As India&apos;s premier destination for high-performance activewear and luxury athleisure, featuring our signature <Link href="/speedsuit" style={{ textDecoration: 'underline', color: 'var(--color-text)', textUnderlineOffset: '4px', fontWeight: 500 }}>SpeedSuit collection</Link>, our meticulously curated catalog caters to both dedicated professional athletes and style-conscious individuals who absolutely refuse to compromise. Each individual piece within our collection is developed using revolutionary, state-of-the-art fabrications—offering unprecedented moisture management, highly advanced kinetic stretch capabilities, and unparalleled long-term durability. From rigorous, high-intensity interval training sessions to refined, sophisticated casual outings, our elite performance gear guarantees that you remain entirely comfortable, incredibly confident, and visually striking at all times.
-          </React.Fragment>,
-          <React.Fragment key="2">
-            Whether you are actively searching for dynamic compression garments that stabilize core muscles during heavy lifts, ultralight breathable tops precisely engineered to dramatically enhance airflow, or extremely sleek outerwear designed to flawlessly combat unpredictable elements in unmistakable style, you will find it right here. We strictly and systematically source all of our premium materials to thoroughly guarantee that every single reinforced seam and intelligently contoured panel powerfully supports elite physical exertion. Our revolutionary contemporary designs not only elevate your visual presence but proactively and efficiently assist in allowing you to aggressively push past your perceived physical limits. Feel the remarkable difference of intelligent, responsive sportswear that intuitively adapts directly to your unique needs.
-          </React.Fragment>,
-          <React.Fragment key="3">
-            By seamlessly marrying modern, fashion-forward silhouettes with hardcore technical functionality and utility, <Link href="/shop?category=speedsuit" style={{ textDecoration: 'underline', color: 'var(--color-text)', textUnderlineOffset: '4px', fontWeight: 500 }}>DualDeer</Link> has firmly established itself as the very best premium activewear brand available on the market today. When you consciously choose to invest in our meticulously tailored, luxury garments, you are actively investing in peak physiological performance and an inherently superior, commanding aesthetic. Browse our incredibly diverse range of specialized athletic categories to find the exact performance lifestyle pieces necessary to flawlessly complete your luxury training wardrobe. Fully embrace the unmatched power, supreme physical resilience, and truly distinctive look that only DualDeer can provide—because achieving true greatness inherently requires gear that is equally exceptional.
-          </React.Fragment>
-        ]}
-      />
-
-      {/* 2. Category Strip */}
-      <section className={styles.categoryStrip}>
-        <div className={styles.categoryGrid}>
-          {liveCategories.slice(0, 3).map((cat, i) => {
-            const fallbackImages = [
-              'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800&auto=format&fit=crop',
-              'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop',
-              'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop',
-            ];
-            return (
-              <motion.div
-                key={cat.id || i}
-                className={styles.catCard}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-              >
-                <img src={cat.image || fallbackImages[i % 3]} alt={cat.name} />
-                <div className={styles.catOverlay}>
-                   <h3>{cat.name.toUpperCase()}</h3>
-                   <p>EXPLORE NOW</p>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 3. Filter Navigation */}
-      <section className={styles.filterSection} id="collection">
-        <ul className={styles.filterList}>
+      {/* 2. Floating Filter Pills */}
+      <section className={styles.filterSection}>
+        <div className={styles.filterGlass}>
           {filters.map(filter => (
-            <li key={filter}>
-              <button
-                className={`${styles.filterBtn} ${activeFilter === filter && !activeGender ? styles.active : ''}`}
-                onClick={() => {
-                  setActiveFilter(filter);
-                  if (["ALL", "SPECIAL", "BEST SELLER", "FEATURED PRODUCTS"].includes(filter)) {
-                    setActiveGender(null);
-                    setActiveType(null);
-                  }
-                }}
-              >
-                {filter}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* 4. Product Grid + Sidebar */}
-      <section className={styles.shopLayoutSection}>
-        <div
-          className={styles.shopLayoutBackdrop}
-          style={backdropUrl ? { backgroundImage: `url(${backdropUrl})` } : {}}
-        />
-
-        <div className={styles.shopLayoutContainer}>
-          {/* Mobile Filter Header */}
-          <div className={styles.mobileFilterHeader}>
-            <button className={styles.mobileFilterBtn} onClick={() => setIsMobileFilterOpen(true)}>
-              <Filter size={16} strokeWidth={2} />
-              <span>Filters</span>
-              {activeFiltersCount > 0 && (
-                <span className={styles.mobileFilterBadge}>{activeFiltersCount}</span>
-              )}
+            <button 
+              key={filter}
+              className={`${styles.filterBtn} ${activeFilter === filter ? styles.active : ''}`}
+              onMouseEnter={() => playInteractionSound('hover')}
+              onClick={() => {
+                playInteractionSound('click');
+                setActiveFilter(filter);
+              }}
+            >
+              {filter}
             </button>
-          </div>
-
-          {/* Sidebar */}
-          <>
-            {isMobileFilterOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className={styles.mobileFilterBackdrop}
-                onClick={() => setIsMobileFilterOpen(false)}
-              />
-            )}
-            <aside className={`${styles.filterSidebar} ${isMobileFilterOpen ? styles.mobileFilterSidebarOpen : ''}`}>
-              <div className={styles.glassPanel}>
-                <div className={styles.sidebarHeader}>
-                  <h3>Filter by Category</h3>
-                  {isMobileFilterOpen && (
-                    <button className={styles.closeFilterBtn} onClick={() => setIsMobileFilterOpen(false)}>
-                      <X size={24} strokeWidth={1.5} />
-                    </button>
-                  )}
-                </div>
-                <ul className={styles.filterTree}>
-                  <li
-                    className={(!activeGender && !activeType && activeFilter === 'ALL') ? styles.activeFilter : styles.subItem}
-                    onClick={() => { setActiveGender(null); setActiveType(null); setActiveFilter('ALL'); }}
-                    style={{ fontWeight: 600, cursor: 'pointer', marginBottom: '1.5rem', marginLeft: 0 }}
-                  >
-                    All Products <span className={styles.badge}>{liveProducts.length}</span>
-                  </li>
-                  {liveCategories.map((cat) => (
-                    <div key={cat.id || cat.name} style={{ marginBottom: '1.2rem' }}>
-                      <div
-                        className={activeGender === cat.name && !activeType ? styles.activeFilter : styles.groupTitle}
-                        onClick={() => {
-                          setActiveGender(activeGender === cat.name && !activeType ? null : cat.name);
-                          setActiveType(null);
-                          setActiveFilter('ALL');
-                        }}
-                        style={{ fontWeight: activeGender === cat.name ? 700 : 500 }}
-                      >
-                        {activeGender === cat.name ? '▾ ' : '▸ '}{cat.name}
-                      </div>
-                      {cat.subcategories && cat.subcategories.length > 0 && (
-                        <div style={{ marginLeft: '0.2rem', display: activeGender === cat.name ? 'block' : 'none', marginTop: '0.8rem' }}>
-                          {cat.subcategories.map((sub: string) => (
-                            <li
-                              key={sub}
-                              className={activeType === sub ? styles.activeFilter : styles.subItem}
-                              onClick={() => { setActiveGender(cat.name); setActiveType(sub); setActiveFilter('ALL'); }}
-                              style={{ cursor: 'pointer', opacity: activeType === sub ? 1 : 0.6, marginBottom: '0.8rem', whiteSpace: 'nowrap' }}
-                            >
-                              {sub}
-                            </li>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </ul>
-                <ul className={styles.filterTree} style={{ marginTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
-                  <li onClick={() => { setActiveFilter('NEW ARRIVAL'); setActiveGender(null); setActiveType(null); }} className={activeFilter === 'NEW ARRIVAL' ? styles.activeFilter : ''} style={{ cursor: 'pointer' }}><span>🔍</span> New Arrival</li>
-                  <li onClick={() => { setActiveFilter('BEST SELLER'); setActiveGender(null); setActiveType(null); }} className={activeFilter === 'BEST SELLER' ? styles.activeFilter : ''} style={{ cursor: 'pointer' }}><span>★</span> Best Seller</li>
-                  <li onClick={() => { setActiveFilter('DISCOUNT'); setActiveGender(null); setActiveType(null); }} className={activeFilter === 'DISCOUNT' ? styles.activeFilter : ''} style={{ cursor: 'pointer' }}><span>%</span> On Discount</li>
-                </ul>
-              </div>
-            </aside>
-          </>
-
-          {/* Product Grid */}
-          <div className={styles.productGrid}>
-            <AnimatePresence>
-              {loading ? (
-                <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '40px', color: '#fff' }}>Loading real-time inventory...</div>
-              ) : displayProducts.length === 0 ? (
-                <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '40px', color: '#fff' }}>No products matching this filter.</div>
-              ) : displayProducts.map((product, i) => {
-                if (i % 7 === 6) {
-                  return (
-                    <motion.div
-                      key={`featured-${product.id || i}`}
-                      className={styles.featuredCard}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-                    >
-                      <Link href={`/product/${product.slug}`} className={styles.featuredImageWrap}>
-                        <img src={product.image} alt={product.name} className={styles.featuredImg} />
-                      </Link>
-                      <div className={styles.featuredInfo}>
-                        <p className={styles.featuredLabel}>★ FEATURED PICK</p>
-                        <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                          <h3 className={styles.featuredName}>{product.name}</h3>
-                        </Link>
-                        {product.description && (
-                          <p className={styles.featuredDesc}>
-                            {product.description.slice(0, 140)}{product.description.length > 140 ? '…' : ''}
-                          </p>
-                        )}
-                        <div className={styles.featuredRating} style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                          <div style={{ display: 'flex', gap: '1px' }}>
-                            {[1, 2, 3, 4, 5].map(star => (
-                              <span 
-                                key={star} 
-                                className={styles.star}
-                                style={{ 
-                                  opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
-                                  fontSize: '0.8rem'
-                                }}
-                              >
-                                ★
-                              </span>
-                            ))}
-                          </div>
-                          <span style={{ fontWeight: 800 }}>{(product.rating || 5.0).toFixed(1)}</span>
-                          <span style={{ opacity: 0.5, marginLeft: '0.3rem', fontSize: '0.7rem' }}>(Verified Client)</span>
-                        </div>
-                        <div className={styles.featuredPricing}>
-                          {product.mrp && product.mrp > product.price && (
-                            <del className={styles.featuredMrp}>₹{product.mrp.toFixed(2)}</del>
-                          )}
-                          <span className={styles.featuredPrice}>₹{product.price.toFixed(2)}</span>
-                        </div>
-                        {product.colors && product.colors.length > 0 && (
-                          <div className={styles.colorSwatches} style={{ marginBottom: '1.2rem' }}>
-                            {product.colors.map((color: string, idx: number) => (
-                              <div key={idx} className={styles.colorCircle} style={{ backgroundColor: color }} title={color} />
-                            ))}
-                          </div>
-                        )}
-                        <div className={styles.featuredActions}>
-                          <AnimatedCartButton
-                            onAdd={() => addToCart({
-                              id: product.id as string,
-                              name: product.name,
-                              price: product.price,
-                              mrp: product.mrp,
-                              image: product.image,
-                              size: 'M',
-                              quantity: 1,
-                            })}
-                            label="Add To Cart"
-                          />
-                          <button
-                            className={styles.featuredBuyNow}
-                            onClick={(e) => { e.preventDefault(); router.push(`/checkout?buyNow=${product.id}&size=M&qty=1`); }}
-                          >
-                            Buy Now
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                }
-
-                return (
-                  <motion.div
-                    key={product.id || i}
-                    className={styles.glassCard}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ delay: (i % 3) * 0.06, duration: 0.4 }}
-                  >
-                    <Link href={`/product/${product.slug}`} className={styles.productImageGlass}>
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className={styles.primaryImg}
-                      />
-                      <img
-                        src={(product.images && product.images.length > 1) ? product.images[1] : (product.images && product.images[0]) || product.image}
-                        alt={`${product.name} alternate`} 
-                        className={styles.secondaryImg} 
-                      />
-                    </Link>
-                    <div className={styles.productInfoGlass}>
-                      <div className={styles.infoTop}>
-                        <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                          <h4>{product.name}</h4>
-                        </Link>
-                        <p className={styles.priceContainer}>
-                          {product.mrp && product.mrp > product.price && <del className={styles.mrp}>₹{product.mrp.toFixed(2)}</del>}
-                          <span className={styles.price}>₹{product.price.toFixed(2)}</span>
-                        </p>
-                      </div>
-                      {product.colors && product.colors.length > 0 && (
-                        <div className={styles.colorSwatches}>
-                          {product.colors.map((color: string, idx: number) => (
-                            <div key={idx} className={styles.colorCircle} style={{ backgroundColor: color }} title={color} />
-                          ))}
-                        </div>
-                      )}
-                      <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <div style={{ display: 'flex', gap: '1px' }}>
-                          {[1, 2, 3, 4, 5].map(star => (
-                            <span 
-                              key={star} 
-                              className={styles.star}
-                              style={{ 
-                                opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
-                                fontSize: '0.85rem'
-                              }}
-                            >
-                              ★
-                            </span>
-                          ))}
-                        </div>
-                        <span style={{ fontWeight: 800, marginLeft: '2px' }}>{(product.rating || 5.0).toFixed(1)}</span>
-                        <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>(Verified Client)</span>
-                      </div>
-                      <div className={styles.cardActionsGlass}>
-                        <AnimatedCartButton
-                          size="small"
-                          className={styles.addToCartBtnGlass}
-                          onAdd={() => addToCart({
-                            id: product.id as string,
-                            name: product.name,
-                            price: product.price,
-                            mrp: product.mrp,
-                            image: product.image,
-                            size: 'M',
-                            quantity: 1,
-                          })}
-                        />
-                        <button
-                          className={styles.buyNowBtnGlass}
-                          onClick={(e) => { e.preventDefault(); router.push(`/checkout?buyNow=${product.id}&size=M&qty=1`); }}
-                        >
-                          Buy Now
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* 5. Benefits Bar */}
-      <section className={styles.benefitsBar}>
-        <div className={styles.benefit}>
-          <h4>FREE INTERNATIONAL DELIVERY</h4>
-          <p>On all orders over $150.00</p>
-        </div>
-        <div className={styles.benefit}>
-          <h4>50% OFF MEN&apos;S SUITS</h4>
-          <p>Applies only to selected items marked down on site</p>
-        </div>
-      </section>
-
-      {/* 6. Recommendations Slider */}
-      <section className={styles.recommendationsSection}>
-        <div className={styles.recHeader}>
-          <h2>Explore our recommendations</h2>
-          <div className={styles.recArrows}>
-            <button aria-label="Previous" className={styles.arrowBtn} onClick={() => scrollSlider('left')}><ChevronLeft size={20} strokeWidth={1} /></button>
-            <button aria-label="Next" className={styles.arrowBtn} onClick={() => scrollSlider('right')}><ChevronRight size={20} strokeWidth={1} /></button>
-          </div>
-        </div>
-        <div className={styles.infinitySliderContainer}>
-          <div className={styles.infinitySliderTrack} ref={sliderRef}>
-            {liveProducts.slice(0, 16).map((product, i) => (
-              <div key={`rec-${product.id || i}-${i}`} className={styles.glassCard}>
-                <div className={styles.productImageGlass}>
-                  <Link href={`/product/${product.slug}`} style={{ display: 'block', width: '100%', height: '100%', position: 'relative' }}>
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className={styles.primaryImg}
-                    />
-                    <img
-                      src={(product.images && product.images.length > 1) ? product.images[1] : (product.images && product.images[0]) || product.image}
-                      alt={`${product.name} alternate view`} 
-                      className={styles.secondaryImg} 
-                    />
+      {/* 3. Products Showcase */}
+      <section className={styles.productsSection}>
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={activeFilter}
+            className={styles.galleryGrid}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+          >
+            {displayProducts.length === 0 ? (
+              <div className={styles.emptyState}>Archive is currently empty for this category.</div>
+            ) : (
+              displayProducts.map((product: any, i: number) => (
+                <motion.div 
+                  key={product.id} 
+                  className={styles.galleryCard}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.6 }}
+                  onMouseEnter={() => playInteractionSound('hover')}
+                >
+                  <Link href={`/product/${product.slug}`} className={styles.imageContainer}>
+                    <img src={product.image} alt={product.name} className={styles.productImg} />
+                    {product.images && product.images.length > 1 && (
+                      <img src={product.images[1]} alt={product.name} className={styles.imageHover} />
+                    )}
+                    
+                    <div className={styles.badgeContainer}>
+                      {product.mrp && product.mrp > product.price && <span className={`${styles.badge} ${styles.saleBadge}`}>SALE</span>}
+                      {product.isNew && <span className={`${styles.badge} ${styles.newBadge}`}>NEW</span>}
+                    </div>
                   </Link>
-                </div>
-                <div className={styles.productInfoGlass}>
-                  <div className={styles.infoTop}>
-                    <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <h4>{product.name}</h4>
+
+                  <div className={styles.productMeta}>
+                    <span className={styles.brandLabel}>Dual Deer</span>
+                    <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none' }}>
+                      <h3 className={styles.productName}>{product.name}</h3>
                     </Link>
-                    <p className={styles.priceContainer}>
-                      {product.mrp && product.mrp > product.price && <del className={styles.mrp}>₹{product.mrp.toFixed(2)}</del>}
-                      <span className={styles.price}>₹{product.price.toFixed(2)}</span>
-                    </p>
-                  </div>
-                  {product.colors && product.colors.length > 0 && (
-                    <div className={styles.colorSwatches}>
-                      {product.colors.map((color: string, idx: number) => (
-                        <div key={idx} className={styles.colorCircle} style={{ backgroundColor: color }} title={color} />
-                      ))}
+                    
+                    <div className={styles.productPrice}>
+                      {product.mrp && product.mrp > product.price && <span style={{ textDecoration: 'line-through', opacity: 0.5, marginRight: '10px' }}>₹{product.mrp.toFixed(2)}</span>}
+                      <span style={{ fontWeight: 700 }}>₹{product.price.toFixed(2)}</span>
                     </div>
-                  )}
-                  <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <div style={{ display: 'flex', gap: '1px' }}>
-                      {[1, 2, 3, 4, 5].map(star => (
-                        <span 
-                          key={star} 
-                          className={styles.star}
-                          style={{ 
-                            opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
-                            fontSize: '0.85rem'
-                          }}
-                        >
-                          ★
-                        </span>
-                      ))}
+
+                    <div className={styles.cardActions}>
+                      <button 
+                        className={`${styles.actionBtn} ${styles.addBtn}`}
+                        onMouseEnter={() => playInteractionSound('hover')}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          playInteractionSound('ring');
+                          addToCart({ id: product.id, name: product.name, price: product.price, mrp: product.mrp, image: product.image, size: 'M', quantity: 1 });
+                        }}
+                      >
+                        Add to Bag
+                      </button>
+                      <button 
+                        className={`${styles.actionBtn} ${styles.buyBtn}`}
+                        onMouseEnter={() => playInteractionSound('hover')}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          playInteractionSound('click');
+                          router.push(`/checkout?buyNow=${product.id}&size=M&qty=1`);
+                        }}
+                      >
+                        Buy Now
+                      </button>
                     </div>
-                    <span style={{ fontWeight: 800, marginLeft: '2px' }}>{(product.rating || 5.0).toFixed(1)}</span>
-                    <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>(Verified Client)</span>
+
                   </div>
-                  <div className={styles.cardActionsGlass}>
-                    <AnimatedCartButton
-                      size="small"
-                      className={styles.addToCartBtnGlass}
-                      onAdd={() => addToCart({
-                        id: product.id as string,
-                        name: product.name,
-                        price: product.price,
-                        mrp: product.mrp,
-                        image: product.image,
-                        size: 'M',
-                        quantity: 1,
-                      })}
-                    />
-                    <button
-                      className={styles.buyNowBtnGlass}
-                      onClick={(e) => { e.preventDefault(); router.push(`/checkout?buyNow=${product.id}&size=M&qty=1`); }}
-                    >
-                      Buy Now
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+                </motion.div>
+              ))
+            )}
+          </motion.div>
+        </AnimatePresence>
       </section>
 
     </div>

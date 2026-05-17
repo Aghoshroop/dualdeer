@@ -140,19 +140,20 @@ const deleteDocument = async (collectionName: string, id: string) => {
 // ========================
 export const getProducts = async (): Promise<Product[]> => {
   const all = await getCollectionData<Product>('products');
-  return all.filter(p => p.status !== 'deleted');
+  return all.filter(p => p.status !== 'deleted').map(p => ({...p, slug: p.slug || p.id}));
 };
 
 export const getDeletedProducts = async (): Promise<Product[]> => {
   const all = await getCollectionData<Product>('products');
-  return all.filter(p => p.status === 'deleted');
+  return all.filter(p => p.status === 'deleted').map(p => ({...p, slug: p.slug || p.id}));
 };
 
 export const getProduct = async (id: string): Promise<Product | null> => {
   try {
     const docSnap = await getDoc(doc(db, 'products', id));
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() } as Product;
+      const data = { id: docSnap.id, ...docSnap.data() } as Product;
+      return { ...data, slug: data.slug || data.id };
     }
   } catch(e) {
     console.error("Error fetching single product", e);

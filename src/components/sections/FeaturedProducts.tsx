@@ -22,19 +22,34 @@ export default function FeaturedProducts() {
     <section className={styles.section} style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <motion.h2 
-            className={styles.title}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            THE CORE ARSENAL
-          </motion.h2>
-          <Link href="/shop" className={styles.shopAll}>View All Profiles</Link>
+          <div className={styles.titleWrapper}>
+            <motion.span 
+              className={styles.preTitle}
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              Signature Series
+            </motion.span>
+            <motion.h2 
+              className={styles.title}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+            >
+              THE CORE ARSENAL
+            </motion.h2>
+          </div>
+          <Link href="/shop" className={styles.shopAll}>Explore Collection</Link>
         </div>
 
-        <div className={styles.grid}>
+        <div className={`
+          ${styles.grid} 
+          ${!loading && products.length === 1 ? styles.singleItemGrid : ''}
+          ${!loading && products.length === 2 ? styles.twoItemGrid : ''}
+        `}>
           {loading ? (
             <div style={{ color: 'var(--color-text)', textAlign: 'center', width: '100%', padding: '2rem' }}>Loading the Archives...</div>
           ) : products.length === 0 ? (
