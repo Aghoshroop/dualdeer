@@ -271,3 +271,107 @@
     padding: 2rem 1.5rem;
   }
 }
+
+@media (max-width: 480px) {
+  .heroSection {
+    padding: 4rem 0 2rem;
+  }
+  
+  .massiveText {
+    font-size: clamp(2rem, 11vw, 5rem); /* Flawless downscaling on small devices */
+    letter-spacing: -0.02em;
+  }
+  
+  .taglineContainer {
+    padding: 0 1rem;
+    gap: 0.5rem;
+  }
+  
+  .tagline {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+  }
+  
+  .matrixColumn {
+    padding: 2.5rem 1rem;
+  }
+  
+  .matrixTitle {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .matrixDesc {
+    font-size: 0.9rem;
+    max-width: 100%;
+    margin-bottom: 2rem;
+  }
+  
+  .sleekInput {
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+  }
+  
+  .magneticHoverLink {
+    font-size: clamp(1.2rem, 6.5vw, 1.6rem); /* Fluid scaling prevents link wrapping or breaking */
+    gap: 1rem;
+  }
+  
+  .linkArrow {
+    font-size: 1.1rem;
+  }
+  
+  .bottomBar {
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1rem;
+    gap: 1.2rem;
+  }
+  
+  .copyright {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+  }
+  
+  .socials {
+    justify-content: center;
+    gap: 2rem;
+  }
+  
+  .socialLink {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+  }
+}
+
+@media (max-width: 320px) {
+  .massiveText {
+    font-size: 1.8rem;
+  }
+  
+  .tagline {
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    white-space: normal;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .matrixColumn {
+    padding: 2rem 0.75rem;
+  }
+  
+  .magneticHoverLink {
+    font-size: 1.1rem;
+    gap: 0.8rem;
+  }
+  
+  .linkArrow {
+    font-size: 0.9rem;
+  }
+  
+  .bottomBar {
+    padding: 1.5rem 0.5rem;
+  }
+}
