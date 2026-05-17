@@ -92,7 +92,7 @@ export default function Cinematic3DSection() {
         
         context.scale(dpr, dpr);
         context.imageSmoothingEnabled = true;
-        // @ts-expect-error
+        // @ts-ignore
         context.imageSmoothingQuality = "high";
 
         lastRenderedFrame = -1; 
