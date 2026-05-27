@@ -20,7 +20,7 @@
 }
 
 .modal {
-  background: rgba(10, 10, 10, 0.9);
+  background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   width: 100%;
@@ -58,7 +58,7 @@
 
 .closeBtn:hover {
   background: #ff3333;
-  color: var(--color-text);
+  color: #ffffff;
   border-color: #ff3333;
 }
 
@@ -87,7 +87,7 @@
 
 .subtitle {
   font-size: 0.95rem;
-  color: var(--color-border);
+  color: var(--color-text-muted);
   line-height: 1.6;
   margin-bottom: 2rem;
 }
@@ -108,12 +108,12 @@
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .input {
   width: 100%;
-  background: rgba(var(--background-rgb), 0.5);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   color: var(--color-text);
   padding: 1rem 1rem 1rem 3rem;
@@ -169,7 +169,7 @@
 }
 
 .successSubtitle {
-  color: var(--color-border);
+  color: var(--color-text-muted);
   margin-bottom: 2rem;
   line-height: 1.5;
 }

@@ -1,0 +1,189 @@
+.section {
+  position: relative;
+  width: 100%;
+  height: 56px;
+  background-color: var(--color-surface);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.4s ease;
+  user-select: none;
+}
+
+/* Shifting gradient top/bottom lines */
+.gradientBorderTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #7B2FF7, #00E5FF, #FF007F, #00FF66, #FF9900, #7B2FF7);
+  background-size: 200% auto;
+  animation: shiftGradient 6s linear infinite;
+  z-index: 2;
+}
+
+.gradientBorderBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #7B2FF7, #00E5FF, #FF007F, #00FF66, #FF9900, #7B2FF7);
+  background-size: 200% auto;
+  animation: shiftGradient 6s linear infinite;
+  z-index: 2;
+}
+
+@keyframes shiftGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+/* Marquee view wrapper */
+.marqueeWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.marqueeTrack {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: marqueeLoop 30s linear infinite;
+}
+
+/* Pause scroll animation on hover */
+.marqueeWrapper:hover .marqueeTrack {
+  animation-play-state: paused;
+}
+
+@keyframes marqueeLoop {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-33.33333%, 0, 0);
+  }
+}
+
+/* Marquee item layout */
+.marqueeItem {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0 3.5rem; /* Wide breathing room for elite branding */
+  height: 100%;
+  white-space: nowrap;
+  transition: transform 0.3s ease;
+}
+
+/* Pill badge category tags */
+.pillTag {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  padding: 0.2rem 0.65rem;
+  border-radius: 4px;
+  border: 1px solid var(--benefit-color);
+  color: var(--benefit-color);
+  background: rgba(var(--background-rgb), 0.05);
+  box-shadow: inset 0 0 6px rgba(var(--background-rgb), 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.8;
+}
+
+.marqueeItem:hover .pillTag {
+  transform: scale(1.05);
+  opacity: 1;
+  box-shadow: 
+    0 0 10px var(--benefit-color),
+    inset 0 0 4px var(--benefit-color);
+  background: rgba(var(--background-rgb), 0.1);
+}
+
+/* Icon style */
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--benefit-color);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.marqueeItem:hover .iconWrapper {
+  transform: scale(1.2) rotate(15deg);
+}
+
+/* Texts inline style */
+.textContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cardTitle {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--color-text);
+  text-transform: uppercase;
+}
+
+.divider {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  opacity: 0.35;
+}
+
+.cardSubtitle {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.2px;
+}
+
+/* Mobile responsive pacing */
+@media (max-width: 768px) {
+  .section {
+    height: 48px;
+  }
+  .marqueeItem {
+    padding: 0 2rem;
+    gap: 0.65rem;
+  }
+  .pillTag {
+    font-size: 0.5rem;
+    padding: 0.15rem 0.45rem;
+  }
+  .cardTitle {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+  }
+  .cardSubtitle {
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .divider {
+    display: none;
+  }
+  .cardSubtitle {
+    display: none;
+  }
+  .marqueeItem {
+    padding: 0 1.5rem;
+  }
+}

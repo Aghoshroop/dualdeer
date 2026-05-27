@@ -147,7 +147,7 @@ function CheckoutEngine() {
       })),
       total: total,
       discountAmount: discountAmountCapped,
-      appliedCoupon: appliedCoupon ? appliedCoupon.code : undefined,
+      ...(appliedCoupon ? { appliedCoupon: appliedCoupon.code } : {}),
       status: 'processing' as const,
       paymentMethod: paymentMethod,
       utrNumber: paymentMethod === 'upi' ? utrNumber : '',

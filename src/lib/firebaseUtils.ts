@@ -100,7 +100,8 @@ export interface Order {
   total: number;
   discountAmount?: number;
   appliedCoupon?: string;
-  status: 'processing' | 'shipped' | 'delivered';
+  status: 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled';
+  cancellationReason?: string;
   paymentMethod?: string;
   utrNumber?: string;
   shiprocketSyncStatus?: 'pending' | 'synced' | 'failed';

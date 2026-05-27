@@ -32,7 +32,7 @@
 }
 
 .subtitle {
-  color: var(--color-border);
+  color: var(--color-text-muted);
   margin-top: 0.5rem;
   font-size: 0.95rem;
   letter-spacing: 0.5px;
@@ -77,14 +77,14 @@
 .emptyState {
   text-align: center;
   padding: 6rem 2rem;
-  background: var(--color-border);
+  background: var(--color-surface);
   backdrop-filter: blur(10px);
   border: 1px dashed var(--color-border);
   border-radius: 12px;
 }
 
 .emptyIcon {
-  color: var(--color-border);
+  color: var(--color-text-muted);
   margin-bottom: 1.5rem;
 }
 
@@ -95,7 +95,7 @@
 }
 
 .emptyState p {
-  color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .tableWrapper {
@@ -117,8 +117,8 @@
 
 .table th {
   padding: 1.5rem 1rem;
-  background: var(--color-border);
-  color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -133,7 +133,7 @@
 }
 
 .table tr:hover {
-  background: var(--color-border);
+  background: var(--color-surface);
 }
 
 .traceCode {
@@ -146,7 +146,7 @@
 
 .timeLabel {
   font-size: 0.8rem;
-  color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .clientInfo {
@@ -162,12 +162,12 @@
 
 .clientContact {
   font-size: 0.8rem;
-  color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .addressBlock {
   font-size: 0.8rem;
-  color: var(--color-border);
+  color: var(--color-text-muted);
   margin-top: 0.5rem;
   line-height: 1.4;
   padding-left: 0.4rem;
@@ -176,7 +176,7 @@
 
 .guestMarker {
   font-style: italic;
-  color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .manifestCol {
@@ -198,11 +198,11 @@
 
 .manifestItem {
   font-size: 0.8rem;
-  color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .itemMeta {
-  color: var(--color-border);
+  color: var(--color-text-muted);
   font-size: 0.75rem;
 }
 
@@ -323,7 +323,7 @@
 
 /* Filtration Engine */
 .filterBar {
-  background: var(--color-border);
+  background: var(--color-surface);
   border: 1px dashed var(--color-border);
   border-radius: 8px;
   padding: 1rem;
@@ -348,7 +348,7 @@
 .filterBtn {
   background: rgba(var(--background-rgb), 0.3);
   border: 1px solid var(--color-border);
-  color: var(--color-border);
+  color: var(--color-text-muted);
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
@@ -360,7 +360,7 @@
 }
 
 .filterBtn:hover {
-  background: var(--color-border);
+  background: var(--color-surface);
   color: var(--color-text);
 }
 

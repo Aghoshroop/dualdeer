@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { CheckCircle, Package, ArrowRight, Truck, Mail, MapPin, CreditCard, ShoppingBag } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { getOrder, Order } from '@/lib/firebaseUtils';
 import styles from './Success.module.css';
 
@@ -35,15 +37,48 @@ function CheckoutSuccessContent() {
         confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
       }, 250);
 
-      // Fetch order details
-      getOrder(orderId).then(data => {
-        setOrder(data);
+      // Real-time listener for order status/details
+      const docRef = doc(db, 'orders', orderId);
+      const unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setOrder({ id: docSnap.id, ...docSnap.data() } as Order);
+        }
+        setLoading(false);
+      }, (error) => {
+        console.error("Error listening to order status:", error);
         setLoading(false);
       });
+      
+      return () => {
+        clearInterval(interval);
+        unsubscribe();
+      };
     } else {
       setLoading(false);
     }
   }, [searchParams]);
+
+  const getStepClass = (stepName: 'validated' | 'processing' | 'shipped' | 'delivered') => {
+    const currentStatus = order?.status || 'processing';
+
+    if (stepName === 'validated') return `${styles.step} ${styles.completedStep}`;
+
+    if (stepName === 'processing') {
+      if (currentStatus === 'processing') return `${styles.step} ${styles.activeStep}`;
+      if (currentStatus === 'shipped' || currentStatus === 'delivered') return `${styles.step} ${styles.completedStep}`;
+    }
+
+    if (stepName === 'shipped') {
+      if (currentStatus === 'shipped') return `${styles.step} ${styles.activeStep}`;
+      if (currentStatus === 'delivered') return `${styles.step} ${styles.completedStep}`;
+    }
+
+    if (stepName === 'delivered') {
+      if (currentStatus === 'delivered') return `${styles.step} ${styles.completedStep}`;
+    }
+
+    return styles.step;
+  };
 
   if (loading) {
     return (
@@ -91,20 +126,26 @@ function CheckoutSuccessContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        <div className={`${styles.step} ${styles.completedStep}`}>
+        <div className={getStepClass('validated')}>
           <div className={styles.stepIcon}><CheckCircle size={20} /></div>
           <span className={styles.stepLabel}>Validated</span>
         </div>
-        <div className={`${styles.step} ${styles.activeStep}`}>
-          <div className={styles.stepIcon}><Package size={20} /></div>
+        <div className={getStepClass('processing')}>
+          <div className={styles.stepIcon}>
+            {order?.status === 'shipped' || order?.status === 'delivered' ? <CheckCircle size={20} /> : <Package size={20} />}
+          </div>
           <span className={styles.stepLabel}>Processing</span>
         </div>
-        <div className={styles.step}>
-          <div className={styles.stepIcon}><Truck size={20} /></div>
+        <div className={getStepClass('shipped')}>
+          <div className={styles.stepIcon}>
+            {order?.status === 'delivered' ? <CheckCircle size={20} /> : <Truck size={20} />}
+          </div>
           <span className={styles.stepLabel}>Nexus Transit</span>
         </div>
-        <div className={styles.step}>
-          <div className={styles.stepIcon}><MapPin size={20} /></div>
+        <div className={getStepClass('delivered')}>
+          <div className={styles.stepIcon}>
+            {order?.status === 'delivered' ? <CheckCircle size={20} /> : <MapPin size={20} />}
+          </div>
           <span className={styles.stepLabel}>Delivered</span>
         </div>
       </motion.div>

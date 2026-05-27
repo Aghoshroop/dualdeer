@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Zap, TrendingUp, History, Package, CreditCard, Award, ChevronRight } from 'lucide-react';
 import { getUserOrders, Order } from '@/lib/firebaseUtils';
+import { db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import styles from './ProfileComponents.module.css';
 
 interface EliteOverviewProps {
@@ -15,16 +17,28 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.uid) {
-      getUserOrders(user.uid).then(data => {
-        setOrders(data);
-        setLoading(false);
+    if (!user?.uid) return;
+    setLoading(true);
+    const q = query(collection(db, 'orders'), where('userId', '==', user.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const userOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+      // Sort newest first
+      const sorted = userOrders.sort((a, b) => {
+        const timeA = a.createdAt && (a.createdAt as any).toMillis ? (a.createdAt as any).toMillis() : typeof a.createdAt === 'number' ? a.createdAt : 0;
+        const timeB = b.createdAt && (b.createdAt as any).toMillis ? (b.createdAt as any).toMillis() : typeof b.createdAt === 'number' ? b.createdAt : 0;
+        return timeB - timeA;
       });
-    }
+      setOrders(sorted);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching orders:", error);
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, [user]);
 
   const totalSpent = orders.reduce((acc, order) => acc + order.total, 0);
-  const activeOrders = orders.filter(o => o.status !== 'delivered').length;
+  const activeOrders = orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').length;
   
   // Rank Logic
   let rank = "Elite Aspirant";
@@ -146,10 +160,10 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
         <motion.div variants={item} className={styles.latestMission}>
            <h3>Latest Transmission</h3>
            <div className={styles.missionCard}>
-             <div className={styles.missionDot} style={{ background: orders[0].status === 'delivered' ? '#10b981' : '#f59e0b' }} />
+             <div className={styles.missionDot} style={{ background: orders[0].status === 'delivered' ? '#10b981' : orders[0].status === 'cancelled' ? '#ef4444' : '#f59e0b' }} />
              <div className={styles.missionSummary}>
                <span className={styles.missionId}>#ORD-{orders[0].id?.slice(-6).toUpperCase()}</span>
-               <span className={styles.missionStatus}>{orders[0].status}</span>
+               <span className={styles.missionStatus} style={{ textTransform: 'capitalize' }}>{orders[0].status.replace('_', ' ')}</span>
              </div>
              <div className={styles.missionPrice}>₹{orders[0].total.toLocaleString()}</div>
            </div>

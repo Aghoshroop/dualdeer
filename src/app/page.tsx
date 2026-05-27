@@ -4,6 +4,7 @@ import BrandStory from "@/components/sections/BrandStory";
 import TestimonialSlider from "@/components/sections/TestimonialSlider";
 import FeaturedProducts from "@/components/sections/FeaturedProducts";
 import Cinematic3DSection from "@/components/sections/Cinematic3DSection";
+import TrustStrip from "@/components/sections/TrustStrip";
 
 import React from "react";
 import Link from 'next/link';
@@ -40,6 +41,7 @@ export default function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }} />
       <HeroSection />
+      <TrustStrip />
 
       <Cinematic3DSection />
       <FeaturedProducts />

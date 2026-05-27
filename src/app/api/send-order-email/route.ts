@@ -56,9 +56,9 @@ export async function POST(request: Request) {
       </table>
     `;
 
-    const mailOptions = {
-      from: process.env.SMTP_EMAIL || 'aviroopghosh283@gmail.com',
-      to: 'aviroopghosh283@gmail.com', // Admin email
+    const adminMailOptions = {
+      from: '"DualDeer" <hello@dualdeer.com>',
+      to: 'hello@dualdeer.com, aviroopghosh283@gmail.com',
       subject: `New Order Placed - ${orderId}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
@@ -94,8 +94,34 @@ export async function POST(request: Request) {
       `,
     };
 
-    // Send the email
-    await transporter.sendMail(mailOptions);
+    const customerMailOptions = {
+      from: '"DualDeer" <hello@dualdeer.com>',
+      to: shippingDetails?.email || 'hello@dualdeer.com',
+      subject: `Order Confirmation - ${orderId}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+          <h2 style="color: #4f46e5;">Thank you for your order, ${shippingDetails?.name || 'Customer'}! 🎉</h2>
+          <p>Your order <strong>#${orderId}</strong> has been successfully placed and is now being processed.</p>
+          <p><strong>Total Amount:</strong> ₹${total.toFixed(2)}</p>
+          ${discountAmount > 0 ? `<p><strong>Discount Applied:</strong> ₹${discountAmount.toFixed(2)}</p>` : ''}
+          
+          <h3 style="margin-top: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Order Items</h3>
+          ${itemsHtml}
+          
+          <p style="margin-top: 30px;">We will notify you once your order has been shipped. You can track your order status in your profile dashboard.</p>
+          
+          <p style="margin-top: 30px; font-size: 12px; color: #6b7280; text-align: center;">
+            DualDeer Activewear
+          </p>
+        </div>
+      `,
+    };
+
+    // Send emails
+    await Promise.all([
+      transporter.sendMail(adminMailOptions),
+      shippingDetails?.email ? transporter.sendMail(customerMailOptions) : Promise.resolve()
+    ]);
 
     return NextResponse.json({ success: true, message: 'Email sent successfully' });
   } catch (error: any) {

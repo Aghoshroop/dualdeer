@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import styles from "./CustomCursor.module.css";
 
 export default function CustomCursor() {
+  const pathname = usePathname();
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
   

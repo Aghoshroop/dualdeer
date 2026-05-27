@@ -8,7 +8,7 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [mutatingId, setMutatingId] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<'recent' | 'price_high' | 'price_low' | 'processing' | 'shipped' | 'delivered'>('recent');
+  const [activeFilter, setActiveFilter] = useState<'recent' | 'price_high' | 'price_low' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled'>('recent');
 
   useEffect(() => {
     fetchOrders();
@@ -21,7 +21,7 @@ export default function AdminOrdersPage() {
     setLoading(false);
   };
 
-  const handleStatusChange = async (orderId: string, newStatus: 'processing' | 'shipped' | 'delivered') => {
+  const handleStatusChange = async (orderId: string, newStatus: 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled') => {
     setMutatingId(orderId);
     try {
       await updateOrder(orderId, { status: newStatus });
@@ -52,7 +52,9 @@ export default function AdminOrdersPage() {
       case 'price_low': result.sort((a, b) => a.total - b.total); break;
       case 'processing':
       case 'shipped':
-      case 'delivered': result = result.filter(o => o.status === activeFilter); break;
+      case 'delivered': 
+      case 'cancellation_requested':
+      case 'cancelled': result = result.filter(o => o.status === activeFilter); break;
       case 'recent':
       default: break; // Already sorted latest by firebase utils
     }
@@ -64,6 +66,8 @@ export default function AdminOrdersPage() {
   const StatusIcon = ({ status }: { status: string }) => {
     if (status === 'delivered') return <CheckCircle size={14} color="#00ffcc" />;
     if (status === 'shipped') return <Send size={14} color="#3399ff" />;
+    if (status === 'cancellation_requested') return <RefreshCw size={14} color="#f59e0b" />;
+    if (status === 'cancelled') return <Trash2 size={14} color="#ef4444" />;
     return <RefreshCw size={14} color="#ffcc00" className={styles.spin} />;
   };
 
@@ -91,6 +95,8 @@ export default function AdminOrdersPage() {
           <button onClick={() => setActiveFilter('processing')} className={`${styles.filterBtn} ${activeFilter === 'processing' ? styles.activeF : ''}`}>Pending Actions</button>
           <button onClick={() => setActiveFilter('shipped')} className={`${styles.filterBtn} ${activeFilter === 'shipped' ? styles.activeF : ''}`}>Shipped</button>
           <button onClick={() => setActiveFilter('delivered')} className={`${styles.filterBtn} ${activeFilter === 'delivered' ? styles.activeF : ''}`}>Delivered</button>
+          <button onClick={() => setActiveFilter('cancellation_requested')} className={`${styles.filterBtn} ${activeFilter === 'cancellation_requested' ? styles.activeF : ''}`} style={{ color: activeFilter === 'cancellation_requested' ? '#f59e0b' : 'inherit' }}>Cancel Requests</button>
+          <button onClick={() => setActiveFilter('cancelled')} className={`${styles.filterBtn} ${activeFilter === 'cancelled' ? styles.activeF : ''}`}>Cancelled</button>
         </div>
       </div>
 
@@ -136,6 +142,12 @@ export default function AdminOrdersPage() {
                     ) : (
                       <span className={styles.guestMarker}>Anonymous User: {order.userId}</span>
                     )}
+                    {order.cancellationReason && (
+                      <div style={{ marginTop: '0.8rem', padding: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', borderLeft: '3px solid #f59e0b', borderRadius: '4px' }}>
+                        <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#f59e0b', textTransform: 'uppercase', marginBottom: '4px' }}>Cancellation Reason</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text)' }}>{order.cancellationReason}</span>
+                      </div>
+                    )}
                   </td>
                   
                   <td className={styles.manifestCol}>
@@ -158,8 +170,8 @@ export default function AdminOrdersPage() {
                   </td>
                   
                   <td>
-                    <div className={`${styles.statusBadge} ${styles[order.status]}`}>
-                      <StatusIcon status={order.status} /> {order.status.toUpperCase()}
+                    <div className={`${styles.statusBadge} ${styles[order.status]}`} style={order.status === 'cancellation_requested' ? { background: 'rgba(245,158,11,0.2)', color: '#f59e0b', borderColor: '#f59e0b' } : order.status === 'cancelled' ? { background: 'rgba(239,68,68,0.2)', color: '#ef4444', borderColor: '#ef4444' } : {}}>
+                      <StatusIcon status={order.status} /> {order.status.replace('_', ' ').toUpperCase()}
                     </div>
                   </td>
                   
@@ -170,15 +182,25 @@ export default function AdminOrdersPage() {
                         value={order.status}
                         disabled={mutatingId === order.id}
                         onChange={(e) => handleStatusChange(order.id as string, e.target.value as any)}
+                        style={{ marginBottom: '8px' }}
                       >
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
+                        <option value="cancellation_requested">Cancel Requested</option>
+                        <option value="cancelled">Cancelled</option>
                       </select>
                       {mutatingId === order.id && <span className={styles.mutatingTag}>Syncing...</span>}
                       
+                      {order.status === 'cancellation_requested' && (
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexDirection: 'column' }}>
+                          <button onClick={() => handleStatusChange(order.id as string, 'cancelled')} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Cancel Order</button>
+                          <button onClick={() => handleStatusChange(order.id as string, 'processing')} style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Reject Request</button>
+                        </div>
+                      )}
+
                       <button onClick={() => handleDelete(order.id as string)} className={styles.deleteBtn}>
-                        <Trash2 size={14} /> Delete
+                        <Trash2 size={14} /> Hard Delete
                       </button>
                     </div>
                   </td>

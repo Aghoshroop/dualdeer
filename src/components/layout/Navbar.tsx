@@ -150,8 +150,8 @@ export default function Navbar() {
       y: 0, // Lifted completely to the top on all pages!
       backgroundColor: isHome ? "rgba(0,0,0,0)" : (theme === 'dark' ? "var(--color-background)" : "var(--color-background)"),
       backdropFilter: "blur(0px)",
-      border: "1px solid transparent",
-      borderBottomColor: isHome ? "transparent" : "var(--color-border)",
+      border: "1px solid rgba(0,0,0,0)",
+      borderBottomColor: isHome ? "rgba(0,0,0,0)" : "var(--color-border)",
     },
     expandedScrolled: {
       width: "100%",
@@ -159,7 +159,7 @@ export default function Navbar() {
       y: 0,
       backgroundColor: theme === 'dark' ? "rgba(10,10,10,0.85)" : "rgba(255,255,255,0.9)",
       backdropFilter: "blur(16px)",
-      border: "1px solid transparent",
+      border: "1px solid rgba(0,0,0,0)",
       borderBottomColor: "var(--color-border)",
     },
     compact: {
