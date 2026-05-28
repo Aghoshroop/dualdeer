@@ -712,3 +712,63 @@ export const deleteNotification = async (id: string) => {
     console.error("Notification delete error:", e);
   }
 };
+
+// ========================
+// Chat System
+// ========================
+export interface ChatMessage {
+  id?: string;
+  userId: string;
+  text: string;
+  sender: 'admin' | 'user';
+  readByAdmin: boolean;
+  readByUser: boolean;
+  createdAt: Timestamp;
+}
+
+export const getChatMessages = async (userId: string): Promise<ChatMessage[]> => {
+  try {
+    const q = query(collection(db, 'chats'), where('userId', '==', userId));
+    const snap = await getDocs(q);
+    const msgs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage));
+    return msgs.sort((a, b) => {
+      const timeA = (a.createdAt as any)?.toMillis ? (a.createdAt as any).toMillis() : a.createdAt;
+      const timeB = (b.createdAt as any)?.toMillis ? (b.createdAt as any).toMillis() : b.createdAt;
+      return Number(timeA) - Number(timeB); // asc
+    });
+  } catch (e) {
+    console.error("Chat read error:", e);
+    return [];
+  }
+};
+
+export const sendChatMessage = async (userId: string, text: string, sender: 'admin' | 'user') => {
+  try {
+    await addDoc(collection(db, 'chats'), {
+      userId,
+      text,
+      sender,
+      readByAdmin: sender === 'admin',
+      readByUser: sender === 'user',
+      createdAt: Timestamp.now()
+    });
+  } catch (e) {
+    console.error("Chat write error:", e);
+  }
+};
+
+export const markMessagesAsRead = async (userId: string, reader: 'admin' | 'user') => {
+  try {
+    const q = query(collection(db, 'chats'), where('userId', '==', userId), where(reader === 'admin' ? 'readByAdmin' : 'readByUser', '==', false));
+    const snap = await getDocs(q);
+    
+    const updates = snap.docs.map(docSnap => 
+      updateDoc(doc(db, 'chats', docSnap.id), {
+        [reader === 'admin' ? 'readByAdmin' : 'readByUser']: true
+      })
+    );
+    await Promise.all(updates);
+  } catch (e) {
+    console.error("Chat mark read error:", e);
+  }
+};

@@ -6,9 +6,13 @@ import { Search, ShoppingBag, User, X, Sun, Moon, Menu, Bell } from 'lucide-reac
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import LiveTrafficBadge from '../ui/LiveTrafficBadge';
-import { Product, AppNotification, getActiveNotifications } from '@/lib/firebaseUtils';
+import { Product, AppNotification, getActiveNotifications, sendChatMessage, ChatMessage, markMessagesAsRead } from '@/lib/firebaseUtils';
 import { useCart } from '@/context/CartContext';
 import styles from './Navbar.module.css';
+import { auth, db } from '@/lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -21,8 +25,12 @@ export default function Navbar() {
   const [liveCategories, setLiveCategories] = useState<string[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [unreadNotifIds, setUnreadNotifIds] = useState<string[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [replyText, setReplyText] = useState<{ [key: string]: string }>({});
+
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -42,6 +50,11 @@ export default function Navbar() {
     };
     window.addEventListener('resize', handleResize);
     handleResize();
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+
 
     // Dynamically fetch active categories and products
     import('@/lib/firebaseUtils').then(({ getProducts, getCategories }) => {
@@ -66,8 +79,49 @@ export default function Navbar() {
       }).catch(err => console.error(err));
     });
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      unsubscribeAuth();
+    };
   }, []);
+
+  // Real-time Chat Listener
+  useEffect(() => {
+    if (!currentUser) {
+      setChatMessages([]);
+      return;
+    }
+    
+    const q = query(collection(db, 'chats'), where('userId', '==', currentUser.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage));
+      msgs.sort((a, b) => {
+        const timeA = (a.createdAt as any)?.toMillis ? (a.createdAt as any).toMillis() : a.createdAt;
+        const timeB = (b.createdAt as any)?.toMillis ? (b.createdAt as any).toMillis() : b.createdAt;
+        return Number(timeB) - Number(timeA); // desc
+      });
+      setChatMessages(msgs);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  // Combined Notifications and Chats Logic
+  useEffect(() => {
+    let count = 0;
+    
+    // Global Notifications
+    const stored = localStorage.getItem('dualdeer_read_notif_ids');
+    const readIds: string[] = stored ? JSON.parse(stored) : [];
+    const currentUnreadIds = notifications.map(n => n.id).filter(id => id && !readIds.includes(id)) as string[];
+    
+    // Unread Admin Chats
+    const unreadChats = chatMessages.filter(m => m.sender === 'admin' && !m.readByUser);
+    
+    setUnreadNotifIds(currentUnreadIds);
+    setUnreadNotifCount(currentUnreadIds.length + unreadChats.length);
+  }, [notifications, chatMessages]);
+
 
   // Dynamic Scroll Distances
   const dockStart = 0;
@@ -370,14 +424,20 @@ export default function Navbar() {
                 className={styles.iconBtn} 
                 onClick={() => {
                    setIsNotifOpen(!isNotifOpen);
-                   if (!isNotifOpen) {
+                    if (!isNotifOpen) {
                      setUnreadNotifCount(0); 
                      const allKnownIds = notifications.map(n => n.id).filter(id => !!id);
                      const stored = localStorage.getItem('dualdeer_read_notif_ids');
                      const readIds: string[] = stored ? JSON.parse(stored) : [];
                      const combinedReads = Array.from(new Set([...readIds, ...allKnownIds]));
                      localStorage.setItem('dualdeer_read_notif_ids', JSON.stringify(combinedReads));
+                     
+                     // Mark chats as read
+                     if (currentUser) {
+                       markMessagesAsRead(currentUser.uid, 'user');
+                     }
                    }
+
                 }}
                 style={{ position: 'relative' }}
               >
@@ -422,13 +482,60 @@ export default function Navbar() {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
                       >
-                        {notifications.length === 0 ? (
+                        {notifications.length === 0 && chatMessages.filter(m => m.sender === 'admin').length === 0 ? (
                           <div className={styles.overlayNoResults}>
                             You're all caught up!
-                            <span className={styles.overlayDidYouMean}>No active system alerts or athlete notifications at this time</span>
+                            <span className={styles.overlayDidYouMean}>No active system alerts or messages at this time</span>
                           </div>
                         ) : (
                           <div className={styles.notificationGridList}>
+                            {chatMessages.filter(m => m.sender === 'admin').map((msg) => (
+                              <div key={msg.id} className={styles.notificationOverlayItem}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <span className={styles.notificationOverlayItemTitle}>Message from Admin</span>
+                                  {!msg.readByUser && <span className={styles.newBadgeOverlay}>NEW</span>}
+                                </div>
+                                <span className={styles.notificationOverlayItemMessage}>{msg.text}</span>
+                                {msg.createdAt && <span className={styles.notificationOverlayItemTime}>{new Date((msg.createdAt as any).toMillis ? (msg.createdAt as any).toMillis() : msg.createdAt).toLocaleDateString()}</span>}
+                                
+                                {/* Reply Section */}
+                                <div className={styles.replySection}>
+                                  <textarea 
+                                    className={styles.replyInput}
+                                    placeholder="Type a reply..."
+                                    value={replyText[msg.id!] || ''}
+                                    rows={1}
+                                    onChange={(e) => {
+                                      setReplyText({...replyText, [msg.id!]: e.target.value});
+                                      e.target.style.height = 'auto';
+                                      e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                                    }}
+                                    onKeyDown={async (e) => {
+                                      if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        if (replyText[msg.id!]?.trim() && currentUser) {
+                                          await sendChatMessage(currentUser.uid, replyText[msg.id!], 'user');
+                                          setReplyText({...replyText, [msg.id!]: ''});
+                                          e.currentTarget.style.height = 'auto';
+                                        }
+                                      }
+                                    }}
+                                  />
+                                  <button 
+                                    className={styles.replyBtn}
+                                    onClick={async () => {
+                                      if (replyText[msg.id!]?.trim() && currentUser) {
+                                        await sendChatMessage(currentUser.uid, replyText[msg.id!], 'user');
+                                        setReplyText({...replyText, [msg.id!]: ''});
+                                      }
+                                    }}
+                                  >
+                                    Reply
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+
                             {notifications.map((notif) => {
                               const NotificationContent = () => (
                                 <>
@@ -453,6 +560,7 @@ export default function Navbar() {
                             })}
                           </div>
                         )}
+
                       </motion.div>
                     </div>
                   </motion.div>
