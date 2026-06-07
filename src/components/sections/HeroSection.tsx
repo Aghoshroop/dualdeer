@@ -83,7 +83,9 @@ export default function HeroSection() {
     const fetchBanners = async () => {
       try {
         const banners = await getBanners();
-        const activeBanners = banners.filter(b => b.active && !b.deleted);
+        const activeBanners = banners
+          .filter(b => b.active && !b.deleted)
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
         
         if (activeBanners.length > 0) {
           const mappedSlides = activeBanners.map((b, index) => ({

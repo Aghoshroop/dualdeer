@@ -70,6 +70,7 @@ export interface Banner {
   link?: string; // Kept for backwards compatibility, but use ctaLink instead when provided
   ctaLink?: string;
   showCta?: boolean;
+  order?: number;
   active: boolean;
   deleted?: boolean;
   deletedAt?: Timestamp;

@@ -26,6 +26,7 @@ export default function AdminBannersPage() {
     link: '',
     ctaLink: '',
     showCta: true,
+    order: 0,
     active: true
   });
 
@@ -45,7 +46,7 @@ export default function AdminBannersPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ title: '', mediaType: 'image', image: '', mobileImage: '', desktopVideo: '', mobileVideo: '', link: '', ctaLink: '', showCta: true, active: true });
+    setFormData({ title: '', mediaType: 'image', image: '', mobileImage: '', desktopVideo: '', mobileVideo: '', link: '', ctaLink: '', showCta: true, order: 0, active: true });
     setEditingId(null);
     setShowModal(true);
   };
@@ -61,6 +62,7 @@ export default function AdminBannersPage() {
       link: banner.link || '',
       ctaLink: banner.ctaLink || banner.link || '',
       showCta: banner.showCta !== false, // Default to true if undefined
+      order: banner.order || 0,
       active: banner.active
     });
     setEditingId(banner.id!);
@@ -178,9 +180,9 @@ export default function AdminBannersPage() {
     loadBanners();
   };
 
-  const filteredBanners = banners.filter(b => 
-    currentTab === 'active' ? !b.deleted : b.deleted
-  );
+  const filteredBanners = banners
+    .filter(b => currentTab === 'active' ? !b.deleted : b.deleted)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 
   return (
     <div className={styles.page}>
@@ -227,6 +229,7 @@ export default function AdminBannersPage() {
           <table className={styles.table}>
             <thead>
               <tr>
+                <th>Sort Order</th>
                 <th>Title</th>
                 <th>Link</th>
                 <th>Status</th>
@@ -236,6 +239,7 @@ export default function AdminBannersPage() {
             <tbody>
               {filteredBanners.map((banner) => (
                 <tr key={banner.id}>
+                  <td><span className={styles.statusBadge} style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--color-text)' }}>{banner.order || 0}</span></td>
                   <td><span className={styles.nameBadge}>{banner.title}</span></td>
                   <td style={{ color: 'var(--color-primary)' }}>{banner.link || '-'}</td>
                   <td>
@@ -291,14 +295,26 @@ export default function AdminBannersPage() {
           <form className={styles.modalContent} onSubmit={handleSave}>
             <h2>{editingId ? 'Edit Banner' : 'New Banner'}</h2>
             
-            <div className={styles.formGroup}>
-              <label>Banner Title</label>
-              <input 
-                type="text" 
-                value={formData.title} 
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                required
-              />
+            <div style={{ display: 'flex', gap: '1.5rem' }}>
+              <div className={styles.formGroup} style={{ flex: 2 }}>
+                <label>Banner Title</label>
+                <input 
+                  type="text" 
+                  value={formData.title} 
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup} style={{ flex: 1 }}>
+                <label>Sort Order (1, 2, 3...)</label>
+                <input 
+                  type="number" 
+                  value={formData.order} 
+                  onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 0})}
+                  required
+                />
+              </div>
             </div>
 
             <div className={styles.formGroup}>
