@@ -62,8 +62,11 @@ export interface Category {
 export interface Banner {
   id?: string;
   title: string;
-  image: string;
+  mediaType?: 'image' | 'video'; // defaults to 'image' if undefined
+  image: string; // desktop image
   mobileImage?: string;
+  desktopVideo?: string;
+  mobileVideo?: string;
   link?: string; // Kept for backwards compatibility, but use ctaLink instead when provided
   ctaLink?: string;
   showCta?: boolean;
@@ -795,3 +798,34 @@ export const markMessagesAsRead = async (userId: string, reader: 'admin' | 'user
     console.error("Chat mark read error:", e);
   }
 };
+
+// ========================
+// Videos
+// ========================
+
+export interface Video {
+  id?: string;
+  title: string;
+  description: string;
+  category: string;
+  videoUrl: string;
+  publicId: string;
+  productId?: string; // Optional linkage to specific product
+  createdAt: Timestamp;
+}
+
+export const getVideos = () => getCollectionData<Video>('videos');
+
+export const getVideosByCategory = async (category: string): Promise<Video[]> => {
+  const q = query(collection(db, 'videos'), where('category', '==', category));
+  const querySnapshot = await getDocs(q);
+  const data: Video[] = [];
+  querySnapshot.forEach((doc) => {
+    data.push({ id: doc.id, ...doc.data() } as Video);
+  });
+  // Sort by createdAt client-side to avoid needing a composite index if not present
+  return data.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+};
+
+export const addVideo = (data: Omit<Video, 'id'>) => addDocument('videos', data);
+export const deleteVideo = (id: string) => deleteDocument('videos', id);

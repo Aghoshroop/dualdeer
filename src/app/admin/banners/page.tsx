@@ -12,13 +12,17 @@ export default function AdminBannersPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState<{ desktop: number | null, mobile: number | null }>({ desktop: null, mobile: null });
   const [currentTab, setCurrentTab] = useState<'active' | 'bin'>('active');
   
   
   const [formData, setFormData] = useState({
     title: '',
+    mediaType: 'image' as 'image' | 'video',
     image: '',
     mobileImage: '',
+    desktopVideo: '',
+    mobileVideo: '',
     link: '',
     ctaLink: '',
     showCta: true,
@@ -41,7 +45,7 @@ export default function AdminBannersPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ title: '', image: '', mobileImage: '', link: '', ctaLink: '', showCta: true, active: true });
+    setFormData({ title: '', mediaType: 'image', image: '', mobileImage: '', desktopVideo: '', mobileVideo: '', link: '', ctaLink: '', showCta: true, active: true });
     setEditingId(null);
     setShowModal(true);
   };
@@ -49,8 +53,11 @@ export default function AdminBannersPage() {
   const openEditModal = (banner: Banner) => {
     setFormData({
       title: banner.title,
+      mediaType: banner.mediaType || 'image',
       image: banner.image,
       mobileImage: banner.mobileImage || '',
+      desktopVideo: banner.desktopVideo || '',
+      mobileVideo: banner.mobileVideo || '',
       link: banner.link || '',
       ctaLink: banner.ctaLink || banner.link || '',
       showCta: banner.showCta !== false, // Default to true if undefined
@@ -87,6 +94,69 @@ export default function AdminBannersPage() {
       alert("Image upload failed. Please try again.");
     }
     setUploadingImage(false);
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>, isMobile: boolean = false) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const key = isMobile ? 'mobile' : 'desktop';
+    
+    setUploadingVideo(prev => ({ ...prev, [key]: 0 }));
+    
+    try {
+      const signRes = await fetch('/api/cloudinary/sign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paramsToSign: { folder: 'dualdeer_videos' } })
+      });
+      
+      if (!signRes.ok) throw new Error("Failed to get upload signature");
+      const { timestamp, signature } = await signRes.json();
+      
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+      uploadData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
+      uploadData.append('timestamp', timestamp.toString());
+      uploadData.append('signature', signature);
+      uploadData.append('folder', 'dualdeer_videos');
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`);
+      
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          setUploadingVideo(prev => ({ ...prev, [key]: progress }));
+        }
+      };
+      
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          const secure_url = response.secure_url;
+          if (isMobile) {
+            setFormData(prev => ({ ...prev, mobileVideo: secure_url, mobileImage: secure_url }));
+          } else {
+            setFormData(prev => ({ ...prev, desktopVideo: secure_url, image: secure_url }));
+          }
+        } else {
+          console.error("Cloudinary Error:", xhr.responseText);
+          alert("Video upload failed");
+        }
+        setUploadingVideo(prev => ({ ...prev, [key]: null }));
+      };
+      
+      xhr.onerror = () => {
+        alert("Video upload failed");
+        setUploadingVideo(prev => ({ ...prev, [key]: null }));
+      };
+      
+      xhr.send(uploadData);
+    } catch (error) {
+      console.error(error);
+      alert("Error uploading video");
+      setUploadingVideo(prev => ({ ...prev, [key]: null }));
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -232,7 +302,20 @@ export default function AdminBannersPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label>Desktop Image (Upload or Paste URL)</label>
+              <label>Media Type</label>
+              <select 
+                value={formData.mediaType} 
+                onChange={(e) => setFormData({...formData, mediaType: e.target.value as 'image' | 'video'})}
+              >
+                <option value="image">Image Banner</option>
+                <option value="video">Video Banner</option>
+              </select>
+            </div>
+
+            {formData.mediaType === 'image' ? (
+              <>
+                <div className={styles.formGroup}>
+                  <label>Desktop Image (Upload or Paste URL)</label>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <input 
                   type="file" 
@@ -278,8 +361,61 @@ export default function AdminBannersPage() {
                 <img src={formData.mobileImage} alt="Mobile Preview" style={{ marginTop: '1rem', height: '120px', width: 'auto', borderRadius: '4px', objectFit: 'cover' }} />
               )}
             </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.formGroup}>
+              <label>Desktop Video (Upload or Paste URL)</label>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <input 
+                  type="file" 
+                  accept="video/*"
+                  onChange={(e) => handleVideoUpload(e, false)}
+                  disabled={uploadingVideo.desktop !== null}
+                  style={{ flex: 1 }}
+                />
+                {uploadingVideo.desktop !== null && <span style={{ fontSize: '0.9rem', color: 'var(--color-primary)' }}>Uploading... {uploadingVideo.desktop}%</span>}
+              </div>
+              <input 
+                type="url" 
+                value={formData.desktopVideo} 
+                onChange={(e) => setFormData({...formData, desktopVideo: e.target.value, image: e.target.value})} // Fallback to image field for db safety
+                placeholder="Or paste https://.../video.mp4"
+                style={{ marginTop: '0.5rem' }}
+                required
+              />
+              {formData.desktopVideo && (
+                <video src={formData.desktopVideo} style={{ marginTop: '1rem', height: '80px', borderRadius: '4px', objectFit: 'cover', background: '#000' }} controls />
+              )}
+            </div>
 
-            <div className={`${styles.formGroup} ${styles.checkboxGroup}`} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
+            <div className={styles.formGroup}>
+              <label>Mobile Video (Upload or Paste URL)</label>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <input 
+                  type="file" 
+                  accept="video/*"
+                  onChange={(e) => handleVideoUpload(e, true)}
+                  disabled={uploadingVideo.mobile !== null}
+                  style={{ flex: 1 }}
+                />
+                {uploadingVideo.mobile !== null && <span style={{ fontSize: '0.9rem', color: 'var(--color-primary)' }}>Uploading... {uploadingVideo.mobile}%</span>}
+              </div>
+              <input 
+                type="url" 
+                value={formData.mobileVideo} 
+                onChange={(e) => setFormData({...formData, mobileVideo: e.target.value, mobileImage: e.target.value})}
+                placeholder="Optional mobile specific video URL"
+                style={{ marginTop: '0.5rem' }}
+              />
+              {formData.mobileVideo && (
+                <video src={formData.mobileVideo} style={{ marginTop: '1rem', height: '120px', width: 'auto', borderRadius: '4px', objectFit: 'cover', background: '#000' }} controls />
+              )}
+            </div>
+          </>
+        )}
+
+        <div className={`${styles.formGroup} ${styles.checkboxGroup}`} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
               <label style={{ margin: 0, fontWeight: 'bold' }}>Show CTA Button</label>
               <input 
                 type="checkbox" 

@@ -88,8 +88,11 @@ export default function HeroSection() {
         if (activeBanners.length > 0) {
           const mappedSlides = activeBanners.map((b, index) => ({
             id: b.id || index.toString(),
+            mediaType: b.mediaType || 'image',
             image: b.image,
             mobileImage: b.mobileImage || b.image,
+            desktopVideo: b.desktopVideo,
+            mobileVideo: b.mobileVideo,
             heading: b.title,
             subheading: "",
             cta: (b.link || b.ctaLink) ? "DISCOVER MORE" : "SHOP NOW",
@@ -141,28 +144,53 @@ export default function HeroSection() {
           exit={{ opacity: 0, transition: { duration: 1, ease: luxuryEase } }}
           transition={{ duration: 1.2, ease: luxuryEase }}
         >
-          {/* Desktop Background Image with Parallax & Entrance Scale */}
-          <motion.div 
-            className={`${styles.background} ${styles.desktopOnly}`} 
-            style={{ 
-              backgroundImage: `url(${currentSlide.image})`,
-              y: yBg
-            }} 
-            initial={{ scale: 1.15, filter: 'blur(10px)' }}
-            animate={{ scale: 1, filter: 'blur(0px)' }}
-            transition={{ duration: 1.8, ease: luxuryEase }}
-          />
-          {/* Mobile Background Image with Parallax & Entrance Scale */}
-          <motion.div 
-            className={`${styles.background} ${styles.mobileOnly}`} 
-            style={{ 
-              backgroundImage: `url(${currentSlide.mobileImage || currentSlide.image})`,
-              y: yBg
-            }} 
-            initial={{ scale: 1.15, filter: 'blur(10px)' }}
-            animate={{ scale: 1, filter: 'blur(0px)' }}
-            transition={{ duration: 1.8, ease: luxuryEase }}
-          />
+          {/* Desktop Background (Image or Video) */}
+          {currentSlide.mediaType === 'video' && currentSlide.desktopVideo ? (
+            <motion.video 
+              className={`${styles.background} ${styles.desktopOnly}`} 
+              src={currentSlide.desktopVideo}
+              autoPlay muted loop playsInline
+              style={{ objectFit: 'cover', width: '100%', height: '100%', y: yBg }} 
+              initial={{ scale: 1.15, filter: 'blur(10px)' }}
+              animate={{ scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 1.8, ease: luxuryEase }}
+            />
+          ) : (
+            <motion.div 
+              className={`${styles.background} ${styles.desktopOnly}`} 
+              style={{ 
+                backgroundImage: `url(${currentSlide.image})`,
+                y: yBg
+              }} 
+              initial={{ scale: 1.15, filter: 'blur(10px)' }}
+              animate={{ scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 1.8, ease: luxuryEase }}
+            />
+          )}
+
+          {/* Mobile Background (Image or Video) */}
+          {currentSlide.mediaType === 'video' && currentSlide.mobileVideo ? (
+            <motion.video 
+              className={`${styles.background} ${styles.mobileOnly}`} 
+              src={currentSlide.mobileVideo}
+              autoPlay muted loop playsInline
+              style={{ objectFit: 'cover', width: '100%', height: '100%', y: yBg }} 
+              initial={{ scale: 1.15, filter: 'blur(10px)' }}
+              animate={{ scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 1.8, ease: luxuryEase }}
+            />
+          ) : (
+            <motion.div 
+              className={`${styles.background} ${styles.mobileOnly}`} 
+              style={{ 
+                backgroundImage: `url(${currentSlide.mobileImage || currentSlide.image})`,
+                y: yBg
+              }} 
+              initial={{ scale: 1.15, filter: 'blur(10px)' }}
+              animate={{ scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 1.8, ease: luxuryEase }}
+            />
+          )}
           <div 
             className={`${styles.overlay} ${currentSlide.theme === 'light' ? styles.overlayLight : ''}`} 
           />

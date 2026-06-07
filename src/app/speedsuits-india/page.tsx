@@ -1,4 +1,4 @@
-import { getProducts } from '@/lib/firebaseUtils';
+import { getProducts, getVideosByCategory } from '@/lib/firebaseUtils';
 import { serializeProduct } from '@/lib/serialize';
 import SpeedSuitsIndiaClient from './SpeedsuitsClient';
 import type { Metadata } from 'next';
@@ -41,9 +41,18 @@ export default async function SpeedSuitsIndiaPage() {
       ((p as any).tags || []).some((t: string) => t.toLowerCase().includes("speedsuit"))
   );
 
+  const rawVideos = await getVideosByCategory('speedsuits').catch(() => []);
+  const videos = rawVideos.map(v => ({
+    ...v,
+    createdAt: (v.createdAt as any)?.toMillis ? (v.createdAt as any).toMillis() : v.createdAt
+  }));
+
   return (
     <>
-      <SpeedSuitsIndiaClient initialProducts={speedsuits?.map(serializeProduct) ?? []} />
+      <SpeedSuitsIndiaClient 
+        initialProducts={speedsuits?.map(serializeProduct) ?? []} 
+        initialVideos={videos as any[]}
+      />
     </>
   );
 }

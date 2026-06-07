@@ -4,12 +4,20 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { Product } from "@/lib/firebaseUtils";
+import { Product, Video as VideoType } from "@/lib/firebaseUtils";
 import { useCart } from "@/context/CartContext";
 import { useCurrency } from "@/context/CurrencyContext";
+import VideoPlayer from "@/components/ui/VideoPlayer";
 
-export default function SpeedSuitsIndiaClient({ initialProducts }: { initialProducts: Product[] }) {
+export default function SpeedSuitsIndiaClient({ 
+  initialProducts,
+  initialVideos = []
+}: { 
+  initialProducts: Product[],
+  initialVideos?: VideoType[]
+}) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [videos, setVideos] = useState<VideoType[]>(initialVideos);
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
 
@@ -120,6 +128,34 @@ export default function SpeedSuitsIndiaClient({ initialProducts }: { initialProd
           </div>
         )}
       </section>
+
+      {/* Dynamic Video Showcase */}
+      {videos.length > 0 && (
+        <section className={styles.section} style={{ padding: '0 2rem' }}>
+          <div className={styles.sectionHeader}>
+            <motion.h2 className={styles.sectionTitle} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              Campaign Films
+            </motion.h2>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem', maxWidth: '1200px', margin: '0 auto' }}>
+            {videos.map((video, i) => (
+              <motion.div 
+                key={video.id || i}
+                initial="hidden" 
+                whileInView="visible" 
+                viewport={{ once: true }} 
+                variants={fadeUpBlur}
+              >
+                <VideoPlayer video={video} />
+                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                  <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-logo)' }}>{video.title}</h3>
+                  <p style={{ opacity: 0.8, marginTop: '0.5rem' }}>{video.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 3. Performance & Luxury Experience Sections */}
       <section className={styles.darkSection}>
