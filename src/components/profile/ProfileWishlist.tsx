@@ -7,11 +7,13 @@ import { useCart } from '@/context/CartContext';
 import styles from './ProfileWishlist.module.css';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function ProfileWishlist({ user }: { user: any }) {
   const [wishlistItems, setWishlistItems] = useState<{ id: string, product: Product }[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
 
   useEffect(() => {
@@ -83,7 +85,7 @@ export default function ProfileWishlist({ user }: { user: any }) {
                 <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <h4>{product.name}</h4>
                 </Link>
-                <p className={styles.price}>₹{product.price.toFixed(2)}</p>
+                <p className={styles.price}>{formatPrice(product.price)}</p>
                 <button 
                   className={styles.addCartBtn}
                   onClick={() => {

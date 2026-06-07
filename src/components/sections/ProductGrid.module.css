@@ -374,3 +374,29 @@
   .rating { align-self: flex-start; }
 }
 
+@media (max-width: 768px) {
+  .horizontalScrollMobile {
+    display: flex !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 1rem;
+    gap: 1rem !important;
+    width: 100vw;
+    margin-left: -5vw;
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+  
+  .horizontalScrollMobile::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .horizontalScrollMobile .card {
+    min-width: 60vw !important;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+}
+

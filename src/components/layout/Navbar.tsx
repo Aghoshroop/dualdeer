@@ -2,12 +2,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingBag, User, X, Sun, Moon, Menu, Bell } from 'lucide-react';
+import { Search, ShoppingBag, User, X, Sun, Moon, Menu, Bell, ChevronRight } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import LiveTrafficBadge from '../ui/LiveTrafficBadge';
 import { Product, AppNotification, getActiveNotifications, sendChatMessage, ChatMessage, markMessagesAsRead } from '@/lib/firebaseUtils';
 import { useCart } from '@/context/CartContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import styles from './Navbar.module.css';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -35,6 +36,7 @@ export default function Navbar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const { cartCount } = useCart();
+  const { formatPrice } = useCurrency();
   const { theme, setTheme } = useTheme();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -129,17 +131,17 @@ export default function Navbar() {
 
   // Cinematic Logo Mappings (Forked for viewport safety)
   const logoYDesktop = useTransform(scrollY, [0, dockStart, dockEnd], [140, 140, 0]);
-  const logoXDesktop = useTransform(scrollY, [0, dockStart, dockEnd], [30, 30, 0]); // Pushed right to fix visual uncentering
-  const logoScaleDesktop = useTransform(scrollY, [0, dockStart, dockEnd], [7.5, 7.5, 1]); // Made bigger
+  const logoXDesktop = useTransform(scrollY, [0, dockStart, dockEnd], [0, 0, 0]); // Mathematically centered
+  const logoScaleDesktop = useTransform(scrollY, [0, dockStart, dockEnd], [4, 4, 1]); // Reduced to fit screen width safely
   
   const logoYMobile = useTransform(scrollY, [0, dockStart, dockEnd], [60, 60, 0]);
   
-  // Calibrated to safely center the left-anchored text without blowing past the viewport
-  const logoXMobile = useTransform(scrollY, [0, dockStart, dockEnd], [35, 35, 0]); 
-  const logoXMicro = useTransform(scrollY, [0, dockStart, dockEnd], [20, 20, 0]); 
+  // Safely centered without arbitrary offsets
+  const logoXMobile = useTransform(scrollY, [0, dockStart, dockEnd], [0, 0, 0]); 
+  const logoXMicro = useTransform(scrollY, [0, dockStart, dockEnd], [0, 0, 0]); 
   
   // Safe scaling for ultra-micro screens
-  const logoScaleMobile = useTransform(scrollY, [0, dockStart, dockEnd], [isMicro ? 1.3 : 1.8, isMicro ? 1.3 : 1.8, 1]);
+  const logoScaleMobile = useTransform(scrollY, [0, dockStart, dockEnd], [isMicro ? 1.2 : 1.5, isMicro ? 1.2 : 1.5, 1]);
   
   const [isDocked, setIsDocked] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -373,7 +375,7 @@ export default function Navbar() {
                                   </div>
                                   <div className={styles.marqueeResultInfo}>
                                     <h4>{product.name}</h4>
-                                    <span>₹{product.price.toFixed(2)}</span>
+                                    <span>{formatPrice(product.price)}</span>
                                   </div>
                                 </Link>
                               ))}
@@ -393,7 +395,7 @@ export default function Navbar() {
                                 </div>
                                 <div className={styles.overlayResultInfo}>
                                   <h4>{product.name}</h4>
-                                  <span>₹{product.price.toFixed(2)}</span>
+                                  <span>{formatPrice(product.price)}</span>
                                 </div>
                               </Link>
                             ))}

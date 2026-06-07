@@ -1,17 +1,20 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Coins, Ticket, Sparkles, Copy, CheckCircle2 } from 'lucide-react';
+import { Coins, Ticket, Sparkles, Copy, CheckCircle2, Award } from 'lucide-react';
 import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { getCoupons, Coupon } from '@/lib/firebaseUtils';
+import { useCurrency } from '@/context/CurrencyContext';
 import styles from './ProfileComponents.module.css';
 
 export default function RewardGame({ user }: { user: any }) {
   const [points, setPoints] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     const loadData = async () => {
@@ -128,7 +131,7 @@ export default function RewardGame({ user }: { user: any }) {
               
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
                 <span className={styles.discountTag}>
-                  {coupon.discountType === 'percentage' ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue} OFF`}
+                  {coupon.discountType === 'percentage' ? `${coupon.discountValue}% OFF` : `${formatPrice(coupon.discountValue)} OFF`}
                 </span>
                 <span className={styles.couponDesc}>
                   {coupon.code === 'WELCOME15' ? 'New Elite Exclusive' : 'Exclusive Elite Reward'}
@@ -143,4 +146,3 @@ export default function RewardGame({ user }: { user: any }) {
 }
 
 // Ensure Award icon gets pulled from lucide
-import { Award } from 'lucide-react';

@@ -7,6 +7,7 @@ import { Eye, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import AnimatedCartButton from "../ui/AnimatedCartButton";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface Product {
   id: string;
@@ -27,6 +28,7 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const router = useRouter();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     import('@/lib/firebaseUtils').then(({ getProducts, getContentBlock }) => {
@@ -133,9 +135,9 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
                   </Link>
                   <div className={styles.priceRow}>
                     {product.mrp && product.mrp > product.price && (
-                      <span className={styles.mrp}>₹{product.mrp.toLocaleString()}</span>
+                      <span className={styles.mrp}>{formatPrice(product.mrp)}</span>
                     )}
-                    <span className={styles.price}>₹{product.price.toLocaleString()}</span>
+                    <span className={styles.price}>{formatPrice(product.price)}</span>
                   </div>
 
                   {/* Color Swatches */}

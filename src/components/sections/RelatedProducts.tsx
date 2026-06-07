@@ -2,8 +2,9 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import styles from "./ProductGrid.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getProducts, Product } from "@/lib/firebaseUtils";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface RelatedProductsProps {
   category: string;
@@ -12,8 +13,8 @@ interface RelatedProductsProps {
 
 export default function RelatedProducts({ category, excludeId }: RelatedProductsProps) {
   const [products, setProducts] = useState<Product[]>([]);
-  const [originalCount, setOriginalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     if (!category) return;
@@ -21,11 +22,7 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
     getProducts().then(prods => {
       // Find products matching the same category, excluding the current product itself
       const related = prods.filter(p => p.category === category && p.id !== excludeId);
-      setOriginalCount(related.length);
-      
-      // Make it feel infinite on mobile by extending short lists up to 8 items
-      const extendedRelated = related.length > 0 && related.length < 8 ? [...related, ...related, ...related].slice(0, 8) : related.slice(0, 8);
-      setProducts(extendedRelated);
+      setProducts(related.slice(0, 4));
       setLoading(false);
     });
   }, [category, excludeId]);
@@ -49,22 +46,21 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
           <Link href={`/shop?category=${encodeURIComponent(category)}`} className={styles.shopAll}>View Category</Link>
         </div>
 
-        <div className={`${styles.grid} ${styles.mobileSlider}`}>
+        <div className={`${styles.grid} ${styles.horizontalScrollMobile}`}>
           {products.map((product, i) => (
             <Link 
-              href={`/product/${product.slug}`} 
-              key={`${product.id}-${i}`} 
+              href={`/product/${product.slug || product.id}`} 
+              key={product.id} 
               style={{ textDecoration: 'none' }}
-              className={i >= originalCount || i >= 4 ? styles.desktopHidden : ''}
             >
               <motion.div 
-                className={styles.premiumGlassCard}
+                className={styles.card}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
               >
-                <div className={styles.premiumImageBox}>
+                <div className={styles.imageBox}>
                   <img 
                     src={product.image}
                     alt={product.name}
@@ -80,9 +76,9 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
                   <h3 className={styles.name}>{product.name}</h3>
                   <div className={styles.priceRow}>
                     {product.mrp && product.mrp > product.price && (
-                      <span className={styles.mrp}>₹{product.mrp.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                      <span className={styles.mrp}>{formatPrice(product.mrp)}</span>
                     )}
-                    <span className={styles.price}>₹{product.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                    <span className={styles.price}>{formatPrice(product.price)}</span>
                   </div>
                   <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <div style={{ display: 'flex', gap: '1px' }}>

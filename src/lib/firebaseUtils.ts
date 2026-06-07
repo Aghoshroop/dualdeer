@@ -25,6 +25,8 @@ export interface Product {
   subcategory?: string;
   price: number;
   mrp?: number;
+  priceUSD?: number;
+  mrpUSD?: number;
   rating?: number;
   image: string;
   images?: string[];
@@ -41,9 +43,11 @@ export interface Review {
   productId: string;
   userName: string;
   userAvatar?: string;
+  userId?: string;
   rating: number; // 1-5
   text: string;
   date: Timestamp;
+  image?: string;
 }
 
 export interface Category {
@@ -59,8 +63,13 @@ export interface Banner {
   id?: string;
   title: string;
   image: string;
-  link?: string;
+  mobileImage?: string;
+  link?: string; // Kept for backwards compatibility, but use ctaLink instead when provided
+  ctaLink?: string;
+  showCta?: boolean;
   active: boolean;
+  deleted?: boolean;
+  deletedAt?: Timestamp;
   createdAt?: Timestamp;
 }
 
@@ -95,18 +104,24 @@ export interface Order {
     address: string;
     city: string;
     zip: string;
+    country?: string;
   };
   items: OrderItem[];
   total: number;
   discountAmount?: number;
   appliedCoupon?: string;
-  status: 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled';
+  status: 'payment_pending' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled';
   cancellationReason?: string;
   paymentMethod?: string;
   utrNumber?: string;
+  currency?: string;
+  exchangeRate?: number;
+  stripeInvoiceId?: string;
+  stripeStatus?: string;
   shiprocketSyncStatus?: 'pending' | 'synced' | 'failed';
   shiprocketOrderId?: string;
-  createdAt?: Timestamp;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 // ========================
@@ -213,6 +228,14 @@ export const addReview = async (review: Omit<Review, 'id' | 'date'>) => {
     date: Timestamp.now()
   });
   return docRef.id;
+};
+
+export const updateReview = async (id: string, data: Partial<Review>) => {
+  return updateDocument('reviews', id, data);
+};
+
+export const deleteReview = async (id: string) => {
+  return deleteDocument('reviews', id);
 };
 
 // ========================

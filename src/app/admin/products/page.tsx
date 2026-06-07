@@ -37,6 +37,8 @@ export default function AdminProductsPage() {
     subcategory: '',
     price: 0,
     mrp: 0,
+    priceUSD: 0,
+    mrpUSD: 0,
     rating: 5,
     image: '',
     images: [] as string[],
@@ -74,7 +76,7 @@ export default function AdminProductsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ name: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, rating: 5, image: '', images: [], stock: 0, colors: '' });
+    setFormData({ name: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '' });
     setEditingId(null);
     setShowModal(true);
   };
@@ -89,6 +91,8 @@ export default function AdminProductsPage() {
       subcategory: product.subcategory || '',
       price: product.price,
       mrp: product.mrp || 0,
+      priceUSD: product.priceUSD || 0,
+      mrpUSD: product.mrpUSD || 0,
       rating: product.rating || 5,
       image: product.image,
       images: product.images || [],
@@ -543,25 +547,47 @@ export default function AdminProductsPage() {
 
               <div className={styles.formGroup}>
                 <label>Offer Price (Selling Price)</label>
-                <input 
-                  type="number" 
-                  value={formData.price} 
-                  onChange={(e) => setFormData({...formData, price: Number(e.target.value)})}
-                  required
-                  step="0.01"
-                  min="0"
-                />
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <input 
+                    type="number" 
+                    value={formData.price} 
+                    onChange={(e) => setFormData({...formData, price: Number(e.target.value)})}
+                    required
+                    step="0.01"
+                    min="0"
+                    placeholder="INR (₹)"
+                  />
+                  <input 
+                    type="number" 
+                    value={formData.priceUSD} 
+                    onChange={(e) => setFormData({...formData, priceUSD: Number(e.target.value)})}
+                    step="0.01"
+                    min="0"
+                    placeholder="USD ($) Optional"
+                  />
+                </div>
               </div>
 
               <div className={styles.formGroup}>
                 <label>MRP (Original Price)</label>
-                <input 
-                  type="number" 
-                  value={formData.mrp} 
-                  onChange={(e) => setFormData({...formData, mrp: Number(e.target.value)})}
-                  step="0.01"
-                  min="0"
-                />
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <input 
+                    type="number" 
+                    value={formData.mrp} 
+                    onChange={(e) => setFormData({...formData, mrp: Number(e.target.value)})}
+                    step="0.01"
+                    min="0"
+                    placeholder="INR (₹)"
+                  />
+                  <input 
+                    type="number" 
+                    value={formData.mrpUSD} 
+                    onChange={(e) => setFormData({...formData, mrpUSD: Number(e.target.value)})}
+                    step="0.01"
+                    min="0"
+                    placeholder="USD ($) Optional"
+                  />
+                </div>
               </div>
 
               <div className={styles.formGroup}>

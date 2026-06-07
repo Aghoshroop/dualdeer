@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import styles from './AdminPage.module.css';
 import { getProducts, getCategories, getCoupons, getUsers } from '@/lib/firebaseUtils';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -12,6 +13,7 @@ export default function AdminDashboard() {
     revenue: 12450 // Keeping this static as we don't have an orders collection yet
   });
   const [loading, setLoading] = useState(true);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     const loadStats = async () => {
@@ -54,7 +56,7 @@ export default function AdminDashboard() {
         </div>
         <div className={styles.statCard}>
           <h3>Total Revenue</h3>
-          <p className={styles.value}>${stats.revenue.toLocaleString()}</p>
+          <p className={styles.value}>{formatPrice(stats.revenue)}</p>
           <span className={styles.trendNeutral}>Calculated statically</span>
         </div>
         <div className={styles.statCard}>

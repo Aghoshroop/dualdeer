@@ -71,29 +71,39 @@
 
 .brand {
   font-family: var(--font-logo), 'Inter', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 400; 
-  letter-spacing: 4px; 
+  font-size: clamp(1.2rem, 1.5vw, 2.2rem);
+  font-weight: 300; 
+  letter-spacing: clamp(2px, 0.5vw, 6px); 
   font-style: normal;
   text-decoration: none;
   text-transform: uppercase;
   display: flex;
-  gap: 0.8rem;
+  gap: 0.5rem;
   justify-content: center;
   align-items: center;
 }
 
 .brandAccent {
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 50%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   display: inline-block;
-  filter: drop-shadow(0 0 8px rgba(157, 78, 221, 0.4)); 
+  filter: drop-shadow(0 0 12px rgba(201, 160, 220, 0.5)); 
+}
+
+/* Ensure the gradient stands out on the bright light mode background */
+:global([data-theme='light']) .brandAccent {
+  background: linear-gradient(135deg, var(--color-foreground) 0%, #4A2C68 50%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(162, 130, 197, 0.2)); 
 }
 
 .brandContainer .brand span:first-child {
   color: var(--color-text);
+  text-shadow: 0 4px 20px rgba(var(--background-rgb), 0.5);
 }
 
 .rightIcons {

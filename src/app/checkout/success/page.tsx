@@ -8,10 +8,13 @@ import confetti from 'canvas-confetti';
 import { db } from '@/lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { getOrder, Order } from '@/lib/firebaseUtils';
+import { useCart } from '@/context/CartContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import styles from './Success.module.css';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
+  const { formatPrice } = useCurrency();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -174,7 +177,7 @@ function CheckoutSuccessContent() {
                   <p>Qty: {item.quantity} {item.size && `| Size: ${item.size}`}</p>
                 </div>
                 <div className={styles.priceInfo}>
-                  ₹{(item.pricePaid * item.quantity).toLocaleString()}
+                  {formatPrice(item.pricePaid * item.quantity)}
                 </div>
               </div>
             ))}
@@ -204,7 +207,7 @@ function CheckoutSuccessContent() {
             </div>
             <div className={styles.detailRow} style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)', fontWeight: 700, fontSize: '1.1rem' }}>
               <span>Total Value</span>
-              <span style={{ color: 'var(--color-primary)' }}>₹{order?.total.toLocaleString()}</span>
+              <span style={{ color: 'var(--color-primary)' }}>{formatPrice(order?.total)}</span>
             </div>
           </div>
         </motion.div>

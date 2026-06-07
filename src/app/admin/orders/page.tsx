@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllOrders, updateOrder, deleteOrder, Order } from '@/lib/firebaseUtils';
 import { Package, RefreshCw, Send, CheckCircle, PackageSearch, Trash2, Filter } from 'lucide-react';
+import { useCurrency } from '@/context/CurrencyContext';
 import styles from './Orders.module.css';
 
 export default function AdminOrdersPage() {
@@ -9,6 +10,7 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [mutatingId, setMutatingId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<'recent' | 'price_high' | 'price_low' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled'>('recent');
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     fetchOrders();
@@ -136,7 +138,8 @@ export default function AdminOrdersPage() {
                         <span className={styles.clientContact}>📞 {order.shippingDetails.phone}</span>
                         <div className={styles.addressBlock}>
                            📍 {order.shippingDetails.address}<br/>
-                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{order.shippingDetails.city}, {order.shippingDetails.zip}
+                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{order.shippingDetails.city}, {order.shippingDetails.zip}<br/>
+                           {order.shippingDetails.country && <>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Country: {order.shippingDetails.country}</strong></>}
                         </div>
                       </div>
                     ) : (
@@ -151,11 +154,19 @@ export default function AdminOrdersPage() {
                   </td>
                   
                   <td className={styles.manifestCol}>
-                    <div className={styles.revenueCol}>Total: ₹{order.total.toFixed(2)}</div>
+                    <div className={styles.revenueCol}>Total: {order.currency === 'USD' ? `$${order.total.toFixed(2)}` : `₹${order.total.toFixed(2)}`}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>
+                      Currency: {order.currency || 'INR'} {order.exchangeRate ? `(Rate: ${order.exchangeRate})` : ''}
+                    </div>
+                    {order.stripeInvoiceId && (
+                      <div style={{ fontSize: '0.75rem', background: '#e0e7ff', color: '#4338ca', padding: '4px 8px', borderRadius: '4px', marginBottom: '0.5rem', display: 'inline-block' }}>
+                        Stripe Invoice: {order.stripeInvoiceId} | Status: {order.stripeStatus || 'pending'}
+                      </div>
+                    )}
                     {(order.appliedCoupon || order.discountAmount) && (
                       <div style={{ fontSize: '0.8rem', color: '#ffcc00', marginBottom: '0.5rem', fontWeight: 600, display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                         {order.appliedCoupon && <span style={{ background: 'rgba(255, 204, 0, 0.2)', padding: '2px 6px', borderRadius: '4px' }}>CODE: {order.appliedCoupon}</span>}
-                        {order.discountAmount ? <span>(Saved ₹{order.discountAmount.toFixed(2)})</span> : null}
+                        {order.discountAmount ? <span>(Saved {order.currency === 'USD' ? `$${order.discountAmount.toFixed(2)}` : `₹${order.discountAmount.toFixed(2)}`})</span> : null}
                       </div>
                     )}
                     <div className={styles.itemList}>
@@ -163,7 +174,7 @@ export default function AdminOrdersPage() {
                         <div key={idx} className={styles.manifestItem}>
                           • {item.quantity}x {item.name} 
                           {item.size && <span className={styles.itemSize}>Size: {item.size}</span>}
-                          <span className={styles.itemMeta}> (₹{item.pricePaid || item.price})</span>
+                          <span className={styles.itemMeta}> ({order.currency === 'USD' ? `$${(item.pricePaid || item.price).toFixed(2)}` : `₹${(item.pricePaid || item.price).toFixed(2)}`})</span>
                         </div>
                       ))}
                     </div>
@@ -184,6 +195,7 @@ export default function AdminOrdersPage() {
                         onChange={(e) => handleStatusChange(order.id as string, e.target.value as any)}
                         style={{ marginBottom: '8px' }}
                       >
+                        <option value="payment_pending">Payment Pending</option>
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>

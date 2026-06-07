@@ -33,6 +33,14 @@
   transform-origin: center center;
 }
 
+.desktopOnly {
+  display: block;
+}
+
+.mobileOnly {
+  display: none;
+}
+
 .overlay {
   position: absolute;
   top: 0;
@@ -171,6 +179,12 @@
 }
 
 @media (max-width: 768px) {
+  .desktopOnly {
+    display: none !important;
+  }
+  .mobileOnly {
+    display: block !important;
+  }
   .heading {
     font-size: 2.2rem;
   }

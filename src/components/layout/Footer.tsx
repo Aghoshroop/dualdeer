@@ -3,8 +3,27 @@ import { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import styles from "./Footer.module.css";
+import { useCurrency, Currency } from "@/context/CurrencyContext";
 
 export default function Footer() {
+  const { currency, setRegion } = useCurrency();
+  const [regionOpen, setRegionOpen] = useState(false);
+  const regionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (regionRef.current && !regionRef.current.contains(event.target as Node)) {
+        setRegionOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleRegionSelect = (code: string, curr: Currency) => {
+    setRegion(code, curr);
+    setRegionOpen(false);
+  };
   return (
     <footer className={styles.footer}>
       
@@ -57,6 +76,42 @@ export default function Footer() {
       {/* Extreme Minimal Bottom Bar */}
       <div className={styles.bottomBar}>
         <div className={styles.copyright}>© {new Date().getFullYear()} DUALDEER. SYSTEM ACTIVE.</div>
+        
+        {/* Region Selector */}
+        <div className={styles.regionSelector} ref={regionRef}>
+          <button 
+            className={styles.regionToggle}
+            onClick={() => setRegionOpen(!regionOpen)}
+          >
+            {currency === "INR" ? "🇮🇳 INDIA (INR)" : "🌎 INTERNATIONAL (USD)"}
+          </button>
+          
+          <AnimatePresence>
+            {regionOpen && (
+              <motion.div 
+                className={styles.regionDropdown}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <button 
+                  className={`${styles.regionOption} ${currency === "INR" ? styles.regionActive : ""}`}
+                  onClick={() => handleRegionSelect("IN", "INR")}
+                >
+                  🇮🇳 INDIA (INR)
+                </button>
+                <button 
+                  className={`${styles.regionOption} ${currency === "USD" ? styles.regionActive : ""}`}
+                  onClick={() => handleRegionSelect("US", "USD")}
+                >
+                  🌎 INTERNATIONAL (USD)
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         <div className={styles.socials}>
           <Link href="#" className={styles.socialLink}>INSTAGRAM</Link>
           <Link href="#" className={styles.socialLink}>TWITTER</Link>

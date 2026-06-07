@@ -5,10 +5,12 @@ import Link from "next/link";
 import styles from "@/app/speedsuits-india/page.module.css";
 import { Product } from "@/lib/firebaseUtils";
 import { useCart } from "@/context/CartContext";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export default function BestGymClient({ initialProducts }: { initialProducts: Product[] }) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     setProducts(initialProducts);
@@ -54,7 +56,7 @@ export default function BestGymClient({ initialProducts }: { initialProducts: Pr
                   </div>
                   <div className={styles.productInfo}>
                     <h4 className={styles.productName}>{product.name}</h4>
-                    <span className={styles.productPrice}>₹{product.price.toLocaleString()}</span>
+                    <span className={styles.productPrice}>{formatPrice(product.price)}</span>
                   </div>
                 </Link>
               </motion.div>

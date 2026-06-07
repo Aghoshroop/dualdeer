@@ -6,8 +6,9 @@ import { createOrder, getProduct, validateCoupon, updateCoupon, Coupon } from '@
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Link from 'next/link';
-import { Lock, ChevronLeft, CreditCard, Wallet, Banknote, ShieldAlert } from 'lucide-react';
+import { Lock, ChevronLeft, CreditCard, Wallet, Banknote, ShieldAlert, Globe } from 'lucide-react';
 import styles from './Checkout.module.css';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function CheckoutPage() {
   return (
@@ -21,9 +22,10 @@ function CheckoutEngine() {
   const { cart, cartTotal: _globalSubtotal, clearCart } = useCart();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { currency, formatPrice, conversionRate, countryCode } = useCurrency();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<'shipping' | 'payment' | 'upi-verification'>('shipping');
-  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi'>('upi');
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi' | 'international_card'>(currency === 'USD' ? 'international_card' : 'upi');
   const [utrNumber, setUtrNumber] = useState('');
   const [upiTr] = useState(() => `DD${Math.floor(Math.random() * 10000000)}`);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -54,7 +56,8 @@ function CheckoutEngine() {
     phone: '',
     address: '',
     city: '',
-    zip: ''
+    zip: '',
+    country: countryCode || 'IN'
   });
 
   const [couponCode, setCouponCode] = useState('');
@@ -102,8 +105,12 @@ function CheckoutEngine() {
   }
   const discountAmountCapped = Math.min(discountAmount, subtotal);
 
-  const shipping = subtotal > 0 ? 15.00 : 0; // Flat luxury shipping rate
-  const total = subtotal - discountAmountCapped + shipping;
+  const isIndia = countryCode === "IN";
+  const taxRate = isIndia ? 0.12 : 0;
+  const taxableAmount = Math.max(0, subtotal - discountAmountCapped);
+  const tax = taxableAmount * taxRate;
+  const shipping = subtotal > 0 ? (isIndia ? 0 : 20 * conversionRate) : 0;
+  const total = taxableAmount + tax + shipping;
 
   const handleApplyCoupon = async () => {
     setCouponError('');
@@ -148,9 +155,11 @@ function CheckoutEngine() {
       total: total,
       discountAmount: discountAmountCapped,
       ...(appliedCoupon ? { appliedCoupon: appliedCoupon.code } : {}),
-      status: 'processing' as const,
+      status: (paymentMethod === 'international_card' ? 'payment_pending' : 'processing') as any,
       paymentMethod: paymentMethod,
       utrNumber: paymentMethod === 'upi' ? utrNumber : '',
+      currency: currency,
+      exchangeRate: currency === 'USD' ? conversionRate : 1,
       shiprocketSyncStatus: 'pending' as const
     };
 
@@ -285,6 +294,11 @@ function CheckoutEngine() {
               <input type="text" className={styles.input} required placeholder="10001" value={formData.zip} onChange={e => setFormData({...formData, zip: e.target.value})} />
             </div>
 
+            <div className={styles.formGroup}>
+              <label>Country</label>
+              <input type="text" className={styles.input} required placeholder="United States" value={formData.country} onChange={e => setFormData({...formData, country: e.target.value})} />
+            </div>
+
             <div className={`${styles.formGroup} ${styles.fullWidth}`}>
               <label>Phone Number</label>
               <input type="tel" className={styles.input} required placeholder="+1 (555) 000-0000" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
@@ -300,37 +314,57 @@ function CheckoutEngine() {
                 <h2>Secure Payment Portal</h2>
               </div>
               <div className={styles.paymentMethods}>
-                <div 
-                   className={`${styles.paymentOption} ${paymentMethod === 'upi' ? styles.paymentOptionActive : ''}`}
-                   onClick={() => setPaymentMethod('upi')}
-                >
-                   <div className={styles.payIcon}><Wallet size={24} /></div>
-                   <div className={styles.payInfo}>
-                     <h4>Pre Online Payment (UPI)</h4>
-                     <span>Pay via UPI directly to the merchant</span>
-                   </div>
-                   {paymentMethod === 'upi' && (
-                     <div className={styles.activeCheck}>
-                       <ShieldAlert size={16} color="#48bb78" /> Selected
+                {currency === 'USD' ? (
+                  <div 
+                     className={`${styles.paymentOption} ${paymentMethod === 'international_card' ? styles.paymentOptionActive : ''}`}
+                     onClick={() => setPaymentMethod('international_card')}
+                  >
+                     <div className={styles.payIcon}><Globe size={24} /></div>
+                     <div className={styles.payInfo}>
+                       <h4>International Payment (Card)</h4>
+                       <span>You will receive a secure Stripe payment link via email after confirming your order.</span>
                      </div>
-                   )}
-                </div>
+                     {paymentMethod === 'international_card' && (
+                       <div className={styles.activeCheck}>
+                         <ShieldAlert size={16} color="#48bb78" /> Selected
+                       </div>
+                     )}
+                  </div>
+                ) : (
+                  <>
+                  <div 
+                     className={`${styles.paymentOption} ${paymentMethod === 'upi' ? styles.paymentOptionActive : ''}`}
+                     onClick={() => setPaymentMethod('upi')}
+                  >
+                     <div className={styles.payIcon}><Wallet size={24} /></div>
+                     <div className={styles.payInfo}>
+                       <h4>Pre Online Payment (UPI)</h4>
+                       <span>Pay via UPI directly to the merchant</span>
+                     </div>
+                     {paymentMethod === 'upi' && (
+                       <div className={styles.activeCheck}>
+                         <ShieldAlert size={16} color="#48bb78" /> Selected
+                       </div>
+                     )}
+                  </div>
 
-                <div 
-                   className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
-                   onClick={() => setPaymentMethod('cod')}
-                >
-                   <div className={styles.payIcon}><Banknote size={24} /></div>
-                   <div className={styles.payInfo}>
-                     <h4>Cash on Delivery (COD)</h4>
-                     <span>Pay at your doorstep with Cash or UPI</span>
-                   </div>
-                   {paymentMethod === 'cod' && (
-                     <div className={styles.activeCheck}>
-                       <ShieldAlert size={16} color="#48bb78" /> Selected
+                  <div 
+                     className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
+                     onClick={() => setPaymentMethod('cod')}
+                  >
+                     <div className={styles.payIcon}><Banknote size={24} /></div>
+                     <div className={styles.payInfo}>
+                       <h4>Cash on Delivery (COD)</h4>
+                       <span>Pay at your doorstep with Cash or UPI</span>
                      </div>
-                   )}
-                </div>
+                     {paymentMethod === 'cod' && (
+                       <div className={styles.activeCheck}>
+                         <ShieldAlert size={16} color="#48bb78" /> Selected
+                       </div>
+                     )}
+                  </div>
+                  </>
+                )}
               </div>
             </>
           ) : (
@@ -343,7 +377,7 @@ function CheckoutEngine() {
               </div>
               <div style={{ padding: '1.5rem', background: 'rgba(var(--foreground-rgb), 0.02)', borderRadius: '12px', border: '1px solid var(--color-border)', textAlign: 'center' }}>
                 <p style={{ marginBottom: '15px', fontSize: '1rem', color: 'var(--color-text)' }}>
-                  Please transfer exactly <strong style={{color: 'var(--color-primary)', fontSize: '1.2rem'}}>₹{total.toFixed(2)}</strong> to proceed.
+                  Please transfer exactly <strong style={{color: 'var(--color-primary)', fontSize: '1.2rem'}}>{formatPrice(total)}</strong> to proceed.
                 </p>
                 
                 <div style={{ background: 'var(--color-foreground)', padding: '1rem', borderRadius: '12px', display: 'inline-block', marginBottom: '1.5rem' }}>
@@ -400,7 +434,7 @@ function CheckoutEngine() {
                   <span className={styles.itemName}>{item.name}</span>
                   <span className={styles.itemMeta}>Size: {item.size} | Qty: {item.quantity}</span>
                 </div>
-                <span className={styles.itemPrice}>₹{(item.price * item.quantity).toFixed(2)}</span>
+                <span className={styles.itemPrice}>{formatPrice(item.price * item.quantity)}</span>
               </div>
             ))}
           </div>
@@ -431,21 +465,25 @@ function CheckoutEngine() {
           <div className={styles.totals}>
              <div className={styles.summaryRow}>
                <span>Subtotal</span>
-               <span>₹{subtotal.toFixed(2)}</span>
+               <span>{formatPrice(subtotal)}</span>
              </div>
              {discountAmountCapped > 0 && (
                <div className={`${styles.summaryRow} ${styles.discountRow}`}>
                  <span>Discount</span>
-                 <span>-₹{discountAmountCapped.toFixed(2)}</span>
+                 <span>-{formatPrice(discountAmountCapped)}</span>
                </div>
              )}
              <div className={styles.summaryRow}>
+               <span>{isIndia ? 'Estimated GST (12%)' : 'Taxes (International)'}</span>
+               <span>{formatPrice(tax)}</span>
+             </div>
+             <div className={styles.summaryRow}>
                <span>Shipping</span>
-               <span>₹{shipping.toFixed(2)}</span>
+               <span>{isIndia ? 'Complimentary' : formatPrice(shipping)}</span>
              </div>
              <div className={`${styles.summaryRow} ${styles.totalRow}`}>
                <span>Total</span>
-               <span>₹{total.toFixed(2)}</span>
+               <span>{formatPrice(total)}</span>
              </div>
           </div>
 
@@ -459,7 +497,7 @@ function CheckoutEngine() {
               disabled={isSubmitting} 
               className={styles.submitBtn}
             >
-              {paymentMethod === 'upi' ? `Pay ₹${total.toFixed(2)} Now` : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
+              {paymentMethod === 'upi' ? `Pay ${formatPrice(total)} Now` : paymentMethod === 'international_card' ? <><Globe size={16} style={{marginRight: '8px'}} /> Request Payment Link</> : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
             </button>
           ) : (
             <button onClick={handleSubmitOrder} disabled={isSubmitting || !utrNumber || utrNumber.length < 5} className={styles.submitBtn}>

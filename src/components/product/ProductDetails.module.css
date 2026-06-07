@@ -644,6 +644,93 @@
   margin-bottom: 3rem;
 }
 
+/* FOMO Animations and Styles */
+@keyframes flashRed {
+  0% { color: var(--color-text); transform: scale(1); }
+  20% { color: #ff3333; transform: scale(1.15); text-shadow: 0 0 8px rgba(255, 51, 51, 0.4); }
+  80% { color: #ff3333; transform: scale(1); text-shadow: 0 0 8px rgba(255, 51, 51, 0.4); }
+  100% { color: var(--color-text); transform: scale(1); }
+}
+
+.fomoNumber {
+  display: inline-block;
+  font-weight: 800;
+  transition: all 0.3s ease;
+}
+
+.fomoNumber.flashing {
+  animation: flashRed 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.fomoBanner {
+  background: linear-gradient(90deg, rgba(255, 51, 51, 0.1) 0%, rgba(255, 51, 51, 0.05) 100%);
+  border-left: 3px solid #ff3333;
+  padding: 0.8rem 1rem;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.fomoBanner p {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.pulseIcon {
+  color: #ff3333;
+  animation: pulse 2s infinite;
+}
+
+.restockOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: white;
+}
+
+[data-theme='dark'] .restockOverlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.restockText {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.restockTimer {
+  font-size: 2.5rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.disabledAction {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
 @media (max-width: 768px) {
   .reviewAggregate {
     flex-direction: column;
@@ -1162,4 +1249,233 @@
   background: var(--color-primary);
   color: var(--color-background);
   box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+/* Review Image Styles */
+.imageUploadWrapper {
+  margin-top: 1rem;
+}
+
+.uploadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: 1px dashed rgba(var(--foreground-rgb), 0.3);
+  border-radius: 6px;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.uploadBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(157, 78, 221, 0.05);
+}
+
+.imagePreview {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+}
+
+.imagePreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.removeImageBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease;
+}
+
+.removeImageBtn:hover {
+  background: #ff3333;
+}
+
+.reviewAttachedImage {
+  margin-top: 1rem;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.reviewAttachedImage:hover {
+  transform: scale(1.02);
+}
+
+.reviewActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reviewActions button {
+  background: rgba(var(--foreground-rgb), 0.05);
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.reviewActions button:hover {
+  background: rgba(var(--foreground-rgb), 0.1);
+  transform: translateY(-1px);
+}
+
+.editReviewForm {
+  display: flex;
+  flex-direction: column;
+  background: rgba(var(--foreground-rgb), 0.02);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed rgba(var(--foreground-rgb), 0.2);
+}
+
+/* Lightbox Styles */
+.lightboxOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.lightboxClose {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10000;
+}
+
+.lightboxClose:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.lightboxContent {
+  position: relative;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightboxImageContainer {
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.lightboxImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.lightboxReviewBox {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 100%;
+  backdrop-filter: blur(10px);
+}
+
+.lightboxReviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lightboxPrev,
+.lightboxNext {
+  position: absolute;
+  top: 40%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lightboxPrev:hover,
+.lightboxNext:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.lightboxPrev {
+  left: -60px;
+}
+
+.lightboxNext {
+  right: -60px;
+}
+
+@media (max-width: 768px) {
+  .lightboxPrev,
+  .lightboxNext {
+    display: none; /* Rely on swiping or make them smaller/inside the image if needed, but for now hide on mobile and show bottom */
+  }
 }

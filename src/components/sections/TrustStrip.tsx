@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { motion } from 'framer-motion';
 import { 
   Zap, 
   Wind, 
@@ -73,11 +74,17 @@ const benefitsData: Benefit[] = [
 // Triplicate the data to ensure smooth, infinite looping on any viewport size
 const infiniteBenefits = [...benefitsData, ...benefitsData, ...benefitsData];
 
+const luxuryEase = [0.76, 0, 0.24, 1] as const;
+
 export default function TrustStrip() {
   return (
-    <section 
+    <motion.section 
       className={styles.section}
       data-cursor="pointer"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, ease: luxuryEase }}
     >
       {/* Top shifting gradient line */}
       <div className={styles.gradientBorderTop} />
@@ -118,6 +125,6 @@ export default function TrustStrip() {
 
       {/* Bottom shifting gradient line */}
       <div className={styles.gradientBorderBottom} />
-    </section>
+    </motion.section>
   );
 }

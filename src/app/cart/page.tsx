@@ -10,10 +10,12 @@ import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
 import QuantitySelector from '@/components/ui/QuantitySelector';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function CartPage() {
   const router = useRouter();
-  const { cart, updateQuantity, removeFromCart, cartTotal, addToCart } = useCart();
+  const { cart, updateQuantity, removeFromCart, cartTotal: subtotal, addToCart } = useCart();
+  const { formatPrice, countryCode, conversionRate } = useCurrency();
   const [mounted, setMounted] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -38,10 +40,12 @@ export default function CartPage() {
     return () => unsubscribe();
   }, []);
 
-  const subtotal = cartTotal;
   const discountedSubtotal = Math.max(0, subtotal - discount);
-  const tax = discountedSubtotal * 0.08; // 8% tax
-  const total = discountedSubtotal + tax;
+  const isIndia = countryCode === "IN";
+  const taxRate = isIndia ? 0.12 : 0; // 12% GST for India, 0% for International
+  const tax = discountedSubtotal * taxRate;
+  const shipping = isIndia ? 0 : (20 * conversionRate); // Flat $20 equivalent for International
+  const total = discountedSubtotal + tax + shipping;
 
   const handleApplyCoupon = async () => {
     setCouponError('');
@@ -61,7 +65,7 @@ export default function CartPage() {
           : coupon.discountValue;
           
         setDiscount(discountAmount);
-        setCouponSuccess(`Coupon applied: ${coupon.discountType === 'percentage' ? coupon.discountValue + '%' : '₹' + coupon.discountValue} OFF`);
+        setCouponSuccess(`Coupon applied: ${coupon.discountType === 'percentage' ? coupon.discountValue + '%' : formatPrice(coupon.discountValue)} OFF`);
       }
     } catch (err: any) {
       setCouponError(err.message || 'Error applying coupon');
@@ -135,7 +139,7 @@ export default function CartPage() {
                     <div className={styles.quickAddInfo}>
                       <div className={styles.quickAddText}>
                         <h4 className={styles.quickAddName}>{prod.name}</h4>
-                        <span className={styles.quickAddPrice}>₹{prod.price.toFixed(2)}</span>
+                        <span className={styles.quickAddPrice}>{formatPrice(prod.price)}</span>
                       </div>
                       <button 
                         className={styles.quickAddBtn}
@@ -174,7 +178,7 @@ export default function CartPage() {
                         <h3>{item.name}</h3>
                         <p className={styles.itemMeta}>{item.color ? `Color: ${item.color} | ` : ''}Size: {item.size}</p>
                       </div>
-                      <p className={styles.itemPrice}>₹{item.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                      <p className={styles.itemPrice}>{formatPrice(item.price)}</p>
                     </div>
 
                     <div className={styles.itemBottom}>
@@ -209,21 +213,21 @@ export default function CartPage() {
               
               <div className={styles.summaryRow}>
                 <span>Subtotal</span>
-                <span>₹{subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                <span>{formatPrice(subtotal)}</span>
               </div>
               {discount > 0 && (
                 <div className={`${styles.summaryRow} ${styles.discountRow}`}>
                   <span>Discount</span>
-                  <span>-₹{discount.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                  <span>-{formatPrice(discount)}</span>
                 </div>
               )}
               <div className={styles.summaryRow}>
-                <span>Estimated Tax (10%)</span>
-                <span>₹{tax.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                <span>{isIndia ? 'Estimated GST (12%)' : 'Taxes (International)'}</span>
+                <span>{formatPrice(tax)}</span>
               </div>
               <div className={styles.summaryRow}>
                 <span>Shipping</span>
-                <span>Complimentary</span>
+                <span>{isIndia ? 'Complimentary' : formatPrice(shipping)}</span>
               </div>
               
               <div className={styles.couponSection}>
@@ -249,7 +253,7 @@ export default function CartPage() {
               
               <div className={styles.totalRow}>
                 <span>Total</span>
-                <span>₹{total.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                <span>{formatPrice(total)}</span>
               </div>
 
               <Link href="/checkout" className={styles.checkoutBtn} style={{ textDecoration: 'none', display: 'flex' }}>

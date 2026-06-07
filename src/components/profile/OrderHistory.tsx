@@ -5,12 +5,14 @@ import { getUserOrders, updateOrder, Order } from '@/lib/firebaseUtils';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import styles from './ProfileComponents.module.css';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function OrderHistory({ user }: { user: any }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
   const [cancellationReason, setCancellationReason] = useState<string>('');
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     if (!user?.uid) return;
@@ -90,7 +92,7 @@ export default function OrderHistory({ user }: { user: any }) {
         <div className={styles.statCard}>
           <div className={styles.statIconBox} style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}><TrendingUp size={24} /></div>
           <div className={styles.statCard}>
-            <div className={styles.statValue}>₹{totalProfit.toFixed(2)}</div>
+            <div className={styles.statValue}>{formatPrice(totalProfit)}</div>
             <div className={styles.statLabel}>Total Value Retained</div>
           </div>
         </div>
@@ -119,17 +121,17 @@ export default function OrderHistory({ user }: { user: any }) {
                         {item.size && <span style={{ marginLeft: '8px', padding: '2px 6px', background: 'rgba(var(--foreground-rgb), 0.05)', borderRadius: '4px', color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 700 }}>Size: {item.size}</span>}
                       </span>
                       <div className={styles.itemPrices}>
-                        {item.mrp > item.pricePaid && <span className={styles.mrp}>₹{item.mrp.toFixed(2)}</span>}
-                        <span className={styles.paid}>₹{item.pricePaid.toFixed(2)}</span>
+                        {item.mrp > item.pricePaid && <span className={styles.mrp}>{formatPrice(item.mrp)}</span>}
+                        <span className={styles.paid}>{formatPrice(item.pricePaid)}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
               <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                <div style={{ fontSize: '1.5rem', fontWeight: '800' }}>₹{order.total.toFixed(2)}</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '800' }}>{formatPrice(order.total)}</div>
                 {order.discountAmount && order.discountAmount > 0 && (
-                  <p style={{ fontSize: '0.8rem', color: '#10b981', marginTop: '0.5rem' }}>Saved ₹{order.discountAmount.toFixed(2)} with coupon</p>
+                  <p style={{ fontSize: '0.8rem', color: '#10b981', marginTop: '0.5rem' }}>Saved {formatPrice(order.discountAmount)} with coupon</p>
                 )}
                 {order.status === 'processing' && cancellingOrderId !== order.id && (
                   <button 

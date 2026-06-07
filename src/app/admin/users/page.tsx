@@ -5,12 +5,14 @@ import { User, Shield, Mail, MessageSquare, X, Send } from 'lucide-react';
 import { getUsers, getSubscribers, getAllOrders, sendChatMessage, markMessagesAsRead, ChatMessage } from '@/lib/firebaseUtils';
 import { db } from '@/lib/firebase';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { formatPrice } = useCurrency();
 
   // Chat State
   const [chatUser, setChatUser] = useState<any | null>(null);
@@ -130,7 +132,7 @@ export default function AdminUsersPage() {
                     <td>
                       <div className={styles.purchaseStats}>
                         <span className={styles.orderCount}>{userOrders.length} Orders</span>
-                        <span className={styles.orderTotal}>₹{totalSpent.toFixed(2)}</span>
+                        <span className={styles.orderTotal}>{formatPrice(totalSpent)}</span>
                       </div>
                     </td>
                     <td>

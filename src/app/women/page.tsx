@@ -6,12 +6,14 @@ import Link from "next/link";
 import styles from "./WomenPage.module.css";
 import { Product } from "@/lib/firebaseUtils";
 import { useCart } from "@/context/CartContext";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useRouter } from "next/navigation";
 
 export default function WomenPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
 
   useEffect(() => {
@@ -143,9 +145,9 @@ export default function WomenPage() {
                   <h3 className={styles.bentoName}>{product.name}</h3>
                   <span className={styles.bentoPrice}>
                     {product.mrp && product.mrp > product.price && (
-                      <del style={{marginRight: '8px', opacity: 0.5, fontSize: '0.85em'}}>₹{product.mrp.toLocaleString()}</del>
+                      <del style={{marginRight: '8px', opacity: 0.5, fontSize: '0.85em'}}>{formatPrice(product.mrp)}</del>
                     )}
-                    ₹{product.price.toLocaleString()}
+                    {formatPrice(product.price)}
                   </span>
                   <button 
                     className={styles.bentoAction}

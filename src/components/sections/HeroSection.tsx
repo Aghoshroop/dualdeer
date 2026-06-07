@@ -1,8 +1,9 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { getBanners, Banner } from '@/lib/firebaseUtils';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
+import { getBanners } from '@/lib/firebaseUtils';
 import styles from './HeroSection.module.css';
+import Magnetic from '../ui/Magnetic';
 
 const speedSuitSlide = {
   id: 'speedsuit-hero',
@@ -33,24 +34,67 @@ const fallbackSlides = [
   }
 ];
 
+// Easing for luxury feel
+const luxuryEase = [0.76, 0, 0.24, 1] as const;
+
 export default function HeroSection() {
   const [current, setCurrent] = useState(0);
   const [dynamicSlides, setDynamicSlides] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLElement>(null);
+
+  // Scroll Parallax
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+
+  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const yContent = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  const opacityContent = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
+  // CTA Cursor Follower
+  const ctaX = useSpring(0, { stiffness: 150, damping: 15, mass: 0.1 });
+  const ctaY = useSpring(0, { stiffness: 150, damping: 15, mass: 0.1 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!containerRef.current) return;
+    const { clientX, clientY } = e;
+    const { width, height, left, top } = containerRef.current.getBoundingClientRect();
+    
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+    
+    const deltaX = clientX - centerX;
+    const deltaY = clientY - centerY;
+
+    const intensity = 0.15; // How strongly it follows
+    
+    ctaX.set(deltaX * intensity);
+    ctaY.set(deltaY * intensity);
+  };
+
+  const handleMouseLeave = () => {
+    ctaX.set(0);
+    ctaY.set(0);
+  };
 
   useEffect(() => {
     const fetchBanners = async () => {
       try {
         const banners = await getBanners();
-        const activeBanners = banners.filter(b => b.active);
+        const activeBanners = banners.filter(b => b.active && !b.deleted);
         
         if (activeBanners.length > 0) {
           const mappedSlides = activeBanners.map((b, index) => ({
             id: b.id || index.toString(),
             image: b.image,
+            mobileImage: b.mobileImage || b.image,
             heading: b.title,
-            subheading: "Premium exclusive selection.",
-            cta: b.link ? "DISCOVER MORE" : "SHOP NOW",
+            subheading: "",
+            cta: (b.link || b.ctaLink) ? "DISCOVER MORE" : "SHOP NOW",
+            showCta: b.showCta !== false,
+            ctaLink: b.ctaLink || b.link || '/shop',
             theme: 'dark' 
           }));
           setDynamicSlides(mappedSlides);
@@ -70,77 +114,126 @@ export default function HeroSection() {
     if (dynamicSlides.length === 0) return;
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % dynamicSlides.length);
-    }, 6000); 
+    }, 15000); 
     return () => clearInterval(timer);
   }, [dynamicSlides]);
 
-  if (loading) return <section className={styles.hero} style={{ background: '#0a0a0a' }} />;
+  if (loading) return <section ref={containerRef} className={styles.hero} style={{ background: '#0a0a0a' }} />;
+
+  const currentSlide = dynamicSlides[current];
+
+  // Split text for character animation
+  const headingChars = currentSlide.heading.split('');
 
   return (
-    <section className={styles.hero}>
+    <section 
+      ref={containerRef} 
+      className={styles.hero}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
           className={styles.slide}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+          exit={{ opacity: 0, transition: { duration: 1, ease: luxuryEase } }}
+          transition={{ duration: 1.2, ease: luxuryEase }}
         >
-          {/* Background Image */}
+          {/* Desktop Background Image with Parallax & Entrance Scale */}
           <motion.div 
-            className={styles.background} 
-            style={{ backgroundImage: `url(${dynamicSlides[current].image})` }} 
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 6, ease: "linear" }}
+            className={`${styles.background} ${styles.desktopOnly}`} 
+            style={{ 
+              backgroundImage: `url(${currentSlide.image})`,
+              y: yBg
+            }} 
+            initial={{ scale: 1.15, filter: 'blur(10px)' }}
+            animate={{ scale: 1, filter: 'blur(0px)' }}
+            transition={{ duration: 1.8, ease: luxuryEase }}
+          />
+          {/* Mobile Background Image with Parallax & Entrance Scale */}
+          <motion.div 
+            className={`${styles.background} ${styles.mobileOnly}`} 
+            style={{ 
+              backgroundImage: `url(${currentSlide.mobileImage || currentSlide.image})`,
+              y: yBg
+            }} 
+            initial={{ scale: 1.15, filter: 'blur(10px)' }}
+            animate={{ scale: 1, filter: 'blur(0px)' }}
+            transition={{ duration: 1.8, ease: luxuryEase }}
           />
           <div 
-            className={`${styles.overlay} ${dynamicSlides[current].theme === 'light' ? styles.overlayLight : ''}`} 
+            className={`${styles.overlay} ${currentSlide.theme === 'light' ? styles.overlayLight : ''}`} 
           />
 
           {/* Text Content */}
-          <div className={`${styles.content} ${dynamicSlides[current].theme === 'light' ? styles.themeLight : ''}`}>
-            <motion.h2 
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 1 }}
-              className={styles.heading}
-            >
-              {dynamicSlides[current].heading}
-            </motion.h2>
-            <motion.p 
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.7, duration: 1 }}
-              className={styles.subheading}
-            >
-              {dynamicSlides[current].subheading}
-            </motion.p>
-            <motion.button 
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.9, duration: 1 }}
-              className={styles.ctaBtn}
-              onClick={() => {
-                const heading = dynamicSlides[current].heading?.toLowerCase() || '';
-                if (heading.includes('speedsuit')) {
-                  window.location.href = '/speedsuits-india';
-                } else if (heading.includes('men') || heading.includes('male')) {
-                  window.location.href = '/men';
-                } else {
-                  window.location.href = '/shop';
-                }
-              }}
-            >
-              {dynamicSlides[current].cta}
-            </motion.button>
-          </div>
+          <motion.div 
+            className={`${styles.content} ${currentSlide.theme === 'light' ? styles.themeLight : ''}`}
+            style={{ y: yContent, opacity: opacityContent }}
+          >
+            <h2 className={styles.heading}>
+              {headingChars.map((char: string, index: number) => (
+                <motion.span
+                  key={index}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    duration: 0.8, 
+                    ease: luxuryEase, 
+                    delay: 0.4 + (index * 0.03) 
+                  }}
+                  style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </h2>
+            {currentSlide.subheading && (
+              <motion.p 
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.2, duration: 1, ease: luxuryEase }}
+                className={styles.subheading}
+              >
+                {currentSlide.subheading}
+              </motion.p>
+            )}
+            
+            {currentSlide.showCta !== false && (
+              <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.4, duration: 1, ease: luxuryEase }}
+                style={{ x: ctaX, y: ctaY }}
+              >
+                <button 
+                  className={styles.ctaBtn}
+                  onClick={() => {
+                    if (currentSlide.ctaLink) {
+                      window.location.href = currentSlide.ctaLink;
+                    } else {
+                      const heading = currentSlide.heading?.toLowerCase() || '';
+                      if (heading.includes('speedsuit')) {
+                        window.location.href = '/speedsuits-india';
+                      } else if (heading.includes('men') || heading.includes('male')) {
+                        window.location.href = '/men';
+                      } else {
+                        window.location.href = '/shop';
+                      }
+                    }
+                  }}
+                >
+                  {currentSlide.cta}
+                </button>
+              </motion.div>
+            )}
+          </motion.div>
         </motion.div>
       </AnimatePresence>
 
       {/* Slider Progress Indicators */}
-      <div className={`${styles.indicators} ${dynamicSlides[current].theme === 'light' ? styles.themeLight : ''}`}>
+      <div className={`${styles.indicators} ${currentSlide?.theme === 'light' ? styles.themeLight : ''}`}>
         {dynamicSlides.map((_, index) => (
           <div 
             key={index} 
@@ -153,7 +246,7 @@ export default function HeroSection() {
                 layoutId="indicatorFill"
                 initial={{ width: "0%" }}
                 animate={{ width: "100%" }}
-                transition={{ duration: 6, ease: "linear" }}
+                transition={{ duration: 15, ease: "linear" }}
               />
             )}
           </div>

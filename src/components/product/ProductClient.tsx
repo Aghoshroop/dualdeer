@@ -2,18 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Product, getReviews, Review, addReview, checkInWishlist, addToWishlist, removeFromWishlist } from '@/lib/firebaseUtils';
+import { Product, getReviews, Review, addReview, checkInWishlist, addToWishlist, removeFromWishlist, updateReview, deleteReview } from '@/lib/firebaseUtils';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
-import { Heart, CheckCircle, ChevronDown, Star, ChevronLeft, X, Share2 } from 'lucide-react';
+import { Heart, CheckCircle, ChevronDown, Star, ChevronLeft, X, Share2, ImagePlus, Edit2, Trash2 } from 'lucide-react';
 import RelatedProducts from '@/components/sections/RelatedProducts';
 import Link from 'next/link';
 import styles from './ProductDetails.module.css';
 import QuantitySelector from '@/components/ui/QuantitySelector';
 import AnimatedCartButton from '@/components/ui/AnimatedCartButton';
+import { useFomoStock } from '@/hooks/useFomoStock';
 
-// Removed MOCK_REVIEWS to adhere to real Review data constraints
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface ProductClientProps {
   initialProduct: Product;
@@ -21,8 +22,11 @@ interface ProductClientProps {
 }
 
 export default function ProductClient({ initialProduct, initialReviews }: ProductClientProps) {
-  const router = useRouter();
+  const [reviewCount, setReviewCount] = useState(0);
+
   const { addToCart, cart } = useCart();
+  const { formatPrice } = useCurrency();
+  const router = useRouter();
   const [product, setProduct] = useState<Product>(initialProduct);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
 
@@ -37,7 +41,16 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   const [reviewName, setReviewName] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewText, setReviewText] = useState('');
+  const [reviewImage, setReviewImage] = useState<File | null>(null);
+  const [reviewImagePreview, setReviewImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [editReviewText, setEditReviewText] = useState('');
+  const [editReviewRating, setEditReviewRating] = useState(5);
 
   const [authLoading, setAuthLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -115,26 +128,100 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reviewName || !reviewText || !product?.id) return;
+    if (!product?.id) return;
     setIsSubmitting(true);
-    
-    const avatar = `https://ui-avatars.com/api/?name=${reviewName}&background=random&color=fff`;
 
-    await addReview({
+    let imageUrl = '';
+    if (reviewImage) {
+      try {
+        const formData = new FormData();
+        formData.append('image', reviewImage);
+        
+        const imgbbKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+        if (!imgbbKey) throw new Error("ImgBB API key is missing");
+
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          imageUrl = data.data.url;
+        } else {
+          throw new Error(data.error?.message || "Unknown ImgBB Error");
+        }
+      } catch (err: any) {
+        console.error("Error uploading review image", err);
+        alert(`Could not upload image: ${err.message}. Please try again.`);
+        setIsSubmitting(false);
+        return; // Stop submission if image upload fails
+      }
+    }
+
+    const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewName)}&background=random&color=fff`;
+
+    const newReview: Omit<Review, 'id' | 'date'> = {
       productId: product.id,
       userName: reviewName,
       userAvatar: avatar,
+      ...(currentUser?.uid ? { userId: currentUser.uid } : {}),
       rating: reviewRating,
-      text: reviewText
-    });
+      text: reviewText,
+      ...(imageUrl ? { image: imageUrl } : {})
+    };
 
-    const freshReviews = await getReviews(product.id);
-    setReviews(freshReviews);
-    
-    setReviewName('');
-    setReviewText('');
-    setReviewRating(5);
-    setIsSubmitting(false);
+    try {
+      const id = await addReview(newReview);
+      
+      const submittedReview: Review = {
+        id,
+        ...newReview,
+        date: { toMillis: () => Date.now() } as any
+      };
+
+      setReviews([submittedReview, ...reviews]);
+      setReviewName('');
+      setReviewText('');
+      setReviewRating(5);
+      setReviewImage(null);
+      setReviewImagePreview(null);
+    } catch (err: any) {
+      console.error("Failed to add review to Firestore", err);
+      alert(`Could not submit review: ${err.message}. Please check your Firestore rules.`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete your review?")) {
+      try {
+        await deleteReview(id);
+        setReviews(reviews.filter(r => r.id !== id));
+      } catch (err: any) {
+        console.error("Failed to delete review", err);
+        alert("Could not delete review: " + err.message);
+      }
+    }
+  };
+
+  const startEditReview = (rev: Review) => {
+    setEditingReviewId(rev.id || null);
+    setEditReviewText(rev.text);
+    setEditReviewRating(rev.rating);
+  };
+
+  const handleUpdateReview = async (id: string) => {
+    try {
+      await updateReview(id, { text: editReviewText, rating: editReviewRating });
+      setReviews(reviews.map(r => r.id === id ? { ...r, text: editReviewText, rating: editReviewRating } : r));
+      setEditingReviewId(null);
+    } catch (err: any) {
+      console.error("Failed to update review", err);
+      alert("Could not update review: " + err.message);
+    }
   };
 
   if (!product) {
@@ -142,6 +229,24 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   }
 
   const combinedReviews = [...reviews];
+  const reviewsWithImages = combinedReviews.filter(r => r.image);
+
+  const openLightbox = (reviewId: string) => {
+    const idx = reviewsWithImages.findIndex(r => r.id === reviewId);
+    if (idx !== -1) setLightboxIndex(idx);
+  };
+
+  const nextLightboxImage = () => {
+    if (lightboxIndex !== null && lightboxIndex < reviewsWithImages.length - 1) {
+      setLightboxIndex(lightboxIndex + 1);
+    }
+  };
+
+  const prevLightboxImage = () => {
+    if (lightboxIndex !== null && lightboxIndex > 0) {
+      setLightboxIndex(lightboxIndex - 1);
+    }
+  };
 
   const reviewAvg = combinedReviews.length > 0
     ? (combinedReviews.reduce((acc, r) => acc + r.rating, 0) / combinedReviews.length)
@@ -162,13 +267,19 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   };
 
   const currentAvailableStock = getAvailableStock(selectedSize);
-  const isOutOfStock = currentAvailableStock <= 0;
+
+  // FOMO Logic overriding the stock display
+  const { fomoStock, totalBought, isRestocking, formattedTime } = useFomoStock(product?.id, currentAvailableStock);
+  const displayStock = fomoStock;
+
+  const isOutOfStock = currentAvailableStock <= 0 || isRestocking || displayStock <= 0;
 
   const cartItemInfo = cart.find(c => c.id === product?.id && c.size === selectedSize);
   const qtyInCart = cartItemInfo ? cartItemInfo.quantity : 0;
-  const maxAddable = Math.max(0, currentAvailableStock - qtyInCart);
+  const effectiveStock = Math.min(currentAvailableStock, displayStock);
+  const maxAddable = Math.max(0, effectiveStock - qtyInCart);
   const isMaxInCart = maxAddable <= 0 && !isOutOfStock;
-  const canPerformAction = !isOutOfStock && maxAddable > 0;
+  const canPerformAction = !isOutOfStock && maxAddable > 0 && !isRestocking;
 
   const starCounts = [0, 0, 0, 0, 0];
   const targetScore = Number(avgRating);
@@ -269,11 +380,30 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
             </div>
             
             <h1 className={styles.productTitle}>{product.name}</h1>
-            {!isOutOfStock ? (
+            {isRestocking ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem' }}>
-                 <span className={styles.stockBadge}>{currentAvailableStock} In Stock ({selectedSize})</span>
-                 {currentAvailableStock <= 10 && (
-                    <span style={{ color: '#ff4444', fontSize: '0.8rem', fontWeight: 600, animation: 'pulse 2s infinite' }}>Hurry! Only {currentAvailableStock} left!</span>
+                <span className={styles.stockBadge} style={{ background: '#ff3333', animation: 'pulse 2s infinite' }}>
+                  Restocking in {formattedTime}
+                </span>
+                <span style={{ fontSize: '0.8rem', color: '#ff3333', fontWeight: 600 }}>All stock sold out globally.</span>
+              </div>
+            ) : !isOutOfStock ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem' }}>
+                 <div className={styles.stockBadge} style={{ background: displayStock < 100 ? '#ff3333' : 'var(--color-primary)', transition: 'background 0.3s ease' }}>
+                   <motion.span 
+                      key={displayStock}
+                      initial={{ opacity: 0.5, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`${styles.fomoNumber} ${displayStock % 2 === 0 ? styles.flashing : ''}`}
+                   >
+                     {displayStock}
+                   </motion.span>
+                   {' '}In Stock ({selectedSize})
+                 </div>
+                 {displayStock < 800 && (
+                    <span style={{ color: '#ff4444', fontSize: '0.8rem', fontWeight: 600, animation: 'pulse 2s infinite' }}>
+                      🔥 Selling fast! Hurry, stock will remove soon!
+                    </span>
                  )}
               </div>
             ) : (
@@ -291,11 +421,37 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
           </div>
 
           <div className={styles.pricing}>
-            <span className={styles.offerPrice}>₹{(product.price || 0).toFixed(2)}</span>
+            <span className={styles.offerPrice}>{formatPrice(product.price)}</span>
             {product.mrp && product.mrp > product.price && (
-              <del className={styles.mrpPrice}>₹{product.mrp.toFixed(2)}</del>
+              <del className={styles.mrpPrice}>{formatPrice(product.mrp)}</del>
             )}
           </div>
+
+          {!isRestocking && displayStock > 0 && displayStock < 1000 && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className={styles.fomoBanner}
+            >
+              <div className={styles.pulseIcon}>⚡</div>
+              <p>High Demand: <strong>{totalBought.toLocaleString()}</strong> bought this from all over the world. Buy fast!</p>
+            </motion.div>
+          )}
+
+          {isRestocking && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={styles.fomoBanner}
+              style={{ background: 'rgba(255, 51, 51, 0.1)', borderLeft: '4px solid #ff3333' }}
+            >
+              <div className={styles.pulseIcon}>⏳</div>
+              <div>
+                <p style={{ color: '#ff3333', fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>SOLD OUT GLOBALLY</p>
+                <p style={{ fontSize: '0.85rem', margin: '4px 0 0 0' }}>Next drop releases in <strong style={{fontSize:'1rem'}}>{formattedTime}</strong>.</p>
+              </div>
+            </motion.div>
+          )}
 
           <p className={styles.shortDescription}>
             {product.description || "Elite performance wear crafted for maximum aerodynamic efficiency."}
@@ -347,13 +503,13 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                         opacity: disabled ? 0.3 : 1, 
                         cursor: disabled ? 'not-allowed' : 'pointer'
                       }}
-                      title={disabled ? "Sold out" : `${stockLeft} in stock`}
+                      title={disabled ? "Sold out" : "Select size"}
                     >
                       {size}
                     </button>
-                    {product.sizes && product.sizes.length > 0 && (
-                      <span style={{ fontSize: '0.65rem', opacity: disabled ? 0.8 : 0.6, whiteSpace: 'nowrap', fontWeight: 500 }}>
-                        {stockLeft > 0 ? `${stockLeft} left` : 'Sold out'}
+                    {product.sizes && product.sizes.length > 0 && disabled && (
+                      <span style={{ fontSize: '0.65rem', opacity: 0.8, whiteSpace: 'nowrap', fontWeight: 500 }}>
+                        Sold out
                       </span>
                     )}
                   </div>
@@ -385,7 +541,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                     });
                   }
                 }}
-                label={isOutOfStock ? "Sold Out" : isMaxInCart ? "Max in Cart" : "Add To Cart"}
+                label={isRestocking ? `RESTOCKING ${formattedTime}` : isOutOfStock ? "Sold Out" : isMaxInCart ? "Max in Cart" : "Add To Cart"}
               />
             </div>
             <button 
@@ -398,7 +554,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                 }
               }}
             >
-              {!canPerformAction ? (isOutOfStock ? 'Unavailable' : 'Limit Reached') : 'Buy Now'}
+              {!canPerformAction ? (isRestocking ? `WAIT ${formattedTime}` : isOutOfStock ? 'Unavailable' : 'Limit Reached') : 'Buy Now'}
             </button>
             <div className={styles.actionIconGroup}>
               <button 
@@ -541,8 +697,9 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                   {combinedReviews.length === 0 ? (
                     <p className={styles.noReviews}>Be the first to review this exceptional piece.</p>
                   ) : (
-                    combinedReviews.map(rev => (
-                      <div key={rev.id} className={styles.reviewCard}>
+                    <>
+                      {combinedReviews.slice(0, visibleReviewsCount).map(rev => (
+                        <div key={rev.id} className={styles.reviewCard}>
                         <div className={styles.revHeader}>
                           <div className={styles.revUser}>
                             <img src={rev.userAvatar || `https://ui-avatars.com/api/?name=${rev.userName}&background=random`} alt={rev.userName} className={styles.avatar} loading="lazy" decoding="async" />
@@ -551,19 +708,67 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                               <span className={styles.verified}><CheckCircle size={12} /> Verified</span>
                             </div>
                           </div>
-                          <span className={styles.revDate}>
-                            {new Date((rev.date as unknown as number) || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <span className={styles.revDate}>
+                              {new Date((rev.date as unknown as number) || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                            </span>
+                            {currentUser?.uid && currentUser.uid === rev.userId && (
+                              <div className={styles.reviewActions}>
+                                <button onClick={() => startEditReview(rev)} title="Edit Review"><Edit2 size={14} /></button>
+                                <button onClick={() => handleDeleteReview(rev.id!)} title="Delete Review" style={{ color: '#ff3333' }}><Trash2 size={14} /></button>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <p className={styles.revText}>{rev.text}</p>
-                        <div className={styles.starsRow} style={{ marginTop: '0.8rem' }}>
-                          {[1,2,3,4,5].map(star => (
-                            <Star key={star} size={14} fill={star <= rev.rating ? "var(--color-primary)" : "none"} color="var(--color-primary)" />
-                          ))}
-                          <span style={{ fontSize: '0.8rem', marginLeft: '0.5rem', fontWeight: 600 }}>{rev.rating}.0</span>
-                        </div>
+                        {editingReviewId === rev.id ? (
+                          <div className={styles.editReviewForm} style={{ marginTop: '1rem' }}>
+                            <select value={editReviewRating} onChange={e => setEditReviewRating(Number(e.target.value))} className={styles.inputField} style={{ marginBottom: '0.8rem', width: 'auto', padding: '0.4rem' }}>
+                              <option value={5}>⭐⭐⭐⭐⭐ - 5 Stars</option>
+                              <option value={4}>⭐⭐⭐⭐ - 4 Stars</option>
+                              <option value={3}>⭐⭐⭐ - 3 Stars</option>
+                              <option value={2}>⭐⭐ - 2 Stars</option>
+                              <option value={1}>⭐ - 1 Star</option>
+                            </select>
+                            <textarea value={editReviewText} onChange={e => setEditReviewText(e.target.value)} className={styles.textArea} style={{ marginBottom: '0.8rem', minHeight: '80px' }} />
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                              <button onClick={() => handleUpdateReview(rev.id!)} className={styles.submitBtn} style={{ padding: '0.5rem 1rem', width: 'auto' }}>Save</button>
+                              <button onClick={() => setEditingReviewId(null)} className={styles.uploadBtn} style={{ border: '1px solid var(--color-primary)' }}>Cancel</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <p className={styles.revText}>{rev.text}</p>
+                            {rev.image && (
+                              <img 
+                                src={rev.image} 
+                                alt="Review attachment" 
+                                className={styles.reviewAttachedImage} 
+                                loading="lazy" 
+                                onClick={() => openLightbox(rev.id!)}
+                                style={{ cursor: 'zoom-in' }}
+                              />
+                            )}
+                            <div className={styles.starsRow} style={{ marginTop: '0.8rem' }}>
+                              {[1,2,3,4,5].map(star => (
+                                <Star key={star} size={14} fill={star <= rev.rating ? "var(--color-primary)" : "none"} color="var(--color-primary)" />
+                              ))}
+                              <span style={{ fontSize: '0.8rem', marginLeft: '0.5rem', fontWeight: 600 }}>{rev.rating}.0</span>
+                            </div>
+                          </>
+                        )}
                       </div>
-                    ))
+                    ))}
+                    </>
+                  )}
+                  {combinedReviews.length > visibleReviewsCount && (
+                    <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+                      <button 
+                        onClick={() => setVisibleReviewsCount(prev => prev + 3)} 
+                        className={styles.readMoreBtn}
+                      >
+                        Show More Reviews
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -600,9 +805,65 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                       onChange={e => setReviewText(e.target.value)}
                       className={styles.textArea}
                     />
+                    <div className={styles.imageUploadWrapper}>
+                      <label className={styles.uploadBtn}>
+                        <ImagePlus size={16} /> Attach Image
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          style={{ display: 'none' }} 
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              const file = e.target.files[0];
+                              setReviewImage(file);
+                              setReviewImagePreview(URL.createObjectURL(file));
+                            }
+                          }} 
+                        />
+                      </label>
+                      {reviewImagePreview && (
+                        <div className={styles.imagePreview}>
+                          <img src={reviewImagePreview} alt="Preview" />
+                          <button 
+                            type="button" 
+                            className={styles.removeImageBtn} 
+                            onClick={() => {
+                              setReviewImage(null);
+                              setReviewImagePreview(null);
+                            }}
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                     <button type="submit" disabled={isSubmitting} className={styles.submitBtn}>
                       {isSubmitting ? 'Submitting...' : 'Submit Review'}
                     </button>
+                    {currentUser?.email === 'aviroopghosh283@gmail.com' && (
+                      <button 
+                        type="button" 
+                        onClick={async () => {
+                          if (window.confirm("Are you sure you want to delete ALL reviews?")) {
+                            setIsSubmitting(true);
+                            try {
+                              for (const rev of reviews) {
+                                if (rev.id) await deleteReview(rev.id);
+                              }
+                              setReviews([]);
+                              alert("All reviews deleted.");
+                            } catch (e: any) {
+                              alert("Error deleting reviews: " + e.message);
+                            } finally {
+                              setIsSubmitting(false);
+                            }
+                          }
+                        }}
+                        style={{ background: 'red', color: 'white', marginTop: '1rem', width: '100%', padding: '1rem', borderRadius: '50px', cursor: 'pointer', fontWeight: 'bold' }}
+                      >
+                        ADMIN: Delete All Reviews
+                      </button>
+                    )}
                   </form>
                 </div>
 
@@ -611,6 +872,56 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
       </section>
 
       <RelatedProducts category={product.category} excludeId={product.id!} />
+
+      {/* Lightbox Modal */}
+      {lightboxIndex !== null && reviewsWithImages[lightboxIndex] && (
+        <div className={styles.lightboxOverlay} onClick={() => setLightboxIndex(null)}>
+          <button className={styles.lightboxClose} onClick={() => setLightboxIndex(null)}>
+            <X size={24} color="#fff" />
+          </button>
+          
+          <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.lightboxImageContainer}>
+              <img 
+                src={reviewsWithImages[lightboxIndex].image} 
+                alt="Review Attachment Full" 
+                className={styles.lightboxImage} 
+              />
+            </div>
+            
+            <div className={styles.lightboxReviewBox}>
+              <div className={styles.lightboxReviewHeader}>
+                <div className={styles.revUser}>
+                  <img src={reviewsWithImages[lightboxIndex].userAvatar || `https://ui-avatars.com/api/?name=${reviewsWithImages[lightboxIndex].userName}&background=random`} alt={reviewsWithImages[lightboxIndex].userName} className={styles.avatar} style={{ width: '32px', height: '32px' }} />
+                  <div>
+                    <h4 className={styles.revName} style={{ color: '#fff', fontSize: '0.9rem' }}>{reviewsWithImages[lightboxIndex].userName}</h4>
+                    <div className={styles.starsRow}>
+                      {[1,2,3,4,5].map(star => (
+                        <Star key={star} size={12} fill={star <= reviewsWithImages[lightboxIndex].rating ? "var(--color-primary)" : "none"} color="var(--color-primary)" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className={styles.lightboxReviewText} style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.9rem', marginTop: '0.8rem', lineHeight: 1.5 }}>
+                "{reviewsWithImages[lightboxIndex].text}"
+              </p>
+            </div>
+
+            {lightboxIndex > 0 && (
+              <button className={styles.lightboxPrev} onClick={(e) => { e.stopPropagation(); prevLightboxImage(); }}>
+                <ChevronLeft size={32} color="#fff" />
+              </button>
+            )}
+            
+            {lightboxIndex < reviewsWithImages.length - 1 && (
+              <button className={styles.lightboxNext} onClick={(e) => { e.stopPropagation(); nextLightboxImage(); }}>
+                <ChevronLeft size={32} color="#fff" style={{ transform: 'rotate(180deg)' }} />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

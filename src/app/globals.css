@@ -1,29 +1,30 @@
 :root {
-  --color-primary: #5A0FC8; /* Deep Violet */
-  --color-secondary: #7B2FF7; /* Royal Purple */
-  --color-accent: #9D4EDD; /* Neon Violet */
+  --color-primary: #C9A0DC; /* Wisteria */
+  --color-secondary: #A282C5; /* Lavender Purple */
+  --color-accent: #EAE3F2; /* Lavender Mist */
+  --ease-luxury: cubic-bezier(0.76, 0, 0.24, 1); /* High-end fashion easing */
 }
 
 [data-theme='light'] {
-  --color-background: #ffffff;
-  --background-rgb: 255, 255, 255;
-  --color-foreground: #000000;
-  --foreground-rgb: 0, 0, 0;
-  --color-border: #EAEAEA;
-  --color-text: #111111;
-  --color-text-muted: #666666;
-  --color-surface: #F8F8F8;
+  --color-background: #EAE3F2; /* Lavender Mist */
+  --background-rgb: 234, 227, 242;
+  --color-foreground: #160B24; /* Indigo Velvet */
+  --foreground-rgb: 22, 11, 36;
+  --color-border: #D1C5E0;
+  --color-text: #160B24; /* Indigo Velvet */
+  --color-text-muted: #574A6A;
+  --color-surface: #F4EEFC;
 }
 
 [data-theme='dark'] {
-  --color-background: #000000;
-  --background-rgb: 0, 0, 0;
-  --color-foreground: #ffffff;
-  --foreground-rgb: 255, 255, 255;
-  --color-border: #222222;
-  --color-text: #ffffff;
-  --color-text-muted: #999999;
-  --color-surface: #0A0A0A;
+  --color-background: #160B24; /* Indigo Velvet */
+  --background-rgb: 22, 11, 36;
+  --color-foreground: #EAE3F2; /* Lavender Mist */
+  --foreground-rgb: 234, 227, 242;
+  --color-border: #2D1B48; /* Dark Amethyst */
+  --color-text: #EAE3F2; /* Lavender Mist */
+  --color-text-muted: #A282C5; /* Lavender Purple */
+  --color-surface: #2D1B48; /* Dark Amethyst */
 }
 
 

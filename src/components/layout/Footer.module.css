@@ -207,6 +207,76 @@
   color: rgba(255, 255, 255, 0.3);
 }
 
+/* Region Selector */
+.regionSelector {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.regionToggle {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.regionToggle:hover {
+  border-color: #7b2ff7;
+  color: #7b2ff7;
+}
+
+.regionDropdown {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  overflow: hidden;
+  z-index: 50;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.regionOption {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 1rem;
+  text-align: left;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.regionOption:last-child {
+  border-bottom: none;
+}
+
+.regionOption:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.regionActive {
+  color: #7b2ff7;
+  background: rgba(123, 47, 247, 0.1);
+}
+
 .socials {
   display: flex;
   gap: 3rem;

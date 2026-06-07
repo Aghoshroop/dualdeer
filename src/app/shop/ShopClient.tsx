@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './ShopPage.module.css';
 import { useCart } from '@/context/CartContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import React from 'react';
 
 // UI Interaction Sound Generator (No external assets required)
@@ -87,6 +88,7 @@ function ShopEngine({ initialProducts, initialHeroUrl, initialHeroText }: any) {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState("ALL");
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   // Process live products
   const displayProducts = initialProducts.filter((p: any) => {
@@ -183,8 +185,8 @@ function ShopEngine({ initialProducts, initialHeroUrl, initialHeroText }: any) {
                     </Link>
                     
                     <div className={styles.productPrice}>
-                      {product.mrp && product.mrp > product.price && <span style={{ textDecoration: 'line-through', opacity: 0.5, marginRight: '10px' }}>₹{product.mrp.toFixed(2)}</span>}
-                      <span style={{ fontWeight: 700 }}>₹{product.price.toFixed(2)}</span>
+                      {product.mrp && product.mrp > product.price && <span style={{ textDecoration: 'line-through', opacity: 0.5, marginRight: '10px' }}>{formatPrice(product.mrp)}</span>}
+                      <span style={{ fontWeight: 700 }}>{formatPrice(product.price)}</span>
                     </div>
 
                     <div className={styles.cardActions}>

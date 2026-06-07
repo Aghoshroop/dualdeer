@@ -11,6 +11,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import StoreAudio from "@/components/layout/StoreAudio";
 import { ThemeProvider } from "next-themes";
 import { CartProvider } from '@/context/CartContext';
+import { CurrencyProvider } from '@/context/CurrencyContext';
 import Script from "next/script";
 import SplashScreen from "@/components/layout/SplashScreen";
 import CustomCursor from "@/components/layout/CustomCursor";
@@ -152,7 +153,8 @@ export default function RootLayout({
         </noscript>
         <ThemeProvider defaultTheme="light" attribute="data-theme">
         <CustomCursor />
-        <CartProvider>
+        <CurrencyProvider>
+          <CartProvider>
             <SplashScreen />
             <HideOnAdmin>
               <Navbar />
@@ -168,6 +170,7 @@ export default function RootLayout({
               <BottomNav />
             </HideOnAdmin>
           </CartProvider>
+        </CurrencyProvider>
         </ThemeProvider>
         <Analytics />
       </body>

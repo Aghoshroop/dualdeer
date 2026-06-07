@@ -6,10 +6,12 @@ import Link from "next/link";
 import styles from "./page.module.css";
 import { Product } from "@/lib/firebaseUtils";
 import { useCart } from "@/context/CartContext";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export default function SpeedSuitsIndiaClient({ initialProducts }: { initialProducts: Product[] }) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     setProducts(initialProducts);
@@ -101,7 +103,7 @@ export default function SpeedSuitsIndiaClient({ initialProducts }: { initialProd
                   </div>
                   <div className={styles.productInfo}>
                     <h4 className={styles.productName}>{product.name}</h4>
-                    <span className={styles.productPrice}>₹{product.price.toLocaleString()}</span>
+                    <span className={styles.productPrice}>{formatPrice(product.price)}</span>
                     <button
                       className={styles.buyBtn}
                       onClick={(e) => {

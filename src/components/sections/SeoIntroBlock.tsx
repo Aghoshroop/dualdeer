@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import styles from './SeoIntroBlock.module.css';
 import Link from 'next/link';
 
@@ -12,41 +13,96 @@ interface SeoIntroBlockProps {
   reverse?: boolean;
 }
 
+const luxuryEase = [0.76, 0, 0.24, 1] as const;
+
 export default function SeoIntroBlock({ h1, h2, h3, paragraphs, image, reverse = false }: SeoIntroBlockProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  // Ultra premium default image complementing the dark luxury aesthetic
-  const defaultImage = "https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?q=80&w=1600&auto=format&fit=crop";
-  const displayImage = image || defaultImage;
 
   return (
     <section className={styles.seoSection}>
       <div className={`${styles.seoContainer} ${reverse ? styles.reverse : ''}`}>
-        <div className={styles.imageColumn}>
+        <motion.div 
+          className={styles.imageColumn}
+          initial={{ opacity: 0, filter: "blur(10px)", scale: 0.95 }}
+          whileInView={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1.2, ease: luxuryEase }}
+        >
           <div className={styles.imageWrapper}>
             <div className={styles.glassBadge}>Premium Reserve</div>
             <img src="/speedsuit.png" alt="DualDeer SpeedSuit premium compression wear India" className={styles.image} />
           </div>
-        </div>
+        </motion.div>
         <div className={styles.textColumn}>
           <div className={styles.textWrapper}>
-            {h2 && <h2 className={styles.subtitle}>{h2}</h2>}
-            <h1 className={styles.title}>{h1}</h1>
-            <div className={styles.divider}></div>
-            {h3 && <h3 className={styles.subSubtitle}>{h3}</h3>}
+            {h2 && (
+              <motion.h2 
+                className={styles.subtitle}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8, ease: luxuryEase }}
+              >
+                {h2}
+              </motion.h2>
+            )}
+            
+            <motion.h1 
+              className={styles.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: luxuryEase, delay: 0.1 }}
+            >
+              {h1}
+            </motion.h1>
+            
+            <motion.div 
+              className={styles.divider}
+              initial={{ scaleX: 0, originX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1, ease: luxuryEase, delay: 0.2 }}
+            />
+            
+            {h3 && (
+              <motion.h3 
+                className={styles.subSubtitle}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8, ease: luxuryEase, delay: 0.3 }}
+              >
+                {h3}
+              </motion.h3>
+            )}
+            
             <div className={`${styles.paragraphs} ${!isExpanded ? styles.collapsed : ''}`}>
               {paragraphs.map((content, idx) => (
-                <p key={idx} className={styles.text}>{content}</p>
+                <motion.p 
+                  key={idx} 
+                  className={styles.text}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.8, ease: luxuryEase, delay: 0.4 + (idx * 0.1) }}
+                >
+                  {content}
+                </motion.p>
               ))}
             </div>
             
             {paragraphs.length > 1 && (
-              <button 
+              <motion.button 
                 className={styles.readMoreBtn} 
                 onClick={() => setIsExpanded(!isExpanded)}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.8 }}
               >
                 {isExpanded ? 'Show Less' : 'Read More Details'}
-              </button>
+              </motion.button>
             )}
           </div>
         </div>

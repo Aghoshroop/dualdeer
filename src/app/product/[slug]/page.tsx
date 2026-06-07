@@ -123,19 +123,34 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       "@type": "Brand",
       "name": "DualDeer"
     },
-    "offers": {
-      "@type": "Offer",
-      "url": `https://dualdeer.com/product/${product.slug}`,
-      "priceCurrency": "INR",
-      "price": product.price,
-      "priceValidUntil": "2027-12-31",
-      "itemCondition": "https://schema.org/NewCondition",
-      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "DualDeer Activewear"
+    "offers": [
+      {
+        "@type": "Offer",
+        "url": `https://dualdeer.com/product/${product.slug}`,
+        "priceCurrency": "INR",
+        "price": product.price,
+        "priceValidUntil": "2027-12-31",
+        "itemCondition": "https://schema.org/NewCondition",
+        "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        "seller": {
+          "@type": "Organization",
+          "name": "DualDeer Activewear"
+        }
+      },
+      {
+        "@type": "Offer",
+        "url": `https://dualdeer.com/product/${product.slug}`,
+        "priceCurrency": "USD",
+        "price": product.priceUSD || Number((product.price / 83).toFixed(2)),
+        "priceValidUntil": "2027-12-31",
+        "itemCondition": "https://schema.org/NewCondition",
+        "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        "seller": {
+          "@type": "Organization",
+          "name": "DualDeer Activewear"
+        }
       }
-    }
+    ]
   };
 
   if (safeReviews && safeReviews.length > 0) {

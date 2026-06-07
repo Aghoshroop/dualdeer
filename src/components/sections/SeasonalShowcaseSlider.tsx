@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ChevronRight, Play, Pause } from "lucide-react";
 import styles from "./SeasonalShowcaseSlider.module.css";
 import { useCart } from "@/context/CartContext";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface Product {
   id: string;
@@ -25,6 +26,7 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     import('@/lib/firebaseUtils').then(({ getProducts, getContentBlock }) => {
@@ -117,7 +119,7 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
               >
                 <span className={styles.categorySpan}>{title} / {activeProduct.category || "Featured"}</span>
                 <h2 className={styles.title}>{activeProduct.name}</h2>
-                <div className={styles.price}>₹{activeProduct.price?.toLocaleString()}</div>
+                <div className={styles.price}>{formatPrice(activeProduct.price)}</div>
                 <Link href={`/product/${activeProduct.slug || activeProduct.id.replace('-dup', '')}`} className={styles.shopButton}>
                   Shop Now
                 </Link>
@@ -175,7 +177,7 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
                   </div>
                   <div className={styles.mobileInfo}>
                      <h3 className={styles.mobileName}>{product.name}</h3>
-                     <div className={styles.mobilePrice}>₹{product.price?.toLocaleString()}</div>
+                     <div className={styles.mobilePrice}>{formatPrice(product.price)}</div>
                      <Link href={`/product/${product.slug}`} className={styles.mobileShopBtn}>
                         Shop Now
                      </Link>

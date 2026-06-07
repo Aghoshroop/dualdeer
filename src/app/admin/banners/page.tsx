@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { uploadImageToImgBB } from '@/lib/uploadUtils';
 import styles from '../categories/CategoriesPage.module.css'; // Reusing categories styles
 import { getBanners, addBanner, updateBanner, deleteBanner, Banner } from '@/lib/firebaseUtils';
+import { Timestamp } from 'firebase/firestore';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -11,11 +12,16 @@ export default function AdminBannersPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [currentTab, setCurrentTab] = useState<'active' | 'bin'>('active');
+  
   
   const [formData, setFormData] = useState({
     title: '',
     image: '',
+    mobileImage: '',
     link: '',
+    ctaLink: '',
+    showCta: true,
     active: true
   });
 
@@ -35,7 +41,7 @@ export default function AdminBannersPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ title: '', image: '', link: '', active: true });
+    setFormData({ title: '', image: '', mobileImage: '', link: '', ctaLink: '', showCta: true, active: true });
     setEditingId(null);
     setShowModal(true);
   };
@@ -44,7 +50,10 @@ export default function AdminBannersPage() {
     setFormData({
       title: banner.title,
       image: banner.image,
+      mobileImage: banner.mobileImage || '',
       link: banner.link || '',
+      ctaLink: banner.ctaLink || banner.link || '',
+      showCta: banner.showCta !== false, // Default to true if undefined
       active: banner.active
     });
     setEditingId(banner.id!);
@@ -62,14 +71,18 @@ export default function AdminBannersPage() {
     loadBanners();
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isMobile: boolean = false) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
     
     setUploadingImage(true);
     const url = await uploadImageToImgBB(file);
     if (url) {
-      setFormData({ ...formData, image: url });
+      if (isMobile) {
+        setFormData({ ...formData, mobileImage: url });
+      } else {
+        setFormData({ ...formData, image: url });
+      }
     } else {
       alert("Image upload failed. Please try again.");
     }
@@ -77,11 +90,27 @@ export default function AdminBannersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this banner?")) {
-      await deleteBanner(id);
-      loadBanners();
+    if (currentTab === 'active') {
+      if (confirm("Move this banner to the Recycle Bin?")) {
+        await updateBanner(id, { deleted: true, deletedAt: Timestamp.now() });
+        loadBanners();
+      }
+    } else {
+      if (confirm("Are you sure you want to PERMANENTLY delete this banner? This cannot be undone.")) {
+        await deleteBanner(id);
+        loadBanners();
+      }
     }
   };
+
+  const handleRestore = async (id: string) => {
+    await updateBanner(id, { deleted: false });
+    loadBanners();
+  };
+
+  const filteredBanners = banners.filter(b => 
+    currentTab === 'active' ? !b.deleted : b.deleted
+  );
 
   return (
     <div className={styles.page}>
@@ -93,6 +122,35 @@ export default function AdminBannersPage() {
       </header>
 
       <div className={styles.tableContainer}>
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>
+          <button 
+            onClick={() => setCurrentTab('active')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: currentTab === 'active' ? 'var(--color-primary)' : 'var(--text-muted)',
+              fontWeight: currentTab === 'active' ? 'bold' : 'normal',
+              cursor: 'pointer',
+              fontSize: '1rem'
+            }}
+          >
+            Active Banners
+          </button>
+          <button 
+            onClick={() => setCurrentTab('bin')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: currentTab === 'bin' ? 'var(--color-primary)' : 'var(--text-muted)',
+              fontWeight: currentTab === 'bin' ? 'bold' : 'normal',
+              cursor: 'pointer',
+              fontSize: '1rem'
+            }}
+          >
+            Recycle Bin
+          </button>
+        </div>
+
         {loading ? (
           <p>Loading banners...</p>
         ) : (
@@ -106,28 +164,49 @@ export default function AdminBannersPage() {
               </tr>
             </thead>
             <tbody>
-              {banners.map((banner) => (
+              {filteredBanners.map((banner) => (
                 <tr key={banner.id}>
                   <td><span className={styles.nameBadge}>{banner.title}</span></td>
                   <td style={{ color: 'var(--color-primary)' }}>{banner.link || '-'}</td>
                   <td>
-                    <span className={`${styles.statusBadge} ${banner.active ? styles.active : styles.inactive}`}>
-                      {banner.active ? 'Active' : 'Inactive'}
-                    </span>
+                    {banner.deleted ? (
+                      <span className={`${styles.statusBadge} ${styles.inactive}`}>Deleted</span>
+                    ) : (
+                      <span className={`${styles.statusBadge} ${banner.active ? styles.active : styles.inactive}`}>
+                        {banner.active ? 'Active' : 'Inactive'}
+                      </span>
+                    )}
                   </td>
                   <td>
                     <div className={styles.actions}>
-                      <button className={styles.editBtn} onClick={() => openEditModal(banner)} aria-label="Edit">
-                        <Edit2 size={16} />
-                      </button>
-                      <button className={styles.deleteBtn} onClick={() => handleDelete(banner.id!)} aria-label="Delete">
-                        <Trash2 size={16} />
-                      </button>
+                      {currentTab === 'active' ? (
+                        <>
+                          <button className={styles.editBtn} onClick={() => openEditModal(banner)} aria-label="Edit">
+                            <Edit2 size={16} />
+                          </button>
+                          <button className={styles.deleteBtn} onClick={() => handleDelete(banner.id!)} aria-label="Move to Bin" title="Move to Bin">
+                            <Trash2 size={16} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button 
+                            className={styles.editBtn} 
+                            onClick={() => handleRestore(banner.id!)} 
+                            style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
+                          >
+                            Restore
+                          </button>
+                          <button className={styles.deleteBtn} onClick={() => handleDelete(banner.id!)} aria-label="Permanently Delete" title="Permanently Delete" style={{ color: 'red' }}>
+                            <Trash2 size={16} />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>
               ))}
-              {banners.length === 0 && (
+              {filteredBanners.length === 0 && (
                 <tr>
                   <td colSpan={4} style={{ textAlign: 'center' }}>No banners found.</td>
                 </tr>
@@ -153,12 +232,12 @@ export default function AdminBannersPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label>Banner Image (Upload or Paste URL)</label>
+              <label>Desktop Image (Upload or Paste URL)</label>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <input 
                   type="file" 
                   accept="image/*"
-                  onChange={handleImageUpload}
+                  onChange={(e) => handleImageUpload(e, false)}
                   disabled={uploadingImage}
                   style={{ flex: 1 }}
                 />
@@ -173,18 +252,54 @@ export default function AdminBannersPage() {
                 required
               />
               {formData.image && (
-                <img src={formData.image} alt="Preview" style={{ marginTop: '1rem', height: '80px', borderRadius: '4px', objectFit: 'cover' }} />
+                <img src={formData.image} alt="Desktop Preview" style={{ marginTop: '1rem', height: '80px', borderRadius: '4px', objectFit: 'cover' }} />
               )}
             </div>
 
             <div className={styles.formGroup}>
-              <label>Target Link (e.g. /shop)</label>
+              <label>Mobile Image (Upload or Paste URL)</label>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, true)}
+                  disabled={uploadingImage}
+                  style={{ flex: 1 }}
+                />
+              </div>
               <input 
-                type="text" 
-                value={formData.link} 
-                onChange={(e) => setFormData({...formData, link: e.target.value})}
+                type="url" 
+                value={formData.mobileImage} 
+                onChange={(e) => setFormData({...formData, mobileImage: e.target.value})}
+                placeholder="Optional mobile specific image URL"
+                style={{ marginTop: '0.5rem' }}
+              />
+              {formData.mobileImage && (
+                <img src={formData.mobileImage} alt="Mobile Preview" style={{ marginTop: '1rem', height: '120px', width: 'auto', borderRadius: '4px', objectFit: 'cover' }} />
+              )}
+            </div>
+
+            <div className={`${styles.formGroup} ${styles.checkboxGroup}`} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
+              <label style={{ margin: 0, fontWeight: 'bold' }}>Show CTA Button</label>
+              <input 
+                type="checkbox" 
+                checked={formData.showCta} 
+                onChange={(e) => setFormData({...formData, showCta: e.target.checked})}
+                style={{ width: '20px', height: '20px', marginLeft: 'auto' }}
               />
             </div>
+
+            {formData.showCta && (
+              <div className={styles.formGroup}>
+                <label>Target Link for CTA (e.g. /shop or /speedsuits-india)</label>
+                <input 
+                  type="text" 
+                  value={formData.ctaLink} 
+                  onChange={(e) => setFormData({...formData, ctaLink: e.target.value, link: e.target.value})}
+                  placeholder="Defaults to /shop"
+                />
+              </div>
+            )}
 
             <div className={`${styles.formGroup} ${styles.checkboxGroup}`} style={{ flexDirection: 'row', alignItems: 'center' }}>
               <label>Active</label>
