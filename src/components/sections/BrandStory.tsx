@@ -23,7 +23,8 @@ export default function BrandStory() {
     getContentBlock('brand-story').then(res => setBlock(res));
   }, []);
 
-  const image = block?.imageUrl || 'https://images.unsplash.com/photo-1558222218-b7b54eede3f3?q=80&w=2600&auto=format&fit=crop';
+  const isVideo = block?.mediaType === 'video' && block?.videoUrl;
+  const mediaSrc = isVideo ? block.videoUrl : (block?.imageUrl || 'https://images.unsplash.com/photo-1558222218-b7b54eede3f3?q=80&w=2600&auto=format&fit=crop');
   const title = block?.title || 'The Pursuit of Absolute Perfection';
   const text = block?.body || 'DualDeer was founded on a singular philosophy: that extreme athletic performance and uncompromising luxury are not mutually exclusive. We source the world\'s most advanced aerodynamic fabrics and stitch them with heritage craftsmanship to create silhouettes that command the street and dominate the track.';
   const cta = block?.ctaText || 'DISCOVER THE HERITAGE';
@@ -40,10 +41,21 @@ export default function BrandStory() {
           <motion.div 
             className={styles.image}
             style={{ 
-              backgroundImage: `url('${image}')`,
+              backgroundImage: isVideo ? 'none' : `url('${mediaSrc}')`,
               y: yBg
             }}
-          />
+          >
+            {isVideo && (
+              <video 
+                src={mediaSrc} 
+                autoPlay 
+                muted 
+                loop 
+                playsInline 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            )}
+          </motion.div>
           <motion.div 
             initial={{ height: "100%" }}
             whileInView={{ height: "0%" }}

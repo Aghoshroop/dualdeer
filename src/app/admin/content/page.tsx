@@ -18,18 +18,19 @@ export default function AdminContentPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState<number | null>(null);
   
   const [formData, setFormData] = useState<Partial<ContentBlock>>({
-    title: '', body: '', imageUrl: '', ctaText: '', ctaLink: ''
+    title: '', body: '', mediaType: 'image', imageUrl: '', videoUrl: '', ctaText: '', ctaLink: ''
   });
 
   const loadBlock = async (id: string) => {
     setLoading(true);
     const block = await getContentBlock(id);
     if (block) {
-      setFormData(block);
+      setFormData({ ...block, mediaType: block.mediaType || 'image' });
     } else {
-      setFormData({ title: '', body: '', imageUrl: '', ctaText: '', ctaLink: '' });
+      setFormData({ title: '', body: '', mediaType: 'image', imageUrl: '', videoUrl: '', ctaText: '', ctaLink: '' });
     }
     setLoading(false);
   };
@@ -62,6 +63,63 @@ export default function AdminContentPage() {
       alert("Image upload failed. Please try again.");
     }
     setUploadingImage(false);
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    
+    setUploadingVideo(0);
+    
+    try {
+      const signRes = await fetch('/api/cloudinary/sign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paramsToSign: { folder: 'dualdeer_videos' } })
+      });
+      
+      if (!signRes.ok) throw new Error("Failed to get upload signature");
+      const { timestamp, signature } = await signRes.json();
+      
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+      uploadData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
+      uploadData.append('timestamp', timestamp.toString());
+      uploadData.append('signature', signature);
+      uploadData.append('folder', 'dualdeer_videos');
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`);
+      
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          setUploadingVideo(progress);
+        }
+      };
+      
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          setFormData(prev => ({ ...prev, videoUrl: response.secure_url }));
+        } else {
+          console.error("Cloudinary Error:", xhr.responseText);
+          alert("Video upload failed");
+        }
+        setUploadingVideo(null);
+      };
+      
+      xhr.onerror = () => {
+        alert("Video upload failed");
+        setUploadingVideo(null);
+      };
+      
+      xhr.send(uploadData);
+    } catch (error) {
+      console.error(error);
+      alert("Error uploading video");
+      setUploadingVideo(null);
+    }
   };
 
   return (
@@ -125,28 +183,65 @@ export default function AdminContentPage() {
               </div>
 
               <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                <label>Media / Image Element</label>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                  <input 
-                    type="file" 
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    disabled={uploadingImage}
-                    style={{ flex: 1 }}
-                  />
-                  {uploadingImage && <span style={{ fontSize: '0.9rem', color: 'var(--color-primary)' }}>Uploading...</span>}
-                </div>
-                <input 
-                  type="url" 
-                  value={formData.imageUrl || ''} 
-                  onChange={(e) => setFormData({...formData, imageUrl: e.target.value})} 
-                  placeholder="Or paste image URL here..."
-                  style={{ marginTop: '0.5rem' }}
-                />
-                {formData.imageUrl && (
-                  <img src={formData.imageUrl} alt="Preview" style={{ marginTop: '1rem', height: '100px', borderRadius: '8px', objectFit: 'cover' }} />
-                )}
+                <label>Media Type</label>
+                <select
+                  value={formData.mediaType || 'image'}
+                  onChange={(e) => setFormData({...formData, mediaType: e.target.value as 'image' | 'video'})}
+                >
+                  <option value="image">Image</option>
+                  <option value="video">Video</option>
+                </select>
               </div>
+
+              {formData.mediaType === 'image' ? (
+                <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+                  <label>Image Element</label>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploadingImage}
+                      style={{ flex: 1 }}
+                    />
+                    {uploadingImage && <span style={{ fontSize: '0.9rem', color: 'var(--color-primary)' }}>Uploading...</span>}
+                  </div>
+                  <input 
+                    type="url" 
+                    value={formData.imageUrl || ''} 
+                    onChange={(e) => setFormData({...formData, imageUrl: e.target.value})} 
+                    placeholder="Or paste image URL here..."
+                    style={{ marginTop: '0.5rem' }}
+                  />
+                  {formData.imageUrl && (
+                    <img src={formData.imageUrl} alt="Preview" style={{ marginTop: '1rem', height: '100px', borderRadius: '8px', objectFit: 'cover' }} />
+                  )}
+                </div>
+              ) : (
+                <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+                  <label>Video Element</label>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <input 
+                      type="file" 
+                      accept="video/*"
+                      onChange={handleVideoUpload}
+                      disabled={uploadingVideo !== null}
+                      style={{ flex: 1 }}
+                    />
+                    {uploadingVideo !== null && <span style={{ fontSize: '0.9rem', color: 'var(--color-primary)' }}>Uploading... {uploadingVideo}%</span>}
+                  </div>
+                  <input 
+                    type="url" 
+                    value={formData.videoUrl || ''} 
+                    onChange={(e) => setFormData({...formData, videoUrl: e.target.value})} 
+                    placeholder="Or paste video URL here..."
+                    style={{ marginTop: '0.5rem' }}
+                  />
+                  {formData.videoUrl && (
+                    <video src={formData.videoUrl} controls style={{ marginTop: '1rem', height: '100px', borderRadius: '8px', objectFit: 'cover' }} />
+                  )}
+                </div>
+              )}
 
               <div style={{ display: 'flex', gap: '1.5rem' }}>
                 <div className={styles.formGroup} style={{ flex: 1, marginBottom: 0 }}>

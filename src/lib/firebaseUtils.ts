@@ -9,7 +9,9 @@ export interface ContentBlock {
   id?: string;
   title: string;
   body: string;
+  mediaType?: 'image' | 'video';
   imageUrl?: string;
+  videoUrl?: string;
   ctaText?: string;
   ctaLink?: string;
 }
