@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Lock, ChevronLeft, CreditCard, Wallet, Banknote, ShieldAlert, Globe } from 'lucide-react';
 import styles from './Checkout.module.css';
 import { useCurrency } from '@/context/CurrencyContext';
+import { calculateBundleSavings } from '@/lib/bundleLogic';
 
 export default function CheckoutPage() {
   return (
@@ -95,6 +96,8 @@ function CheckoutEngine() {
   const activeItems = buyNowId ? (buyNowItem ? [buyNowItem] : []) : cart;
   const subtotal = activeItems.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
   
+  const { bundleSavings, appliedBundles } = calculateBundleSavings(activeItems);
+  
   let discountAmount = 0;
   if (appliedCoupon) {
     if (appliedCoupon.discountType === 'percentage') {
@@ -106,8 +109,10 @@ function CheckoutEngine() {
   const discountAmountCapped = Math.min(discountAmount, subtotal);
 
   const isIndia = countryCode === "IN";
-  const taxRate = isIndia ? 0.12 : 0;
-  const taxableAmount = Math.max(0, subtotal - discountAmountCapped);
+  const estimatedGstRate = isIndia ? 0.12 : 0;
+  const taxableAmount = Math.max(0, subtotal - bundleSavings - discountAmountCapped);
+  const estimatedGst = taxableAmount * estimatedGstRate;
+  const taxRate = 0; // Cut GST on total
   const tax = taxableAmount * taxRate;
   const shipping = subtotal > 0 ? (isIndia ? 0 : 20 * conversionRate) : 0;
   const total = taxableAmount + tax + shipping;
@@ -153,6 +158,8 @@ function CheckoutEngine() {
         image: item.image || ''
       })),
       total: total,
+      bundleSavings: bundleSavings,
+      appliedBundles: appliedBundles,
       discountAmount: discountAmountCapped,
       ...(appliedCoupon ? { appliedCoupon: appliedCoupon.code } : {}),
       status: (paymentMethod === 'international_card' ? 'payment_pending' : 'processing') as any,
@@ -467,6 +474,12 @@ function CheckoutEngine() {
                <span>Subtotal</span>
                <span>{formatPrice(subtotal)}</span>
              </div>
+             {bundleSavings > 0 && (
+               <div className={`${styles.summaryRow} ${styles.discountRow}`} style={{ color: 'var(--color-primary)' }}>
+                 <span>Duo Pack Savings</span>
+                 <span>-{formatPrice(bundleSavings)}</span>
+               </div>
+             )}
              {discountAmountCapped > 0 && (
                <div className={`${styles.summaryRow} ${styles.discountRow}`}>
                  <span>Discount</span>
@@ -475,11 +488,17 @@ function CheckoutEngine() {
              )}
              <div className={styles.summaryRow}>
                <span>{isIndia ? 'Estimated GST (12%)' : 'Taxes (International)'}</span>
-               <span>{formatPrice(tax)}</span>
+               <span>{formatPrice(estimatedGst)}</span>
              </div>
+             {estimatedGst > 0 && (
+               <div className={`${styles.summaryRow} ${styles.discountRow}`} style={{ color: 'var(--color-primary)' }}>
+                 <span>GST Waived</span>
+                 <span>-{formatPrice(estimatedGst)}</span>
+               </div>
+             )}
              <div className={styles.summaryRow}>
                <span>Shipping</span>
-               <span>{isIndia ? 'Complimentary' : formatPrice(shipping)}</span>
+               <span>{isIndia ? 'Free' : formatPrice(shipping)}</span>
              </div>
              <div className={`${styles.summaryRow} ${styles.totalRow}`}>
                <span>Total</span>

@@ -377,6 +377,9 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
               <span style={{ padding: '4px 8px', background: 'rgba(var(--foreground-rgb), 0.1)', borderRadius: '4px', color: 'var(--color-text)' }}>🔥 Popular Choice</span>
               <span style={{ padding: '4px 8px', background: 'var(--color-primary)', color: 'var(--color-background)', borderRadius: '4px' }}>⚡ Performance Gear</span>
               <span style={{ padding: '4px 8px', border: '1px solid var(--color-primary)', borderRadius: '4px', color: 'var(--color-primary)' }}>✓ Indian Climate Tested</span>
+              {(product.name.toLowerCase().includes('greninja') || product.name.toLowerCase().includes('blue horizon')) && (
+                <span style={{ padding: '4px 8px', background: 'linear-gradient(45deg, var(--color-primary), #333)', color: 'var(--color-background)', borderRadius: '4px' }}>🎁 Duo Pack Eligible</span>
+              )}
             </div>
             
             <h1 className={styles.productTitle}>{product.name}</h1>

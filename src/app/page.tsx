@@ -41,7 +41,8 @@ export default function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }} />
       <HeroSection />
-      <TrustStrip />
+      <div style={{ position: 'relative', zIndex: 1, backgroundColor: 'var(--color-background)' }}>
+        <TrustStrip />
 
       <Cinematic3DSection />
       <FeaturedProducts />
@@ -69,6 +70,7 @@ export default function Home() {
             </React.Fragment>
           ]}
         />
+      </div>
       </div>
     </main>
   );

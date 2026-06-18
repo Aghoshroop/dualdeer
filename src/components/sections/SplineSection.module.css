@@ -1,0 +1,32 @@
+.splineContainer {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* Full screen height for the 3D model */
+  background-color: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splineContainer canvas {
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.overlay p {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}

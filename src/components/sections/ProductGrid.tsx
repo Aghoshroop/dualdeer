@@ -61,6 +61,28 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
         </div>
 
         <div className={styles.grid}>
+          {/* Promo Banner */}
+          {!loading && products.some(p => p.name.toLowerCase().includes('greninja') || p.name.toLowerCase().includes('blue horizon')) && (
+            <div style={{
+              gridColumn: '1 / -1',
+              background: 'linear-gradient(45deg, rgba(var(--foreground-rgb), 0.05), transparent)',
+              border: '1px solid var(--color-border)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              marginBottom: '1rem',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1px', color: 'var(--color-primary)', marginBottom: '0.5rem' }}>LIMITED TIME OFFER</span>
+              <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Unlock the DualDeer Duo Pack</h3>
+              <p style={{ margin: '0.5rem 0 0 0', opacity: 0.8, fontSize: '0.9rem', maxWidth: '500px' }}>
+                Add 1x Greninja and 1x Blue Horizon to your cart and automatically get the bundle for just {formatPrice(1549)}. No code needed.
+              </p>
+            </div>
+          )}
           <AnimatePresence>
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
@@ -99,6 +121,11 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
                      )}
                      {product.isNew && (
                        <span className={styles.newBadge}>NEW</span>
+                     )}
+                     {(product.name.toLowerCase().includes('greninja') || product.name.toLowerCase().includes('blue horizon')) && (
+                       <span style={{ padding: '4px 8px', background: 'var(--color-primary)', color: 'var(--color-background)', fontSize: '0.65rem', fontWeight: 700, borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                         Duo Pack Eligible
+                       </span>
                      )}
                   </div>
 

@@ -1,5 +1,6 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { calculateBundleSavings } from '@/lib/bundleLogic';
 
 export interface CartItem {
   id: string; // Product Firebase ID
@@ -20,6 +21,8 @@ interface CartContextType {
   clearCart: () => void;
   cartCount: number;
   cartTotal: number;
+  bundleSavings: number;
+  appliedBundles: string[];
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -80,8 +83,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
+  // Calculate bundle savings dynamically
+  const { bundleSavings, appliedBundles } = useMemo(() => {
+    return calculateBundleSavings(cart);
+  }, [cart]);
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal, bundleSavings, appliedBundles }}>
       {children}
     </CartContext.Provider>
   );

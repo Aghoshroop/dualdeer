@@ -14,7 +14,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 
 export default function CartPage() {
   const router = useRouter();
-  const { cart, updateQuantity, removeFromCart, cartTotal: subtotal, addToCart } = useCart();
+  const { cart, updateQuantity, removeFromCart, cartTotal: subtotal, addToCart, bundleSavings } = useCart();
   const { formatPrice, countryCode, conversionRate } = useCurrency();
   const [mounted, setMounted] = useState(false);
   const [couponCode, setCouponCode] = useState('');
@@ -40,9 +40,11 @@ export default function CartPage() {
     return () => unsubscribe();
   }, []);
 
-  const discountedSubtotal = Math.max(0, subtotal - discount);
+  const discountedSubtotal = Math.max(0, subtotal - bundleSavings - discount);
   const isIndia = countryCode === "IN";
-  const taxRate = isIndia ? 0.12 : 0; // 12% GST for India, 0% for International
+  const estimatedGstRate = isIndia ? 0.12 : 0; // 12% GST for India
+  const estimatedGst = discountedSubtotal * estimatedGstRate;
+  const taxRate = 0; // Cut GST on total
   const tax = discountedSubtotal * taxRate;
   const shipping = isIndia ? 0 : (20 * conversionRate); // Flat $20 equivalent for International
   const total = discountedSubtotal + tax + shipping;
@@ -215,6 +217,12 @@ export default function CartPage() {
                 <span>Subtotal</span>
                 <span>{formatPrice(subtotal)}</span>
               </div>
+              {bundleSavings > 0 && (
+                <div className={`${styles.summaryRow} ${styles.discountRow}`} style={{ color: 'var(--color-primary)' }}>
+                  <span>Duo Pack Savings</span>
+                  <span>-{formatPrice(bundleSavings)}</span>
+                </div>
+              )}
               {discount > 0 && (
                 <div className={`${styles.summaryRow} ${styles.discountRow}`}>
                   <span>Discount</span>
@@ -223,11 +231,17 @@ export default function CartPage() {
               )}
               <div className={styles.summaryRow}>
                 <span>{isIndia ? 'Estimated GST (12%)' : 'Taxes (International)'}</span>
-                <span>{formatPrice(tax)}</span>
+                <span>{formatPrice(estimatedGst)}</span>
               </div>
+              {estimatedGst > 0 && (
+                <div className={`${styles.summaryRow} ${styles.discountRow}`} style={{ color: 'var(--color-primary)' }}>
+                  <span>GST Waived</span>
+                  <span>-{formatPrice(estimatedGst)}</span>
+                </div>
+              )}
               <div className={styles.summaryRow}>
                 <span>Shipping</span>
-                <span>{isIndia ? 'Complimentary' : formatPrice(shipping)}</span>
+                <span>{isIndia ? 'Free' : formatPrice(shipping)}</span>
               </div>
               
               <div className={styles.couponSection}>
