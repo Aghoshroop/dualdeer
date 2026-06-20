@@ -61,37 +61,31 @@ export default function AdminReactionTest() {
         <h1 className={styles.title}><Zap size={28} /> Reaction Test Management</h1>
       </div>
 
-      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div style={{ background: 'var(--color-surface)', padding: '1.5rem', borderRadius: '12px', flex: 1, border: '1px solid var(--color-border)' }}>
-          <h3 style={{ marginBottom: '1rem', color: 'var(--color-text-muted)' }}>Game Status</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: gameActive ? '#10b981' : 'var(--red-500)' }}>
-              {gameActive ? 'LIVE' : 'STOPPED'}
-            </span>
-            <button 
-              onClick={handleToggleGame}
-              style={{ background: gameActive ? 'var(--red-500)' : '#10b981', color: 'var(--color-text)', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-            >
-              {gameActive ? <XCircle size={18} /> : <Power size={18} />} {gameActive ? 'Stop Game' : 'Start Game'}
-            </button>
-          </div>
-          <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Stopping the game hides gameplay but keeps the leaderboard visible.</p>
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', padding: '0.75rem 1.25rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+          <span style={{ color: 'var(--color-text-muted)', fontWeight: 600, fontSize: '0.9rem' }}>Game Status:</span>
+          <span style={{ fontSize: '0.9rem', fontWeight: 800, color: gameActive ? '#10b981' : 'var(--red-500)' }}>
+            {gameActive ? 'LIVE' : 'STOPPED'}
+          </span>
+          <button 
+            onClick={handleToggleGame}
+            style={{ background: gameActive ? 'var(--red-500)' : '#10b981', color: 'var(--color-background)', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}
+          >
+            {gameActive ? <XCircle size={14} /> : <Power size={14} />} {gameActive ? 'Stop Game' : 'Start Game'}
+          </button>
         </div>
 
-        <div style={{ background: 'var(--color-surface)', padding: '1.5rem', borderRadius: '12px', flex: 1, border: '1px solid var(--color-border)' }}>
-          <h3 style={{ marginBottom: '1rem', color: 'var(--color-text-muted)' }}>Active Cycle</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'monospace' }}>
-              {activeCycleId}
-            </span>
-            <button 
-              onClick={handleNewCycle}
-              style={{ background: 'var(--color-primary)', color: 'var(--color-text)', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-            >
-              <RefreshCw size={18} /> Start New Cycle
-            </button>
-          </div>
-          <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Starts a fresh leaderboard. Old scores remain in database.</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', padding: '0.75rem 1.25rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+          <span style={{ color: 'var(--color-text-muted)', fontWeight: 600, fontSize: '0.9rem' }}>Active Cycle:</span>
+          <span style={{ fontSize: '0.9rem', fontWeight: 700, fontFamily: 'monospace' }}>
+            {activeCycleId}
+          </span>
+          <button 
+            onClick={handleNewCycle}
+            style={{ background: 'var(--color-primary)', color: 'var(--color-background)', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}
+          >
+            <RefreshCw size={14} /> Start New Cycle
+          </button>
         </div>
       </div>
 

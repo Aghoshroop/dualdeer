@@ -68,33 +68,44 @@ export default function CustomCursor() {
       }
       setCursorState(nextState);
 
-      // 2. Walk up DOM tree to find computed background color for same-color purple checks
-      let elementBgColor = "";
-      let el: HTMLElement | null = target;
-      while (el && el !== document.documentElement) {
-        const bg = window.getComputedStyle(el).backgroundColor;
-        if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
-          elementBgColor = bg;
+      // 2. Optimized background color check to prevent layout thrashing
+      // Walking the DOM and calling getComputedStyle on every mouseover causes massive slowdowns
+      let purple = false;
+      
+      // Skip expensive checks for inline elements
+      const tag = target.tagName.toLowerCase();
+      let el: HTMLElement | null = ['path', 'svg', 'span', 'strong', 'b', 'i', 'p', 'a'].includes(tag) 
+        ? target.closest('div, section, header, footer') as HTMLElement
+        : target;
+
+      let depth = 0;
+      while (el && el !== document.documentElement && depth < 3) {
+        // Use cached result if available to avoid getComputedStyle layout thrashing
+        if (el.dataset.purpleBg !== undefined) {
+          purple = el.dataset.purpleBg === 'true';
           break;
         }
+
+        try {
+          const bg = window.getComputedStyle(el).backgroundColor;
+          if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
+            const rgb = bg.match(/\d+/g);
+            if (rgb && rgb.length >= 3) {
+              const r = parseInt(rgb[0]);
+              const g = parseInt(rgb[1]);
+              const b = parseInt(rgb[2]);
+              purple = b > 150 && r > 80 && g < 120;
+            }
+            // Cache the result to prevent future recalculations on this element
+            el.dataset.purpleBg = purple ? 'true' : 'false';
+            break;
+          }
+        } catch (e) {}
+        
         el = el.parentElement;
+        depth++;
       }
 
-      if (!elementBgColor && typeof window !== "undefined") {
-        elementBgColor = window.getComputedStyle(document.body).backgroundColor;
-      }
-
-      // 3. Purple screen detection
-      let purple = false;
-      if (elementBgColor) {
-        const rgb = elementBgColor.match(/\d+/g);
-        if (rgb && rgb.length >= 3) {
-          const r = parseInt(rgb[0]);
-          const g = parseInt(rgb[1]);
-          const b = parseInt(rgb[2]);
-          purple = b > 150 && r > 80 && g < 120;
-        }
-      }
       setIsPurpleBg(purple);
     };
 

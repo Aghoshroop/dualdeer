@@ -4,120 +4,60 @@
   pointer-events: none;
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, rgba(15, 15, 15, 0.85) 0%, rgba(25, 25, 25, 0.95) 100%);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  border-right: 4px solid #8b5cf6;
-  padding: 8px 20px 8px 24px;
-  transform: skewX(-12deg);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.15);
-  overflow: hidden;
-}
-
-.content {
-  transform: skewX(12deg);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.stripe {
-  position: absolute;
-  top: 0;
-  left: 10px;
-  width: 20px;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
-  transform: skewX(20deg);
-}
-
-.stripe2 {
-  position: absolute;
-  top: 0;
-  left: 40px;
-  width: 5px;
-  height: 100%;
-  background: rgba(139, 92, 246, 0.15);
-  transform: skewX(20deg);
+  gap: 8px;
+  background: rgba(15, 15, 15, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 14px;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .pulseDot {
-  width: 8px;
-  height: 8px;
-  background-color: #8b5cf6;
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.9);
+  width: 6px;
+  height: 6px;
+  background-color: #10b981;
   border-radius: 50%;
-}
-
-.icon {
-  color: #8b5cf6;
-  opacity: 0.9;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
 }
 
 .textGroup {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-inter), sans-serif;
-}
-
-.liveTag {
-  background: #8b5cf6;
-  color: #ffffff;
-  font-size: 0.55rem;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 2px;
-  letter-spacing: 1px;
-}
-
-.numberGroup {
   display: flex;
   align-items: baseline;
   gap: 4px;
 }
 
 .number {
-  font-weight: 900;
-  font-style: italic;
-  font-size: 1.2rem;
+  font-weight: 700;
+  font-size: 0.8rem;
   color: #ffffff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.5px;
+  font-family: var(--font-inter), sans-serif;
 }
 
 .label {
-  font-weight: 600;
-  font-style: italic;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-weight: 500;
+  font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-inter), sans-serif;
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 5px 12px 5px 14px;
+    padding: 4px 10px;
     bottom: 85px !important;
     right: 10px !important;
-    border-right-width: 3px;
   }
   .number {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
   .label {
-    font-size: 0.5rem;
-  }
-  .content {
-    gap: 6px;
-  }
-  .liveTag {
-    font-size: 0.45rem;
-    padding: 2px 4px;
+    font-size: 0.6rem;
   }
   .pulseDot {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 }

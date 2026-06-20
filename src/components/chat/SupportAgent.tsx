@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { MessageSquare, X, Send, Sparkles } from 'lucide-react';
 import styles from './SupportAgent.module.css';
 import { getAIMemory, updateAIMemory } from '@/lib/firebaseUtils';
@@ -17,6 +17,31 @@ export default function SupportAgent() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [snapSide, setSnapSide] = useState<'left' | 'right'>('right');
+  const wrapperControls = useAnimation();
+
+  // ------------------------
+  // 📜 INITIAL ENTRY & SCROLL LOGIC
+  // ------------------------
+  useEffect(() => {
+    // Initial entry animation
+    wrapperControls.start({ y: 0, opacity: 1, transition: { duration: 0.5 } });
+
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      setIsScrolling(true);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 800);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, [wrapperControls]);
 
   // ------------------------
   // 🧠 INIT MEMORY
@@ -59,10 +84,10 @@ export default function SupportAgent() {
   }, [messages, isLoading]);
 
   // ------------------------
-  // 📱 MOBILE FIX
+  // 🛑 PREVENT BACKGROUND SCROLL
   // ------------------------
   useEffect(() => {
-    if (isOpen && window.innerWidth <= 768) {
+    if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -158,25 +183,50 @@ export default function SupportAgent() {
 
   return (
     <>
-      {/* FAB */}
-      <motion.button
-        className={styles.fab}
-        onClick={() => setIsOpen(true)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      {/* FAB WRAPPER */}
+      <motion.div
+        className={styles.fabWrapper}
+        drag
+        dragMomentum={false}
+        animate={wrapperControls}
         initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        onDragEnd={(e, info) => {
+          if (typeof window !== 'undefined') {
+            const isLeft = info.point.x < window.innerWidth / 2;
+            setSnapSide(isLeft ? 'left' : 'right');
+            // Element is right: 50px. 
+            // Target X for left edge snap = 144 - window.innerWidth
+            // Target X for right edge snap = 0
+            wrapperControls.start({
+              x: isLeft ? 144 - window.innerWidth : 0,
+              transition: { type: 'spring', stiffness: 300, damping: 25 }
+            });
+          }
+        }}
       >
-        <MessageSquare size={24} />
-      </motion.button>
+        <motion.button
+          className={styles.fab}
+          onClick={() => setIsOpen(true)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          animate={{ 
+            opacity: isScrolling ? 0.5 : 1,
+            x: isScrolling ? (snapSide === 'right' ? 80 : -80) : 0
+          }}
+          transition={{ duration: 0.4, type: "spring", bounce: 0.2 }}
+        >
+          <MessageSquare size={20} />
+        </motion.button>
+      </motion.div>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
             className={styles.chatWindow}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           >
 
             {/* HEADER */}
@@ -272,9 +322,14 @@ export default function SupportAgent() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask anything..."
-                disabled={isLoading}
+                // Removed disabled={isLoading} so users can type while AI thinks!
               />
-              <button className={styles.sendBtn} type="submit" disabled={!input.trim() || isLoading}>
+              <button 
+                className={styles.sendBtn} 
+                type="submit" 
+                disabled={!input.trim() || isLoading}
+                onMouseDown={(e) => e.preventDefault()} // Prevents the button from stealing focus from the input!
+              >
                 <Send size={18} />
               </button>
             </form>

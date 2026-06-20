@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './LiveTrafficBadge.module.css';
 
@@ -34,45 +33,33 @@ export default function LiveTrafficBadge() {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 2, type: 'spring', stiffness: 200, damping: 20 }} 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 2 }} 
       className={styles.container}
       style={{
-        bottom: isMobile ? '85px' : '30px',
-        right: isMobile ? '10px' : '30px',
+        bottom: isMobile ? '80px' : '20px',
+        right: isMobile ? '10px' : '20px',
       }}
     >
-      <div className={styles.stripe} />
-      <div className={styles.stripe2} />
-      
-      <div className={styles.content}>
-        <motion.div 
-          animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          className={styles.pulseDot}
-        />
-        
-        <Activity size={isMobile ? 12 : 18} className={styles.icon} strokeWidth={2.5} />
-        
-        <div className={styles.textGroup}>
-          <span className={styles.liveTag}>LIVE</span>
-          <div className={styles.numberGroup}>
-            <AnimatePresence mode="popLayout">
-              <motion.span
-                key={traffic}
-                initial={{ opacity: 0, y: -15, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 15, scale: 0.9 }}
-                transition={{ duration: 0.3, type: "spring" }}
-                className={styles.number}
-              >
-                {traffic}
-              </motion.span>
-            </AnimatePresence>
-            <span className={styles.label}>Active</span>
-          </div>
-        </div>
+      <motion.div 
+        animate={{ opacity: [1, 0.4, 1], scale: [1, 1.1, 1] }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        className={styles.pulseDot}
+      />
+      <div className={styles.textGroup}>
+        <AnimatePresence mode="popLayout">
+          <motion.span
+            key={traffic}
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+            className={styles.number}
+          >
+            {traffic}
+          </motion.span>
+        </AnimatePresence>
+        <span className={styles.label}>Online</span>
       </div>
     </motion.div>
   );
