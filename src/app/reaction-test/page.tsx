@@ -217,10 +217,15 @@ export default function ReactionTestV2() {
                  borderRadius: '20px',
                  cursor: 'pointer',
                  transition: 'background-color 0.1s ease',
-                 position: 'relative'
+                 position: 'relative',
+                 touchAction: 'none',
+                 userSelect: 'none',
+                 WebkitUserSelect: 'none'
                }}
-               onMouseDown={handleTapAreaClick}
-               onTouchStart={(e) => { e.preventDefault(); handleTapAreaClick(); }}
+               onPointerDown={(e) => {
+                 e.preventDefault();
+                 handleTapAreaClick();
+               }}
             >
                <div style={{ position: 'absolute', top: '1rem', left: '1rem', fontSize: '1.2rem', fontWeight: 800 }}>ATTEMPT {Math.min(attempts.length + 1, 3)}/3</div>
                
