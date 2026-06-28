@@ -1,16 +1,14 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 function SplashScreenContent() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [showSplash, setShowSplash] = useState(true);
   const [progress, setProgress] = useState(0);
   const [isReady, setIsReady] = useState(false);
-  const [isEntering, setIsEntering] = useState(false);
 
   useEffect(() => {
     if (pathname?.startsWith('/admin')) {
@@ -37,7 +35,7 @@ function SplashScreenContent() {
 
     let currentProgress = 0;
     const startTime = Date.now();
-    const MIN_LOAD_TIME = 4000; // Force at least 4 seconds of magical splash
+    const MIN_LOAD_TIME = 2500; // Allow 2.5s for "DUAL DEER" typography and logo entrance to fully complete
 
     const interval = setInterval(() => {
       const elapsedTime = Date.now() - startTime;
@@ -59,11 +57,16 @@ function SplashScreenContent() {
         }
       }
 
-      if (currentProgress >= 100) {
+      if (currentProgress >= 99 && !isLoaded) {
+        currentProgress = 99; // Hold at 99% until everything is completely loaded
+      }
+
+      if (currentProgress >= 100 && isLoaded) {
         currentProgress = 100;
         setProgress(100);
         clearInterval(interval);
         setIsReady(true);
+        setShowSplash(false);
       } else {
         setProgress(currentProgress);
       }
@@ -73,15 +76,7 @@ function SplashScreenContent() {
       clearInterval(interval);
       window.removeEventListener('load', handleLoad);
     };
-  }, [pathname, searchParams]); 
-
-  const handleEnter = () => {
-    setIsEntering(true);
-    // Hold for the zoom mask effect, then unmount
-    setTimeout(() => {
-      setShowSplash(false);
-    }, 1200);
-  };
+  }, [pathname]); 
 
   if (pathname?.startsWith('/admin')) {
     return null;
@@ -94,8 +89,8 @@ function SplashScreenContent() {
           key="splash-screen-overlay"
           initial={{ opacity: 1 }}
           exit={{ 
-            opacity: 0, 
-            transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } 
+            y: '-100vh', 
+            transition: { duration: 1.4, ease: [0.65, 0, 0.15, 1] } 
           }}
           style={{
             position: 'fixed',
@@ -177,7 +172,7 @@ function SplashScreenContent() {
             {/* Glowing Filling Logo */}
             <motion.div
               initial={{ rotateY: 90, opacity: 0 }}
-              animate={{ rotateY: 0, opacity: isEntering ? 0 : 1 }}
+              animate={{ rotateY: 0, opacity: 1 }}
               transition={{ duration: 1.8, ease: "easeOut", delay: 0.2 }}
               style={{
                 position: 'relative', marginBottom: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -225,17 +220,12 @@ function SplashScreenContent() {
             {/* Brand Typography */}
             <motion.h1
               initial="hidden"
-              animate={isEntering ? "zoom" : "visible"}
+              animate="visible"
               variants={{
                 hidden: { opacity: 1 },
                 visible: {
                   opacity: 1,
                   transition: { staggerChildren: 0.12, delayChildren: 0.3 }
-                },
-                zoom: {
-                  scale: 120, // Massive zoom
-                  opacity: 0,
-                  transition: { duration: 1.1, ease: [0.76, 0, 0.24, 1] }
                 }
               }}
               style={{
@@ -255,8 +245,7 @@ function SplashScreenContent() {
                   key={i}
                   variants={{
                     hidden: { opacity: 0, y: 40, filter: 'blur(10px)' },
-                    visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: "spring", damping: 12, stiffness: 200 } },
-                    zoom: { opacity: 1 } 
+                    visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: "spring", damping: 12, stiffness: 200 } }
                   }}
                   style={{ display: "inline-block", whiteSpace: "pre" }}
                 >
@@ -267,7 +256,7 @@ function SplashScreenContent() {
 
             {/* Subtitle */}
             <motion.p
-              animate={{ opacity: isEntering ? 0 : 0.8 }}
+              animate={{ opacity: 0.8 }}
               transition={{ duration: 0.8 }}
               style={{
                 color: '#e0d4fc',
@@ -279,10 +268,9 @@ function SplashScreenContent() {
               Luxury Athleisure
             </motion.p>
 
-            {/* Interaction Area (Progress Bar or Enter Button) */}
+            {/* Interaction Area (Progress Bar) */}
             <div style={{ marginTop: '5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '80px' }}>
               <AnimatePresence mode="wait">
-                {!isReady ? (
                   <motion.div 
                     key="progress-bar"
                     initial={{ opacity: 0 }}
@@ -345,49 +333,6 @@ function SplashScreenContent() {
                       </motion.div>
                     </div>
                   </motion.div>
-                ) : (
-                  !isEntering && (
-                    <motion.div
-                      key="enter-btn"
-                      initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                      exit={{ opacity: 0, scale: 1.5, filter: 'blur(10px)' }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    >
-                      <button
-                        onClick={handleEnter}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          backdropFilter: 'blur(12px)',
-                          border: '1px solid rgba(255, 255, 255, 0.3)',
-                          color: '#ffffff',
-                          padding: '1rem 3.5rem',
-                          borderRadius: '50px',
-                          fontSize: '0.85rem',
-                          fontWeight: 700,
-                          letterSpacing: '4px',
-                          textTransform: 'uppercase',
-                          cursor: 'pointer',
-                          boxShadow: '0 0 25px rgba(123,47,247,0.3), inset 0 0 10px rgba(255,255,255,0.1)',
-                          transition: 'all 0.3s ease',
-                          outline: 'none'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                          e.currentTarget.style.boxShadow = '0 0 35px rgba(123,47,247,0.6), inset 0 0 15px rgba(255,255,255,0.2)';
-                          e.currentTarget.style.transform = 'scale(1.02)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                          e.currentTarget.style.boxShadow = '0 0 25px rgba(123,47,247,0.3), inset 0 0 10px rgba(255,255,255,0.1)';
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }}
-                      >
-                        Enter Experience
-                      </button>
-                    </motion.div>
-                  )
-                )}
               </AnimatePresence>
             </div>
           </motion.div>
@@ -398,9 +343,5 @@ function SplashScreenContent() {
 }
 
 export default function SplashScreen() {
-  return (
-    <Suspense fallback={null}>
-      <SplashScreenContent />
-    </Suspense>
-  );
+  return <SplashScreenContent />;
 }

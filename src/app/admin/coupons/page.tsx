@@ -16,6 +16,7 @@ export default function AdminCouponsPage() {
     discountValue: 0,
     active: true,
     usageLimitType: 'once_per_user' as 'single_use' | 'once_per_user' | 'unlimited',
+    applyTo: 'total_cart' as 'total_cart' | 'first_item',
   });
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function AdminCouponsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ code: '', discountType: 'percentage', discountValue: 0, active: true, usageLimitType: 'once_per_user' });
+    setFormData({ code: '', discountType: 'percentage', discountValue: 0, active: true, usageLimitType: 'once_per_user', applyTo: 'total_cart' });
     setEditingId(null);
     setShowModal(true);
   };
@@ -45,7 +46,8 @@ export default function AdminCouponsPage() {
       discountType: coupon.discountType,
       discountValue: coupon.discountValue,
       active: coupon.active,
-      usageLimitType: coupon.usageLimitType || 'unlimited'
+      usageLimitType: coupon.usageLimitType || 'unlimited',
+      applyTo: coupon.applyTo || 'total_cart'
     });
     setEditingId(coupon.id!);
     setShowModal(true);
@@ -167,6 +169,17 @@ export default function AdminCouponsPage() {
                 <option value="unlimited">Unlimited (All Users)</option>
                 <option value="single_use">Single Use (Burned once used by anyone)</option>
                 <option value="once_per_user">Once Per User (Each user gets 1 use)</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Apply To</label>
+              <select 
+                value={formData.applyTo}
+                onChange={(e) => setFormData({...formData, applyTo: e.target.value as any})}
+              >
+                <option value="total_cart">Total Cart</option>
+                <option value="first_item">First Item Only (1 Unit)</option>
               </select>
             </div>
 

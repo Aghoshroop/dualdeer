@@ -100,10 +100,15 @@ function CheckoutEngine() {
   
   let discountAmount = 0;
   if (appliedCoupon) {
+    let targetAmount = subtotal;
+    if (appliedCoupon.applyTo === 'first_item' && activeItems.length > 0) {
+      targetAmount = activeItems[0].price; // Apply to 1 unit of the first item
+    }
+
     if (appliedCoupon.discountType === 'percentage') {
-      discountAmount = subtotal * (appliedCoupon.discountValue / 100);
+      discountAmount = targetAmount * (appliedCoupon.discountValue / 100);
     } else {
-      discountAmount = appliedCoupon.discountValue;
+      discountAmount = appliedCoupon.applyTo === 'first_item' ? Math.min(appliedCoupon.discountValue, targetAmount) : appliedCoupon.discountValue;
     }
   }
   const discountAmountCapped = Math.min(discountAmount, subtotal);

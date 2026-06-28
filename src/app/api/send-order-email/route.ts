@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         <tbody>
     `;
 
-    items.forEach((item: any) => {
+    (items || []).forEach((item: any) => {
       itemsHtml += `
           <tr>
             <td style="padding: 10px; border: 1px solid #e5e7eb;">${item.name}</td>
@@ -64,11 +64,11 @@ export async function POST(request: Request) {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
           <h2 style="color: #4f46e5;">New Order Received! 🎉</h2>
           <p><strong>Order ID:</strong> ${orderId}</p>
-          <p><strong>Total Amount:</strong> ₹${total.toFixed(2)}</p>
-          ${discountAmount > 0 ? `<p><strong>Discount Applied:</strong> ₹${discountAmount.toFixed(2)}</p>` : ''}
+          <p><strong>Total Amount:</strong> ₹${(total || 0).toFixed(2)}</p>
+          ${(discountAmount || 0) > 0 ? `<p><strong>Discount Applied:</strong> ₹${Number(discountAmount).toFixed(2)}</p>` : ''}
           ${appliedCoupon ? `<p><strong>Promo Code Used:</strong> <span style="background-color: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${appliedCoupon}</span></p>` : ''}
-          <p><strong>Payment Method:</strong> ${paymentMethod.toUpperCase()}</p>
-          ${paymentMethod === 'upi' ? `<p><strong>UTR Number:</strong> ${utrNumber}</p>` : ''}
+          <p><strong>Payment Method:</strong> ${(paymentMethod || 'N/A').toUpperCase()}</p>
+          ${paymentMethod === 'upi' ? `<p><strong>UTR Number:</strong> ${utrNumber || 'N/A'}</p>` : ''}
           
           <h3 style="margin-top: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Customer Details</h3>
           <p><strong>Name:</strong> ${shippingDetails?.name || 'N/A'}</p>
@@ -102,8 +102,8 @@ export async function POST(request: Request) {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
           <h2 style="color: #4f46e5;">Thank you for your order, ${shippingDetails?.name || 'Customer'}! 🎉</h2>
           <p>Your order <strong>#${orderId}</strong> has been successfully placed and is now being processed.</p>
-          <p><strong>Total Amount:</strong> ₹${total.toFixed(2)}</p>
-          ${discountAmount > 0 ? `<p><strong>Discount Applied:</strong> ₹${discountAmount.toFixed(2)}</p>` : ''}
+          <p><strong>Total Amount:</strong> ₹${(total || 0).toFixed(2)}</p>
+          ${(discountAmount || 0) > 0 ? `<p><strong>Discount Applied:</strong> ₹${Number(discountAmount).toFixed(2)}</p>` : ''}
           
           <h3 style="margin-top: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Order Items</h3>
           ${itemsHtml}
@@ -117,11 +117,21 @@ export async function POST(request: Request) {
       `,
     };
 
-    // Send emails
-    await Promise.all([
-      transporter.sendMail(adminMailOptions),
-      shippingDetails?.email ? transporter.sendMail(customerMailOptions) : Promise.resolve()
-    ]);
+    // Send admin email independently so it never fails if customer email is invalid
+    try {
+      await transporter.sendMail(adminMailOptions);
+    } catch (adminErr) {
+      console.error('Failed to send admin email:', adminErr);
+    }
+
+    // Send customer email independently
+    if (shippingDetails?.email) {
+      try {
+        await transporter.sendMail(customerMailOptions);
+      } catch (custErr) {
+        console.error('Failed to send customer email:', custErr);
+      }
+    }
 
     return NextResponse.json({ success: true, message: 'Email sent successfully' });
   } catch (error: any) {

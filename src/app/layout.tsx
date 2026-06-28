@@ -8,7 +8,6 @@ import SupportAgent from "@/components/chat/SupportAgent";
 import HideOnAdmin from "@/components/layout/HideOnAdmin";
 import NewsletterModal from "@/components/modals/NewsletterModal";
 import BottomNav from "@/components/layout/BottomNav";
-import StoreAudio from "@/components/layout/StoreAudio";
 import { ThemeProvider } from "next-themes";
 import { CartProvider } from '@/context/CartContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
@@ -159,7 +158,6 @@ export default function RootLayout({
             <HideOnAdmin>
               <Navbar />
               <NewsletterModal />
-              <StoreAudio />
             </HideOnAdmin>
             <SmoothScrollProvider>
               {children}

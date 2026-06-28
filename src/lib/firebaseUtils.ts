@@ -86,6 +86,7 @@ export interface Coupon {
   discountValue: number;
   active: boolean;
   usageLimitType?: 'single_use' | 'once_per_user' | 'unlimited';
+  applyTo?: 'total_cart' | 'first_item';
   usedBy?: string[];
   createdAt?: Timestamp;
 }
