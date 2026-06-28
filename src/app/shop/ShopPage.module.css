@@ -133,23 +133,22 @@
   min-height: 50vh;
 }
 
-/* Custom Grid tailored for 2 items */
+/* Custom Grid tailored for perfect proportions and dramatic masonry */
 .galleryGrid {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 4rem;
-  flex-wrap: wrap;
-  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 4rem 2rem;
+  max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .galleryCard {
   width: 100%;
-  max-width: 450px; /* Never let it blow up to 600px */
   display: flex;
   flex-direction: column;
   position: relative;
+  height: 100%;
 }
 
 .imageContainer {
@@ -160,6 +159,7 @@
   overflow: hidden;
   position: relative;
   margin-bottom: 2rem;
+  flex-shrink: 0;
 }
 
 .productImg {
@@ -193,6 +193,8 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  flex-grow: 1;
+  width: 100%;
 }
 
 .brandLabel {
@@ -230,6 +232,7 @@
   gap: 1rem;
   width: 100%;
   justify-content: center;
+  margin-top: auto; /* Pushes buttons to the bottom, aligning all cards */
 }
 
 .actionBtn {
@@ -309,6 +312,54 @@
   color: rgba(255,255,255,0.5);
   padding: 4rem 0;
   letter-spacing: 1px;
+  grid-column: 1 / -1;
+}
+
+/* =========================================
+   DRAMATIC EDITORIAL BENTO LAYOUT (Large Grids)
+   ========================================= */
+@media (min-width: 1024px) {
+  /* When there are 5 or more products, make the first one a massive hero block */
+  .galleryGrid:has(.galleryCard:nth-child(5)) .galleryCard:nth-child(1) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  
+  .galleryGrid:has(.galleryCard:nth-child(5)) .galleryCard:nth-child(1) .imageContainer {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 800px;
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+  
+  .galleryGrid:has(.galleryCard:nth-child(5)) .galleryCard:nth-child(1) .productName {
+    font-size: 2.8rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .galleryGrid:has(.galleryCard:nth-child(5)) .galleryCard:nth-child(1) .productPrice {
+    font-size: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .galleryGrid:has(.galleryCard:nth-child(5)) .galleryCard:nth-child(1) .actionBtn {
+    padding: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+
+  /* Make the 7th item a massive landscape block */
+  .galleryGrid:has(.galleryCard:nth-child(7)) .galleryCard:nth-child(7) {
+    grid-column: span 2;
+  }
+  
+  .galleryGrid:has(.galleryCard:nth-child(7)) .galleryCard:nth-child(7) .imageContainer {
+    aspect-ratio: 21/9;
+  }
+  
+  .galleryGrid:has(.galleryCard:nth-child(7)) .galleryCard:nth-child(7) .productName {
+    font-size: 2.2rem;
+  }
 }
 
 @media (max-width: 768px) {

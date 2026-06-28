@@ -99,6 +99,7 @@
   background: transparent;
   transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   border-radius: 16px;
+  height: 100%;
 }
 
 .card:hover {
@@ -116,6 +117,7 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);
   border: 1px solid rgba(var(--background-rgb), 0.05);
   transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  flex-shrink: 0;
 }
 
 [data-theme='dark'] .imageBox {
@@ -205,6 +207,8 @@
   gap: 0.5rem;
   padding: 0 0.5rem;
   align-items: flex-start;
+  flex-grow: 1;
+  width: 100%;
 }
 
 .catRow {
@@ -266,6 +270,7 @@
   display: flex;
   gap: 0.5rem;
   margin-top: 0.8rem;
+  margin-bottom: 1rem;
 }
 
 .colorCircle {
@@ -347,31 +352,29 @@
   .header { flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-bottom: 3rem; }
   .grid { 
     display: grid !important; 
-    grid-template-columns: repeat(2, 1fr) !important; 
-    gap: 1.5rem !important; 
+    grid-template-columns: 1fr !important; /* Stack products vertically on mobile */
+    gap: 3rem !important; 
   }
   .twoItemGrid .card, .singleItemGrid .card { 
     width: 100% !important; 
     max-width: 100% !important; 
   }
-  .title { font-size: 2rem; }
-  .section { padding: 4rem 5%; }
-  .name { font-size: 0.9rem; letter-spacing: 1px; }
-  .catRow { font-size: 0.6rem; }
-  .price { font-size: 1rem; }
-  .saleBadge, .newBadge { padding: 4px 8px; font-size: 0.55rem; }
+  .title { font-size: 2.2rem; line-height: 1.2; }
+  .section { padding: 5rem 1.5rem; }
+  .name { font-size: 1.3rem; letter-spacing: 1px; margin-top: 0.5rem; }
+  .catRow { font-size: 0.75rem; margin-bottom: 0.5rem; }
+  .price { font-size: 1.2rem; }
+  .saleBadge, .newBadge { padding: 6px 12px; font-size: 0.65rem; }
 }
 
 @media (max-width: 480px) {
   .grid { 
-    gap: 0.8rem !important; 
+    gap: 2.5rem !important; 
   }
-  .title { font-size: 1.6rem; }
-  .name { font-size: 0.75rem; letter-spacing: 0px; line-height: 1.15; }
-  .price { font-size: 0.9rem; }
-  .mrp { font-size: 0.75rem; }
-  .catRow { font-size: 0.5rem; flex-direction: column; align-items: flex-start; gap: 0.3rem; }
-  .rating { align-self: flex-start; }
+  .title { font-size: 1.8rem; }
+  .name { font-size: 1.1rem; line-height: 1.3; }
+  .price { font-size: 1.1rem; }
+  .mrp { font-size: 0.9rem; }
 }
 
 @media (max-width: 768px) {
@@ -382,11 +385,11 @@
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 1rem;
-    gap: 1rem !important;
+    gap: 1.5rem !important;
     width: 100vw;
-    margin-left: -5vw;
-    padding-left: 5vw;
-    padding-right: 5vw;
+    margin-left: -1.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
   
   .horizontalScrollMobile::-webkit-scrollbar {
@@ -394,7 +397,7 @@
   }
   
   .horizontalScrollMobile .card {
-    min-width: 60vw !important;
+    min-width: 80vw !important;
     scroll-snap-align: start;
     flex-shrink: 0;
   }

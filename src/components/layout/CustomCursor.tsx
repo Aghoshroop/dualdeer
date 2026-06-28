@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import styles from "./CustomCursor.module.css";
 
 export default function CustomCursor() {
@@ -10,15 +10,11 @@ export default function CustomCursor() {
   const mouseY = useMotionValue(-100);
   
   // High-tension spring for snappy, liquid cursor feel
-  const cursorSpringX = useSpring(mouseX, { damping: 25, stiffness: 300, mass: 0.2 });
-  const cursorSpringY = useSpring(mouseY, { damping: 25, stiffness: 300, mass: 0.2 });
+  const cursorSpringX = useSpring(mouseX, { damping: 25, stiffness: 400, mass: 0.1 });
+  const cursorSpringY = useSpring(mouseY, { damping: 25, stiffness: 400, mass: 0.1 });
   
-  const [cursorState, setCursorState] = useState<"default" | "pointer" | "view">("default");
-  const [cursorText, setCursorText] = useState("VIEW");
+  const [cursorState, setCursorState] = useState<"default" | "pointer">("default");
   const [isVisible, setIsVisible] = useState(false);
-  
-  // Dynamic contrast state for brand overlap checks
-  const [isPurpleBg, setIsPurpleBg] = useState(false);
 
   useEffect(() => {
     // Only show custom cursor on fine pointer devices (desktop/laptops)
@@ -36,77 +32,18 @@ export default function CustomCursor() {
       if (!target) return;
       if (typeof target.closest !== 'function') return;
 
-      // 1. Determine cursor state (default, pointer, or view)
-      const viewEl = 
-        target.closest('[data-cursor="view"]') ||
-        target.closest('[class*="imageBox"]') ||
-        target.closest('[class*="previewCard"]') ||
-        target.closest('[class*="categoryCard"]') ||
-        target.closest('[class*="CategoryCards_card"]') ||
-        target.closest('[class*="ProductGrid_imageBox"]') ||
-        target.closest('[class*="FeaturedProducts_imageBox"]') ||
-        target.closest('[class*="SeasonalShowcaseSlider_previewCard"]');
+      const isClickable = 
+        target.tagName.toLowerCase() === 'a' || 
+        target.tagName.toLowerCase() === 'button' || 
+        target.tagName.toLowerCase() === 'input' || 
+        target.tagName.toLowerCase() === 'select' || 
+        target.tagName.toLowerCase() === 'textarea' || 
+        target.closest('a') || 
+        target.closest('button') ||
+        target.closest('[data-cursor="pointer"]') ||
+        window.getComputedStyle(target).cursor === 'pointer';
         
-      let nextState: "default" | "pointer" | "view" = "default";
-      if (viewEl) {
-        nextState = "view";
-        const customText = (viewEl as HTMLElement).getAttribute('data-cursor-text') || "VIEW";
-        setCursorText(customText);
-      } else {
-        const isClickable = 
-          target.tagName.toLowerCase() === 'a' || 
-          target.tagName.toLowerCase() === 'button' || 
-          target.tagName.toLowerCase() === 'input' || 
-          target.tagName.toLowerCase() === 'select' || 
-          target.tagName.toLowerCase() === 'textarea' || 
-          target.closest('a') || 
-          target.closest('button') ||
-          target.closest('[data-cursor="pointer"]') ||
-          window.getComputedStyle(target).cursor === 'pointer';
-          
-        nextState = isClickable ? "pointer" : "default";
-      }
-      setCursorState(nextState);
-
-      // 2. Optimized background color check to prevent layout thrashing
-      // Walking the DOM and calling getComputedStyle on every mouseover causes massive slowdowns
-      let purple = false;
-      
-      // Skip expensive checks for inline elements
-      const tag = target.tagName.toLowerCase();
-      let el: HTMLElement | null = ['path', 'svg', 'span', 'strong', 'b', 'i', 'p', 'a'].includes(tag) 
-        ? target.closest('div, section, header, footer') as HTMLElement
-        : target;
-
-      let depth = 0;
-      while (el && el !== document.documentElement && depth < 3) {
-        // Use cached result if available to avoid getComputedStyle layout thrashing
-        if (el.dataset.purpleBg !== undefined) {
-          purple = el.dataset.purpleBg === 'true';
-          break;
-        }
-
-        try {
-          const bg = window.getComputedStyle(el).backgroundColor;
-          if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
-            const rgb = bg.match(/\d+/g);
-            if (rgb && rgb.length >= 3) {
-              const r = parseInt(rgb[0]);
-              const g = parseInt(rgb[1]);
-              const b = parseInt(rgb[2]);
-              purple = b > 150 && r > 80 && g < 120;
-            }
-            // Cache the result to prevent future recalculations on this element
-            el.dataset.purpleBg = purple ? 'true' : 'false';
-            break;
-          }
-        } catch (e) {}
-        
-        el = el.parentElement;
-        depth++;
-      }
-
-      setIsPurpleBg(purple);
+      setCursorState(isClickable ? "pointer" : "default");
     };
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -120,62 +57,76 @@ export default function CustomCursor() {
 
   if (!isVisible) return null;
 
-  // 4. Define sandwich contrast styling parameters (solid colors instead of blend modes)
-  const cursorBgColor = cursorState === "view"
-    ? (isPurpleBg ? "#ffffff" : "rgba(123, 47, 247, 0.95)")
-    : cursorState === "pointer"
-      ? "rgba(255, 255, 255, 0.15)"
-      : "#ffffff";
-
-  // Strong solid black border for solid states, solid white border for pointer ring
-  const cursorBorder = cursorState === "view"
-    ? "2.5px solid #000000"
-    : cursorState === "pointer"
-      ? "2px solid #ffffff"
-      : "2.5px solid #000000"; // Strong black rim over the solid white dot
-
-  // Multi-layered shadow system to guarantee high contrast on both dark and light backdrops
-  const cursorShadow = cursorState === "view"
-    ? "0 0 0 2px #ffffff, 0 10px 30px rgba(0,0,0,0.3)"
-    : cursorState === "pointer"
-      ? "0 0 0 2px #000000, inset 0 0 0 1px #000000" // White ring sandwiched between black outer rim and black inner rim
-      : "0 0 0 1.5px #ffffff"; // White outer halo to separate the strong black rim from dark backgrounds/photos
-
-  const cursorTextColor = isPurpleBg ? "rgba(123, 47, 247, 0.95)" : "#ffffff";
+  const isPointer = cursorState === "pointer";
 
   return (
-    <motion.div 
-      className={styles.cursorWrapper}
-      style={{ x: cursorSpringX, y: cursorSpringY }}
-    >
-      <motion.div
-        className={styles.customCursor}
-        style={{
-          mixBlendMode: "normal" // Keep colors pure and solid, relying on sandwich outlines for contrast
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        * {
+          cursor: none !important;
+        }
+      `}} />
+      <motion.div 
+        className={styles.cursorWrapper}
+        style={{ 
+          x: cursorSpringX, 
+          y: cursorSpringY,
+          mixBlendMode: 'difference' // Must be on the element with z-index/transform!
         }}
-        animate={{
-          width: cursorState === "view" ? 80 : cursorState === "pointer" ? 36 : 14,
-          height: cursorState === "view" ? 80 : cursorState === "pointer" ? 36 : 14,
-          backgroundColor: cursorBgColor,
-          border: cursorBorder,
-          boxShadow: cursorShadow
-        }}
-        transition={{ type: "tween", ease: "backOut", duration: 0.4 }}
       >
-        <AnimatePresence>
-          {cursorState === "view" && (
-            <motion.span 
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              className={styles.cursorText}
-              style={{ color: cursorTextColor }}
-            >
-              {cursorText}
-            </motion.span>
-          )}
-        </AnimatePresence>
+        {/* Default Target Cursor - Always spinning */}
+        <motion.img
+          src="/target.png"
+          alt="Cursor Target"
+          animate={{
+            opacity: isPointer ? 0 : 1,
+            scale: isPointer ? 1.2 : 1, // Expands slightly as it fades out
+            width: isPointer ? 56 : 40,
+            height: isPointer ? 56 : 40,
+            rotate: 360
+          }}
+          transition={{
+            opacity: { duration: 0.4, ease: "easeInOut" },
+            scale: { duration: 0.4, ease: "easeOut" },
+            width: { type: "spring", stiffness: 200, damping: 20 },
+            height: { type: "spring", stiffness: 200, damping: 20 },
+            rotate: { repeat: Infinity, duration: 15, ease: "linear" },
+          }}
+          style={{
+            position: 'absolute',
+            pointerEvents: 'none',
+            objectFit: 'contain',
+            filter: 'invert(1) grayscale(1)', 
+          }}
+        />
+
+        {/* Hover Hunting Cursor - 100% Static */}
+        <motion.img
+          src="/hunting.png"
+          alt="Cursor Hunting"
+          animate={{
+            opacity: isPointer ? 1 : 0,
+            scale: isPointer ? 1 : 0.8, // Gently zooms in as it appears
+            width: isPointer ? 56 : 40,
+            height: isPointer ? 56 : 40,
+            rotate: 0
+          }}
+          transition={{
+            opacity: { duration: 0.3, ease: "easeInOut" },
+            scale: { duration: 0.3, ease: "easeOut" },
+            width: { type: "spring", stiffness: 200, damping: 20 },
+            height: { type: "spring", stiffness: 200, damping: 20 },
+            rotate: { duration: 0 }
+          }}
+          style={{
+            position: 'absolute',
+            pointerEvents: 'none',
+            objectFit: 'contain',
+            filter: 'invert(1) grayscale(1)', 
+          }}
+        />
       </motion.div>
-    </motion.div>
+    </>
   );
 }
