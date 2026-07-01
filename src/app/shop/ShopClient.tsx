@@ -338,6 +338,20 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
       <section className={styles.productsSection}>
         <div className={styles.collectionHeaderRow}>
           <div className={styles.gymsharkFilterSection}>
+            <div className={styles.gymsharkViewToggle}>
+              <button 
+                className={`${styles.viewBtn} ${gridLayout === 'grid-1' ? styles.activeView : ''}`}
+                onClick={() => setGridLayout('grid-1')}
+              >
+                <Square size={16} />
+              </button>
+              <button 
+                className={`${styles.viewBtn} ${gridLayout === 'grid-2' ? styles.activeView : ''}`}
+                onClick={() => setGridLayout('grid-2')}
+              >
+                <LayoutGrid size={16} />
+              </button>
+            </div>
 
             <button className={styles.gymsharkFilterBtn} onClick={() => setShowFilters(!showFilters)}>
               <SlidersHorizontal size={16} strokeWidth={2} />
@@ -349,7 +363,6 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
           <motion.div 
             key={`${activeCategory}-${activeSubcategory}-${gridLayout}`}
             className={`${styles.galleryGrid} ${styles[gridLayout] || ''}`}
-            style={displayProducts.length < 4 ? { display: 'flex', flexWrap: 'wrap', justifyContent: 'center' } : {}}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -359,7 +372,7 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
               <div className={styles.emptyState}>Archive is currently empty for this category.</div>
             ) : (
               displayProducts.map((product: any, i: number) => (
-                <div key={product.id} style={displayProducts.length < 4 ? { width: 'calc(25% - 48px)', minWidth: '300px' } : {}}>
+                <div key={product.id} className={styles.productWrapper}>
                   <ProductCard 
                     product={product}
                     i={i}
@@ -433,7 +446,7 @@ function ProductCard({ product, i, styles, wishlist, toggleWishlist, playInterac
           className={styles.premiumWishlistBtn}
           onClick={(e) => toggleWishlist(e, product.id)}
         >
-          <Heart size={18} fill={wishlist.includes(product.id) ? '#4a3b8c' : 'none'} color="#4a3b8c" />
+          <Heart size={18} fill={wishlist.includes(product.id) ? '#ef4444' : 'none'} color={wishlist.includes(product.id) ? '#ef4444' : 'currentColor'} />
         </button>
 
         <Link href={`/product/${product.slug}`}>
