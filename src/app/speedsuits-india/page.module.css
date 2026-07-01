@@ -60,7 +60,7 @@
 }
 
 .heroTitle {
-  font-family: var(--font-logo), serif;
+  font-family: var(--font-nevera), serif;
   font-size: clamp(22px, 10vw, 84px);
   text-transform: uppercase;
   letter-spacing: clamp(1px, 2vw, 4px);
@@ -100,7 +100,7 @@
 }
 
 .sectionTitle {
-  font-family: var(--font-logo), serif;
+  font-family: var(--font-nevera), serif;
   font-size: clamp(24px, 8vw, 64px);
   margin-bottom: 16px;
   word-wrap: break-word;
@@ -262,7 +262,7 @@
 }
 
 .splitTitle {
-  font-family: var(--font-logo), serif;
+  font-family: var(--font-nevera), serif;
   font-size: clamp(24px, 10vw, 48px);
   margin-bottom: clamp(16px, 4vw, 24px);
   line-height: 1.1;

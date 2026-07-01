@@ -14,7 +14,7 @@ export default function RewardGame({ user }: { user: any }) {
   const [loading, setLoading] = useState(true);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     const loadData = async () => {
@@ -131,7 +131,7 @@ export default function RewardGame({ user }: { user: any }) {
               
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
                 <span className={styles.discountTag}>
-                  {coupon.discountType === 'percentage' ? `${coupon.discountValue}% OFF` : `${formatPrice(coupon.discountValue)} OFF`}
+                  {coupon.discountType === 'percentage' ? `${coupon.discountValue}% OFF` : `${renderPrice(coupon.discountValue)} OFF`}
                 </span>
                 <span className={styles.couponDesc}>
                   {coupon.code === 'WELCOME15' ? 'New Elite Exclusive' : 'Exclusive Elite Reward'}

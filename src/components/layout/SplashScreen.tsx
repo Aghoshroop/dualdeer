@@ -240,18 +240,25 @@ function SplashScreenContent() {
                 transformOrigin: '42% 50%' 
               }}
             >
-              {"DUAL DEER".split("").map((char, i) => (
-                <motion.span
-                  key={i}
-                  variants={{
-                    hidden: { opacity: 0, y: 40, filter: 'blur(10px)' },
-                    visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: "spring", damping: 12, stiffness: 200 } }
-                  }}
-                  style={{ display: "inline-block", whiteSpace: "pre" }}
-                >
-                  {char}
-                </motion.span>
-              ))}
+              {"DUAL DEER".split("").map((char, i) => {
+                let charClass = "";
+                if (char === 'A') charClass = "custom-logo-a";
+                if (char === 'E') charClass = "custom-logo-e";
+                
+                return (
+                  <motion.span
+                    key={i}
+                    className={charClass}
+                    variants={{
+                      hidden: { opacity: 0, y: 40, filter: 'blur(10px)' },
+                      visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: "spring", damping: 12, stiffness: 200 } }
+                    }}
+                    style={{ display: "inline-block", whiteSpace: "pre" }}
+                  >
+                    {char}
+                  </motion.span>
+                );
+              })}
             </motion.h1>
 
             {/* Subtitle */}

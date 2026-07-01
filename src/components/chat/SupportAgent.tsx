@@ -194,11 +194,10 @@ export default function SupportAgent() {
           if (typeof window !== 'undefined') {
             const isLeft = info.point.x < window.innerWidth / 2;
             setSnapSide(isLeft ? 'left' : 'right');
-            // Element is right: 50px. 
-            // Target X for left edge snap = 144 - window.innerWidth
-            // Target X for right edge snap = 0
+            // Element is right: 10px. 
+            // Target X for left edge snap (10px gap on left)
             wrapperControls.start({
-              x: isLeft ? 144 - window.innerWidth : 0,
+              x: isLeft ? 64 - window.innerWidth : 0,
               transition: { type: 'spring', stiffness: 300, damping: 25 }
             });
           }

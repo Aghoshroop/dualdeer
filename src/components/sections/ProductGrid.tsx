@@ -20,6 +20,8 @@ interface Product {
   images?: string[];
   isNew?: boolean;
   colors?: string[];
+  isSoldOut?: boolean;
+  stock?: number;
 }
 
 export default function ProductGrid({ title: fallbackTitle }: { title: string }) {
@@ -28,7 +30,7 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const router = useRouter();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     import('@/lib/firebaseUtils').then(({ getProducts, getContentBlock }) => {
@@ -79,7 +81,7 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
               <span style={{ fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1px', color: 'var(--color-primary)', marginBottom: '0.5rem' }}>LIMITED TIME OFFER</span>
               <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Unlock the DualDeer Duo Pack</h3>
               <p style={{ margin: '0.5rem 0 0 0', opacity: 0.8, fontSize: '0.9rem', maxWidth: '500px' }}>
-                Add 1x Greninja and 1x Blue Horizon to your cart and automatically get the bundle for just {formatPrice(1549)}. No code needed.
+                Add 1x Greninja and 1x Blue Horizon to your cart and automatically get the bundle for just {renderPrice(1549)}. No code needed.
               </p>
             </div>
           )}
@@ -112,6 +114,7 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
                     src={(product.images && product.images.length > 1) ? product.images[1] : (product.images && product.images[0]) || product.image} 
                     alt={`${product.name} alternate view`} 
                     className={styles.hoverImage} 
+                    loading="lazy"
                   />
                   
                   {/* Badge system */}
@@ -132,7 +135,17 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
                   {/* Overlays */}
                   <div className={styles.quickActions}>
                       <button className={styles.actionCircle} aria-label="Quick View"><Eye size={16} /></button>
-                      <button className={styles.actionCircle} aria-label="Add to Bag" onClick={(e) => { e.preventDefault(); addToCart({ ...product, size: 'M', quantity: 1 }); }}><ShoppingBag size={16} /></button>
+                      <button 
+                        className={styles.actionCircle} 
+                        aria-label="Add to Bag" 
+                        onClick={(e) => { 
+                          e.preventDefault(); 
+                          if (!product.isSoldOut && product.stock !== 0) {
+                            addToCart({ ...product, size: 'M', quantity: 1 }); 
+                          }
+                        }}
+                        style={{ opacity: (product.isSoldOut || product.stock === 0) ? 0.5 : 1, cursor: (product.isSoldOut || product.stock === 0) ? 'not-allowed' : 'pointer' }}
+                      ><ShoppingBag size={16} /></button>
                   </div>
                 </Link>
 
@@ -162,9 +175,9 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
                   </Link>
                   <div className={styles.priceRow}>
                     {product.mrp && product.mrp > product.price && (
-                      <span className={styles.mrp}>{formatPrice(product.mrp)}</span>
+                      <span className={styles.mrp}>{renderPrice(product.mrp)}</span>
                     )}
-                    <span className={styles.price}>{formatPrice(product.price)}</span>
+                    <span className={styles.price}>{renderPrice(product.price)}</span>
                   </div>
 
                   {/* Color Swatches */}
@@ -180,14 +193,21 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
                   <div className={styles.cardActions}>
                       <button
                         className={styles.buyNowBtn}
-                        onClick={() => router.push(`/checkout?buyNow=${product.id}&size=M&qty=1`)}
+                        onClick={() => {
+                          if (!product.isSoldOut && product.stock !== 0) {
+                            router.push(`/checkout?buyNow=${product.id}&size=M&qty=1`);
+                          }
+                        }}
+                        disabled={product.isSoldOut || product.stock === 0}
+                        style={{ opacity: (product.isSoldOut || product.stock === 0) ? 0.5 : 1, cursor: (product.isSoldOut || product.stock === 0) ? 'not-allowed' : 'pointer' }}
                       >
-                        Buy Now
+                        {(product.isSoldOut || product.stock === 0) ? 'Stock Out' : 'Buy Now'}
                       </button>
                       <AnimatedCartButton
                         size="small"
                         onAdd={() => addToCart({ ...product, size: 'M', quantity: 1 })}
-                        label="+"
+                        label={(product.isSoldOut || product.stock === 0) ? 'X' : '+'}
+                        disabled={product.isSoldOut || product.stock === 0}
                       />
                   </div>
                 </div>

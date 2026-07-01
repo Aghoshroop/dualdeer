@@ -36,7 +36,7 @@ export default function Navbar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const { cartCount } = useCart();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
   const { theme, setTheme } = useTheme();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -295,9 +295,9 @@ export default function Navbar() {
             animate={navState === "compact" ? { scale: 0.9 } : { scale: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 35 }}
           >
-            <Link href="/" className={styles.brand}>
-              <span style={!isDocked && isHome ? { color: 'white', textShadow: '0 4px 20px rgba(0,0,0,0.5)' } : {}}>DUAL</span>
-              <span className={styles.brandAccent}>DEER</span>
+            <Link href="/" className={`${styles.brand} logo-font`}>
+              <span style={!isDocked && isHome ? { color: 'white', textShadow: '0 4px 20px rgba(0,0,0,0.5)' } : {}}>DU<span className="custom-logo-a">A</span>L</span>
+              <span className={styles.brandAccent}>D<span className="custom-logo-e">E</span><span className="custom-logo-e">E</span>R</span>
             </Link>
           </motion.div>
 
@@ -375,7 +375,7 @@ export default function Navbar() {
                                   </div>
                                   <div className={styles.marqueeResultInfo}>
                                     <h4>{product.name}</h4>
-                                    <span>{formatPrice(product.price)}</span>
+                                    <span>{renderPrice(product.price)}</span>
                                   </div>
                                 </Link>
                               ))}
@@ -395,7 +395,7 @@ export default function Navbar() {
                                 </div>
                                 <div className={styles.overlayResultInfo}>
                                   <h4>{product.name}</h4>
-                                  <span>{formatPrice(product.price)}</span>
+                                  <span>{renderPrice(product.price)}</span>
                                 </div>
                               </Link>
                             ))}
@@ -610,8 +610,8 @@ export default function Navbar() {
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
               <div className={styles.drawerHeader}>
-                <Link href="/" onClick={() => setIsDrawerOpen(false)} className={styles.brand}>
-                   <span>DUAL</span><span className={styles.brandAccent}>DEER</span>
+                 <Link href="/" onClick={() => setIsDrawerOpen(false)} className={`${styles.brand} logo-font`}>
+                   <span>DU<span className="custom-logo-a">A</span>L</span><span className={styles.brandAccent}>D<span className="custom-logo-e">E</span><span className="custom-logo-e">E</span>R</span>
                 </Link>
                 <button onClick={() => setIsDrawerOpen(false)} className={styles.iconBtn}><X size={24} /></button>
               </div>

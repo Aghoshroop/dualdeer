@@ -14,7 +14,7 @@ import styles from './Success.module.css';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -177,7 +177,7 @@ function CheckoutSuccessContent() {
                   <p>Qty: {item.quantity} {item.size && `| Size: ${item.size}`}</p>
                 </div>
                 <div className={styles.priceInfo}>
-                  {formatPrice(item.pricePaid * item.quantity)}
+                  {renderPrice(item.pricePaid * item.quantity)}
                 </div>
               </div>
             ))}
@@ -207,7 +207,7 @@ function CheckoutSuccessContent() {
             </div>
             <div className={styles.detailRow} style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)', fontWeight: 700, fontSize: '1.1rem' }}>
               <span>Total Value</span>
-              <span style={{ color: 'var(--color-primary)' }}>{formatPrice(order?.total)}</span>
+              <span style={{ color: 'var(--color-primary)' }}>{renderPrice(order?.total)}</span>
             </div>
           </div>
         </motion.div>

@@ -3,7 +3,7 @@
 }
 
 .title {
-  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-family: var(--font-nevera), 'Playfair Display', serif;
   font-size: 1.8rem;
   font-weight: 300;
   margin-bottom: 2rem;
@@ -31,7 +31,7 @@
 }
 
 .emptyState h2 {
-  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-family: var(--font-nevera), 'Playfair Display', serif;
   font-size: 2rem;
   font-weight: 300;
   margin-bottom: 1rem;

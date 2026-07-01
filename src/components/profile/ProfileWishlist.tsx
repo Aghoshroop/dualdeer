@@ -13,7 +13,7 @@ export default function ProfileWishlist({ user }: { user: any }) {
   const [wishlistItems, setWishlistItems] = useState<{ id: string, product: Product }[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
   const router = useRouter();
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function ProfileWishlist({ user }: { user: any }) {
                 <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <h4>{product.name}</h4>
                 </Link>
-                <p className={styles.price}>{formatPrice(product.price)}</p>
+                <p className={styles.price}>{renderPrice(product.price)}</p>
                 <button 
                   className={styles.addCartBtn}
                   onClick={() => {

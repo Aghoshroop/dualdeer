@@ -18,6 +18,8 @@ interface Product {
   images?: string[];
   category?: string;
   isSeasonal?: boolean;
+  isSoldOut?: boolean;
+  stock?: number;
 }
 
 export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasonal Collection" }: { title?: string }) {
@@ -26,7 +28,7 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     import('@/lib/firebaseUtils').then(({ getProducts, getContentBlock }) => {
@@ -119,9 +121,13 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
               >
                 <span className={styles.categorySpan}>{title} / {activeProduct.category || "Featured"}</span>
                 <h2 className={styles.title}>{activeProduct.name}</h2>
-                <div className={styles.price}>{formatPrice(activeProduct.price)}</div>
-                <Link href={`/product/${activeProduct.slug || activeProduct.id.replace('-dup', '')}`} className={styles.shopButton}>
-                  Shop Now
+                <div className={styles.price}>{renderPrice(activeProduct.price)}</div>
+                <Link 
+                  href={`/product/${activeProduct.slug || activeProduct.id.replace('-dup', '')}`} 
+                  className={styles.shopButton}
+                  style={activeProduct.isSoldOut || activeProduct.stock === 0 ? { pointerEvents: 'none', opacity: 0.5 } : {}}
+                >
+                  {activeProduct.isSoldOut || activeProduct.stock === 0 ? 'Stock Out' : 'Shop Now'}
                 </Link>
               </motion.div>
             </AnimatePresence>
@@ -177,9 +183,13 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
                   </div>
                   <div className={styles.mobileInfo}>
                      <h3 className={styles.mobileName}>{product.name}</h3>
-                     <div className={styles.mobilePrice}>{formatPrice(product.price)}</div>
-                     <Link href={`/product/${product.slug}`} className={styles.mobileShopBtn}>
-                        Shop Now
+                     <div className={styles.mobilePrice}>{renderPrice(product.price)}</div>
+                     <Link 
+                        href={`/product/${product.slug}`} 
+                        className={styles.mobileShopBtn}
+                        style={product.isSoldOut || product.stock === 0 ? { pointerEvents: 'none', opacity: 0.5 } : {}}
+                     >
+                        {product.isSoldOut || product.stock === 0 ? 'Stock Out' : 'Shop Now'}
                      </Link>
                   </div>
                </div>

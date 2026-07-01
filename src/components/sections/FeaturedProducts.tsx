@@ -12,7 +12,7 @@ const luxuryEase = [0.76, 0, 0.24, 1] as const;
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     getProducts().then(prods => {
@@ -80,6 +80,7 @@ export default function FeaturedProducts() {
                       src={(product.images && product.images.length > 1) ? product.images[1] : (product.images && product.images[0]) || product.image} 
                       alt={`${product.name} alternate view`} 
                       className={styles.hoverImage} 
+                      loading="lazy"
                     />
                     
                     <div className={styles.badgeContainer}>
@@ -118,9 +119,9 @@ export default function FeaturedProducts() {
                     </Link>
                     <div className={styles.priceRow}>
                       {product.mrp && product.mrp > product.price && (
-                        <span className={styles.mrp}>{formatPrice(product.mrp)}</span>
+                        <span className={styles.mrp}>{renderPrice(product.mrp)}</span>
                       )}
-                      <span className={styles.price}>{formatPrice(product.price)}</span>
+                      <span className={styles.price}>{renderPrice(product.price)}</span>
                     </div>
 
                     {product.colors && product.colors.length > 0 && (

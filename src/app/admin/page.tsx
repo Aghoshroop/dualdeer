@@ -13,7 +13,7 @@ export default function AdminDashboard() {
     revenue: 12450 // Keeping this static as we don't have an orders collection yet
   });
   const [loading, setLoading] = useState(true);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     const loadStats = async () => {
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
         </div>
         <div className={styles.statCard}>
           <h3>Total Revenue</h3>
-          <p className={styles.value}>{formatPrice(stats.revenue)}</p>
+          <p className={styles.value}>{renderPrice(stats.revenue)}</p>
           <span className={styles.trendNeutral}>Calculated statically</span>
         </div>
         <div className={styles.statCard}>

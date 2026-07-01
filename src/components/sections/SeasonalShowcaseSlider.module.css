@@ -63,7 +63,7 @@
 
 .title {
   font-size: clamp(3rem, 6vw, 5rem);
-  font-family: var(--font-logo), serif;
+  font-family: var(--font-nevera), serif;
   line-height: 1.1;
   margin-bottom: 1rem;
   font-weight: 400;
@@ -182,7 +182,7 @@
   justify-content: center;
   background: var(--color-background);
   color: var(--color-text);
-  font-family: var(--font-logo), serif;
+  font-family: var(--font-nevera), serif;
   font-size: 1.5rem;
   letter-spacing: 2px;
 }
@@ -202,7 +202,7 @@
 }
 
 .mobileTitle {
-  font-family: var(--font-logo), serif;
+  font-family: var(--font-nevera), serif;
   font-size: clamp(1.5rem, 10vw, 2.5rem);
   font-weight: 400;
   color: var(--color-text);

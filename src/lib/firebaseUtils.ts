@@ -38,6 +38,7 @@ export interface Product {
   colors?: string[];
   status?: 'active' | 'deleted';
   createdAt?: Timestamp;
+  isSoldOut?: boolean;
 }
 
 export interface Review {

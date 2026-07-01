@@ -19,7 +19,7 @@ export default function SpeedSuitsIndiaClient({
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [videos, setVideos] = useState<VideoType[]>(initialVideos);
   const { addToCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     setProducts(initialProducts);
@@ -111,15 +111,19 @@ export default function SpeedSuitsIndiaClient({
                   </div>
                   <div className={styles.productInfo}>
                     <h4 className={styles.productName}>{product.name}</h4>
-                    <span className={styles.productPrice}>{formatPrice(product.price)}</span>
+                    <span className={styles.productPrice}>{renderPrice(product.price)}</span>
                     <button
                       className={styles.buyBtn}
                       onClick={(e) => {
                         e.preventDefault();
-                      addToCart({ ...product, id: product.id || '', size: "M", quantity: 1 });
+                        if (!product.isSoldOut && product.stock !== 0) {
+                          addToCart({ ...product, id: product.id || '', size: "M", quantity: 1 });
+                        }
                       }}
+                      disabled={product.isSoldOut || product.stock === 0}
+                      style={{ opacity: (product.isSoldOut || product.stock === 0) ? 0.5 : 1, cursor: (product.isSoldOut || product.stock === 0) ? 'not-allowed' : 'pointer' }}
                     >
-                      Pre-Order / Buy Now
+                      {(product.isSoldOut || product.stock === 0) ? 'Stock Out' : 'Pre-Order / Buy Now'}
                     </button>
                   </div>
                 </Link>
@@ -148,7 +152,7 @@ export default function SpeedSuitsIndiaClient({
               >
                 <VideoPlayer video={video} />
                 <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                  <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-logo)' }}>{video.title}</h3>
+                  <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-nevera)' }}>{video.title}</h3>
                   <p style={{ opacity: 0.8, marginTop: '0.5rem' }}>{video.description}</p>
                 </div>
               </motion.div>

@@ -1,13 +1,17 @@
-import HeroSection from "@/components/sections/HeroSection";
-import SeoIntroBlock from "@/components/sections/SeoIntroBlock";
-import BrandStory from "@/components/sections/BrandStory";
-import TestimonialSlider from "@/components/sections/TestimonialSlider";
-import FeaturedProducts from "@/components/sections/FeaturedProducts";
-import Cinematic3DSection from "@/components/sections/Cinematic3DSection";
-import TrustStrip from "@/components/sections/TrustStrip";
-
 import React from "react";
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Critical rendering path components (above fold)
+import HeroSection from "@/components/sections/HeroSection";
+import TrustStrip from "@/components/sections/TrustStrip";
+
+// Lazy-loaded components (below fold) to drastically reduce initial JS payload
+const Cinematic3DSection = dynamic(() => import("@/components/sections/Cinematic3DSection"), { ssr: true });
+const FeaturedProducts = dynamic(() => import("@/components/sections/FeaturedProducts"), { ssr: true });
+const BrandStory = dynamic(() => import("@/components/sections/BrandStory"), { ssr: true });
+const TestimonialSlider = dynamic(() => import("@/components/sections/TestimonialSlider"), { ssr: true });
+const SeoIntroBlock = dynamic(() => import("@/components/sections/SeoIntroBlock"), { ssr: true });
 
 export default function Home() {
   const storeJsonLd = {

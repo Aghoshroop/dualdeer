@@ -11,7 +11,7 @@ import styles from './ProfileCart.module.css';
 export default function ProfileCart() {
   const { cart, removeFromCart, updateQuantity } = useCart();
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     const fetchRelated = async () => {
@@ -74,7 +74,7 @@ export default function ProfileCart() {
             </div>
 
             <div className={styles.itemPrice}>
-              {formatPrice(item.price * item.quantity)}
+              {renderPrice(item.price * item.quantity)}
             </div>
 
             <button onClick={() => removeFromCart(item.id, item.size)} className={styles.removeBtn} aria-label="Remove item">
@@ -87,7 +87,7 @@ export default function ProfileCart() {
       <div className={styles.cartSummary}>
         <div className={styles.summaryRow}>
            <span>Subtotal</span>
-           <span>{formatPrice(subtotal)}</span>
+           <span>{renderPrice(subtotal)}</span>
         </div>
         <div className={styles.summaryActions}>
            <Link href="/checkout" className={styles.checkoutBtn}>Secure Checkout</Link>
@@ -106,7 +106,7 @@ export default function ProfileCart() {
                 </div>
                 <div className={styles.relatedInfo}>
                   <h5>{product.name}</h5>
-                  <span>{formatPrice(product.price)}</span>
+                  <span>{renderPrice(product.price)}</span>
                 </div>
               </Link>
             ))}

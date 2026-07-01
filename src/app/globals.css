@@ -1,8 +1,27 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap');
+
 :root {
+  --font-satoshi: 'Satoshi', sans-serif;
+  --font-inter: var(--font-satoshi); /* alias to apply Satoshi globally */
+  --font-display: 'PP Formula Condensed', sans-serif;
+  --font-logo: 'Auberga', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-nevera: 'PP Formula Condensed', sans-serif; /* Fallback */
+  --font-instrument: 'Satoshi', sans-serif; /* Fallback */
   --color-primary: #C9A0DC; /* Wisteria */
   --color-secondary: #A282C5; /* Lavender Purple */
   --color-accent: #EAE3F2; /* Lavender Mist */
   --ease-luxury: cubic-bezier(0.76, 0, 0.24, 1); /* High-end fashion easing */
+}
+
+@font-face {
+  font-family: 'PP Formula Condensed';
+  src: local('PP Formula Condensed');
+}
+
+@font-face {
+  font-family: 'Auberga';
+  src: url('/fonts/AubergaDEMO-Regular.ttf') format('truetype');
+  font-weight: 700;
 }
 
 [data-theme='light'] {
@@ -40,7 +59,7 @@ body {
   overflow-x: clip;
   background-color: var(--color-background);
   color: var(--color-text);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-satoshi);
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.3s ease, color 0.3s ease;
   scrollbar-width: none; /* Firefox */
@@ -62,8 +81,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800; /* Nike uses very heavy fonts for headers */
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400; /* Hyper Oxide is already bold/display */
   letter-spacing: -0.03em;
   text-transform: uppercase;
 }
@@ -116,4 +135,143 @@ button {
 .btn-outline:hover {
   background-color: var(--color-foreground);
   color: var(--color-background);
+}
+
+/* --- TYPOGRAPHY SCALE UTILITIES --- */
+
+.font-display-hero {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(96px, 10vw, 120px);
+  line-height: 0.95;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #F4F4F4;
+}
+
+.font-display-section {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(52px, 5vw, 72px);
+  line-height: 0.95;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.font-display-product {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(32px, 3vw, 40px);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.font-display-sale {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(72px, 8vw, 96px);
+  line-height: 0.95;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.font-display-number {
+  font-family: var(--font-display), sans-serif;
+  font-size: 64px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+/* Satoshi Utilities */
+.text-satoshi-base {
+  font-family: var(--font-satoshi);
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: normal;
+}
+
+.text-satoshi-sm {
+  font-family: var(--font-satoshi);
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: normal;
+}
+
+.text-satoshi-price {
+  font-family: var(--font-satoshi);
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.5;
+  letter-spacing: normal;
+}
+
+.first-digit-large {
+  font-size: 1.3em;
+  display: inline-block;
+  line-height: 1;
+}
+
+.mrp, [class*="mrp"] {
+  color: #E53935 !important;
+  opacity: 0.8 !important;
+  text-decoration-color: #E53935 !important;
+  text-decoration-thickness: 2px !important;
+}
+
+.mrp .price-integer, [class*="mrp"] .price-integer {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+}
+
+.mrp .price-decimal, [class*="mrp"] .price-decimal, .mrp .currency-symbol, [class*="mrp"] .currency-symbol {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  vertical-align: baseline !important;
+  opacity: 1 !important;
+}
+
+.currency-symbol {
+  font-size: 0.6em;
+  opacity: 0.7;
+  font-weight: 500;
+  vertical-align: top;
+  margin-right: 2px;
+}
+
+.price-integer {
+  font-size: 1.1em;
+  font-weight: 900;
+}
+
+.price-decimal {
+  font-size: 0.6em;
+  opacity: 0.7;
+  font-weight: 600;
+  vertical-align: super;
+}
+
+/* Instrument Serif Utilities */
+.font-accent-editorial {
+  font-family: var(--font-instrument), serif;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: normal;
+}
+
+.font-accent-regular {
+  font-family: var(--font-instrument), serif;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: normal;
+}
+
+/* Custom Logo Utility Classes */
+.logo-font {
+  font-family: var(--font-logo) !important;
+  font-weight: 700;
+}
+
+.custom-logo-a {
+  display: inline-block;
+}
+
+.custom-logo-e {
+  letter-spacing: normal;
 }

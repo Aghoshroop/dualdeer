@@ -10,7 +10,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 export default function CompressionClient({ initialProducts }: { initialProducts: Product[] }) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const { addToCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     setProducts(initialProducts);
@@ -56,7 +56,7 @@ export default function CompressionClient({ initialProducts }: { initialProducts
                   </div>
                   <div className={styles.productInfo}>
                     <h4 className={styles.productName}>{product.name}</h4>
-                    <span className={styles.productPrice}>{formatPrice(product.price)}</span>
+                    <span className={styles.productPrice}>{renderPrice(product.price)}</span>
                   </div>
                 </Link>
               </motion.div>

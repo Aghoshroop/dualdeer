@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import styles from './SeoIntroBlock.module.css';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface SeoIntroBlockProps {
   h1: string;
@@ -30,7 +31,7 @@ export default function SeoIntroBlock({ h1, h2, h3, paragraphs, image, reverse =
         >
           <div className={styles.imageWrapper}>
             <div className={styles.glassBadge}>Premium Reserve</div>
-            <img src="/speedsuit.png" alt="DualDeer SpeedSuit premium compression wear India" className={styles.image} />
+            <Image src="/speedsuit.png" alt="DualDeer SpeedSuit premium compression wear India" fill style={{ objectFit: 'cover' }} className={styles.image} />
           </div>
         </motion.div>
         <div className={styles.textColumn}>

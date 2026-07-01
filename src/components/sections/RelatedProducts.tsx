@@ -14,7 +14,7 @@ interface RelatedProductsProps {
 export default function RelatedProducts({ category, excludeId }: RelatedProductsProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     if (!category) return;
@@ -76,9 +76,9 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
                   <h3 className={styles.name}>{product.name}</h3>
                   <div className={styles.priceRow}>
                     {product.mrp && product.mrp > product.price && (
-                      <span className={styles.mrp}>{formatPrice(product.mrp)}</span>
+                      <span className={styles.mrp}>{renderPrice(product.mrp)}</span>
                     )}
-                    <span className={styles.price}>{formatPrice(product.price)}</span>
+                    <span className={styles.price}>{renderPrice(product.price)}</span>
                   </div>
                   <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <div style={{ display: 'flex', gap: '1px' }}>

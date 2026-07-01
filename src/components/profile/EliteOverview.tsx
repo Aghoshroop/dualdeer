@@ -16,7 +16,7 @@ interface EliteOverviewProps {
 export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
     if (!user?.uid) return;
@@ -122,7 +122,7 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
         <div className={styles.statCard}>
           <div className={styles.statIconBox}><CreditCard size={20} /></div>
           <div>
-            <div className={styles.statValue}>{formatPrice(totalSpent)}</div>
+            <div className={styles.statValue}>{renderPrice(totalSpent)}</div>
             <div className={styles.statLabel}>Investment</div>
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
                <span className={styles.missionId}>#ORD-{orders[0].id?.slice(-6).toUpperCase()}</span>
                <span className={styles.missionStatus} style={{ textTransform: 'capitalize' }}>{orders[0].status.replace('_', ' ')}</span>
              </div>
-             <div className={styles.missionPrice}>{formatPrice(orders[0].total)}</div>
+             <div className={styles.missionPrice}>{renderPrice(orders[0].total)}</div>
            </div>
         </motion.div>
       )}

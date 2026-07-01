@@ -97,7 +97,7 @@
 }
 
 .oversizedText {
-  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-family: var(--font-nevera), 'Playfair Display', serif;
   font-size: clamp(6rem, 25vw, 30rem);
   font-weight: 900;
   line-height: 0.8;
@@ -154,7 +154,7 @@
 }
 
 .missionStatement {
-  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-family: var(--font-nevera), 'Playfair Display', serif;
   font-size: 2.5rem;
   font-weight: 400;
   line-height: 1.2;
@@ -220,8 +220,8 @@
 .linkItem {
   text-decoration: none;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.95rem;
-  font-weight: 300;
+  font-size: 0.875rem;
+  font-weight: 400;
   letter-spacing: 0.03em;
   transition: color 0.3s ease;
   position: relative;
@@ -329,8 +329,8 @@
   margin: 0 auto;
   width: 100%;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-family: var(--font-inter), sans-serif;
-  font-size: 0.7rem;
+  font-family: var(--font-satoshi);
+  font-size: 0.875rem;
   font-weight: 400;
   letter-spacing: 0.1em;
   color: rgba(255, 255, 255, 0.4);

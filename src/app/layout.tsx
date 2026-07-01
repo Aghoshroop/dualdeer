@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import localFont from 'next/font/local';
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -16,17 +14,6 @@ import SplashScreen from "@/components/layout/SplashScreen";
 import CustomCursor from "@/components/layout/CustomCursor";
 import { Analytics } from "@vercel/analytics/react";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
-
-const inter = Inter({ 
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: '--font-inter'
-});
-
-const engry = localFont({
-  src: '../../public/fonts/engry.otf',
-  variable: '--font-logo'
-});
 
 export const metadata: Metadata = {
   title: "DualDeer SpeedSuits India | Premium Compression & Gym Wear",
@@ -106,8 +93,8 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${engry.variable}`}>
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

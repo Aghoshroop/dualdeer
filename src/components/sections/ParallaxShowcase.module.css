@@ -41,7 +41,7 @@
 }
 
 .title {
-  font-family: var(--font-logo), serif;
+  font-family: var(--font-nevera), serif;
   font-size: clamp(2.5rem, 5vw, 4rem);
   line-height: 1.1;
   margin-bottom: 1.5rem;

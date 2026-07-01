@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import styles from "./Cinematic3DSection.module.css";
 import Link from "next/link";
+import Image from "next/image";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -38,7 +39,7 @@ export default function Cinematic3DSection() {
 
       // 1. Preload all frames
       for (let i = 0; i < frameCount; i++) {
-        const img = new Image();
+        const img = new window.Image();
         img.src = currentFrame(i);
         images.push(img);
       }
@@ -145,7 +146,7 @@ export default function Cinematic3DSection() {
       
       {/* Mobile-Only Static View */}
       <div className={styles.mobileStaticWrapper}>
-        <img src="/file_00000000c8e471fabb8aa20e8fed4be4.png" alt="Collection Preview" className={styles.mobileStaticImage} />
+        <Image src="/file_00000000c8e471fabb8aa20e8fed4be4.png" alt="Collection Preview" fill style={{ objectFit: 'cover' }} className={styles.mobileStaticImage} />
         <div className={styles.mobileOverlayContent}>
           <Link href="/shop" className={styles.ctaButton}>
             Explore Collection

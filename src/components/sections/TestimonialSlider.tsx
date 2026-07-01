@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react';
 import styles from './TestimonialSlider.module.css';
+import Image from 'next/image';
 
 const testimonials = [
   {
@@ -114,10 +115,13 @@ export default function TestimonialSlider() {
                 </div>
 
                 <div className={styles.clientProfile}>
-                  <img 
+                  <Image 
                     src={testimonials[currentIndex].avatar} 
                     alt={testimonials[currentIndex].name} 
-                    className={styles.avatar} 
+                    className={styles.avatar}
+                    width={48}
+                    height={48}
+                    loading="lazy"
                   />
                   <div className={styles.clientInfo}>
                     <h4>{testimonials[currentIndex].name}</h4>

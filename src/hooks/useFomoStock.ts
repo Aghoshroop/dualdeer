@@ -20,25 +20,54 @@ export function useFomoStock(productId: string | undefined, realStock: number) {
     const getInitialStock = () => Math.floor(Math.random() * (1050 - 850 + 1)) + 850;
     
     const boughtKey = `dualdeer_fomo_bought_${productId}`;
-    let initialBought = 0;
+    const timeKey = `dualdeer_fomo_bought_time_${productId}`;
+    let initialBought = 150;
     
-    // Only access localStorage if window is defined (to avoid hydration errors if SSR was involved, though this is a hook)
+    // Only access localStorage if window is defined
     if (typeof window !== 'undefined') {
       const storedBought = localStorage.getItem(boughtKey);
-      if (storedBought && !isNaN(parseInt(storedBought, 10))) {
+      const storedTime = localStorage.getItem(timeKey);
+      
+      if (storedBought && storedTime && !isNaN(parseInt(storedBought, 10))) {
         initialBought = parseInt(storedBought, 10);
+        const lastTime = parseInt(storedTime, 10);
+        const hoursPassed = Math.floor((Date.now() - lastTime) / (1000 * 60 * 60));
+        
+        if (hoursPassed > 0) {
+          // Add 1-3 for each hour passed
+          for (let i = 0; i < hoursPassed; i++) {
+            initialBought += Math.floor(Math.random() * 3) + 1;
+          }
+          localStorage.setItem(boughtKey, initialBought.toString());
+          localStorage.setItem(timeKey, Date.now().toString());
+        }
       } else {
-        initialBought = Math.floor(Math.random() * (18000 - 12000 + 1)) + 12000;
-        localStorage.setItem(boughtKey, initialBought.toString());
+        localStorage.setItem(boughtKey, '150');
+        localStorage.setItem(timeKey, Date.now().toString());
       }
-    } else {
-      initialBought = Math.floor(Math.random() * (18000 - 12000 + 1)) + 12000;
     }
     
     setFomoStock(getInitialStock());
     setTotalBought(initialBought);
     setIsRestocking(false);
     setRestockTimeRemaining(0);
+
+    // Hourly increment interval for the active session
+    let hourlyInterval: NodeJS.Timeout;
+    if (typeof window !== 'undefined') {
+      hourlyInterval = setInterval(() => {
+        setTotalBought(currentBought => {
+          const newBought = (currentBought || 150) + Math.floor(Math.random() * 3) + 1;
+          localStorage.setItem(boughtKey, newBought.toString());
+          localStorage.setItem(timeKey, Date.now().toString());
+          return newBought;
+        });
+      }, 1000 * 60 * 60); // Every 1 hour
+    }
+
+    return () => {
+      if (hourlyInterval) clearInterval(hourlyInterval);
+    };
   }, [productId, realStock]);
 
   useEffect(() => {
@@ -54,14 +83,6 @@ export function useFomoStock(productId: string | undefined, realStock: number) {
         const dropAmount = Math.floor(Math.random() * maxDrop) + 1;
         
         const nextStock = prev - dropAmount;
-        
-        setTotalBought(currentBought => {
-          const newBought = (currentBought || 15000) + dropAmount;
-          if (typeof window !== 'undefined' && productId) {
-            localStorage.setItem(`dualdeer_fomo_bought_${productId}`, newBought.toString());
-          }
-          return newBought;
-        });
 
         if (nextStock <= 0) {
           setIsRestocking(true);

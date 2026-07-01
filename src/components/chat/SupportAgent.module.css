@@ -1,7 +1,7 @@
 .fabWrapper {
   position: fixed;
   bottom: 50px;
-  right: 50px;
+  right: 10px;
   z-index: 10005;
   touch-action: none;
 }
@@ -87,7 +87,7 @@
 }
 
 .headerTitle {
-  font-family: var(--font-logo), serif;
+  font-family: var(--font-nevera), serif;
   font-size: 1.1rem;
   margin: 0;
   letter-spacing: 1px;
@@ -358,7 +358,7 @@
   }
   .fabWrapper {
     bottom: 120px; /* Safely clears the 60px Bottom App Nav + 40px lift */
-    right: 50px;
+    right: 10px;
   }
   .fab {
     width: 45px;

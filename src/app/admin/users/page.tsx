@@ -12,7 +12,7 @@ export default function AdminUsersPage() {
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
 
   // Chat State
   const [chatUser, setChatUser] = useState<any | null>(null);
@@ -132,7 +132,7 @@ export default function AdminUsersPage() {
                     <td>
                       <div className={styles.purchaseStats}>
                         <span className={styles.orderCount}>{userOrders.length} Orders</span>
-                        <span className={styles.orderTotal}>{formatPrice(totalSpent)}</span>
+                        <span className={styles.orderTotal}>{renderPrice(totalSpent)}</span>
                       </div>
                     </td>
                     <td>

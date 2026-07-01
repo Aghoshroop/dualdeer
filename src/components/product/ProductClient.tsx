@@ -13,6 +13,7 @@ import styles from './ProductDetails.module.css';
 import QuantitySelector from '@/components/ui/QuantitySelector';
 import AnimatedCartButton from '@/components/ui/AnimatedCartButton';
 import { useFomoStock } from '@/hooks/useFomoStock';
+import MobileProductGallery from './MobileProductGallery';
 
 import { useCurrency } from '@/context/CurrencyContext';
 
@@ -25,7 +26,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   const [reviewCount, setReviewCount] = useState(0);
 
   const { addToCart, cart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
   const router = useRouter();
   const [product, setProduct] = useState<Product>(initialProduct);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
@@ -47,6 +48,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   
   const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [mobileSlideIdx, setMobileSlideIdx] = useState(0);
   
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [editReviewText, setEditReviewText] = useState('');
@@ -272,7 +274,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   const { fomoStock, totalBought, isRestocking, formattedTime } = useFomoStock(product?.id, currentAvailableStock);
   const displayStock = fomoStock;
 
-  const isOutOfStock = currentAvailableStock <= 0 || isRestocking || displayStock <= 0;
+  const isOutOfStock = product.isSoldOut || currentAvailableStock <= 0 || isRestocking || displayStock <= 0;
 
   const cartItemInfo = cart.find(c => c.id === product?.id && c.size === selectedSize);
   const qtyInCart = cartItemInfo ? cartItemInfo.quantity : 0;
@@ -345,19 +347,34 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
 
       <section className={styles.heroSection}>
         <div className={styles.imageGallery}>
-           <div className={styles.mainImageContainer} onClick={() => setIsZoomed(true)} style={{ cursor: 'zoom-in' }}>
-             <img src={mainImage} alt={`${product.name} - top rated gym wear in India`} className={styles.mainImage} />
+           {/* Desktop Gallery */}
+           <div className={styles.desktopGallery}>
+             <div className={styles.mainImageContainer} onClick={() => setIsZoomed(true)} style={{ cursor: 'zoom-in' }}>
+               <img src={mainImage} alt={`${product.name} - top rated gym wear in India`} className={styles.mainImage} />
+             </div>
+             <div className={styles.thumbnailList}>
+               {alternateImages.map((img, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`${styles.thumbnail} ${mainImage === img && idx === 0 ? styles.activeThumb : ''}`}
+                    onClick={() => setMainImage(img as string)}
+                  >
+                    <img src={img as string} alt={`${product.name} angle ${idx+1} - premium activewear`} loading="lazy" decoding="async" />
+                  </div>
+               ))}
+             </div>
            </div>
-           <div className={styles.thumbnailList}>
-             {alternateImages.map((img, idx) => (
-                <div 
-                  key={idx} 
-                  className={`${styles.thumbnail} ${mainImage === img && idx === 0 ? styles.activeThumb : ''}`}
-                  onClick={() => setMainImage(img as string)}
-                >
-                  <img src={img as string} alt={`${product.name} angle ${idx+1} - premium activewear`} loading="lazy" decoding="async" />
-                </div>
-             ))}
+
+           {/* Mobile Swipeable Gallery */}
+           <div className={styles.mobileGallery}>
+             <MobileProductGallery 
+               images={alternateImages as string[]}
+               productName={product.name}
+               onImageTap={(idx) => {
+                 setMainImage(alternateImages[idx] as string);
+                 setIsZoomed(true);
+               }}
+             />
            </div>
         </div>
 
@@ -424,9 +441,9 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
           </div>
 
           <div className={styles.pricing}>
-            <span className={styles.offerPrice}>{formatPrice(product.price)}</span>
+            <span className={styles.offerPrice}>{renderPrice(product.price)}</span>
             {product.mrp && product.mrp > product.price && (
-              <del className={styles.mrpPrice}>{formatPrice(product.mrp)}</del>
+              <del className={styles.mrpPrice}>{renderPrice(product.mrp)}</del>
             )}
           </div>
 
@@ -437,7 +454,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
               className={styles.fomoBanner}
             >
               <div className={styles.pulseIcon}>⚡</div>
-              <p>High Demand: <strong>{totalBought.toLocaleString()}</strong> bought this from all over the world. Buy fast!</p>
+              <p>High Demand: <strong>{totalBought.toLocaleString()}</strong> bought this from all over india. Buy fast!</p>
             </motion.div>
           )}
 
@@ -522,50 +539,59 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
           </div>
 
           <div className={styles.actionsBox}>
-            <QuantitySelector
-              value={quantity > maxAddable && maxAddable > 0 ? maxAddable : quantity}
-              min={1}
-              max={maxAddable > 0 ? maxAddable : 1}
-              onChange={setQuantity}
-            />
-            <div style={{ flex: 1, pointerEvents: !canPerformAction ? 'none' : 'auto', opacity: !canPerformAction ? 0.5 : 1 }}>
-              <AnimatedCartButton
-                onAdd={() => {
-                  if (product && canPerformAction) {
-                    addToCart({
-                      id: product.id as string,
-                      name: product.name,
-                      price: product.price,
-                      mrp: product.mrp,
-                      image: product.image,
-                      size: selectedSize,
-                      color: selectedColor || undefined,
-                      quantity: Math.min(quantity, maxAddable)
-                    });
+            {/* ROW 1: Quantity + Add to Bag */}
+            <div className={styles.actionRowPrimary}>
+              <QuantitySelector
+                value={quantity > maxAddable && maxAddable > 0 ? maxAddable : quantity}
+                min={1}
+                max={maxAddable > 0 ? maxAddable : 1}
+                onChange={setQuantity}
+              />
+              <div style={{ flex: 1, pointerEvents: !canPerformAction ? 'none' : 'auto', opacity: !canPerformAction ? 0.5 : 1 }}>
+                <AnimatedCartButton
+                  onAdd={() => {
+                    if (product && canPerformAction) {
+                      addToCart({
+                        id: product.id as string,
+                        name: product.name,
+                        price: product.price,
+                        mrp: product.mrp,
+                        image: product.image,
+                        size: selectedSize,
+                        color: selectedColor || undefined,
+                        quantity: Math.min(quantity, maxAddable)
+                      });
+                    }
+                  }}
+                  label={isRestocking ? `RESTOCKING ${formattedTime}` : isOutOfStock ? "Sold Out" : isMaxInCart ? "Max in Cart" : "Add To Bag"}
+                />
+              </div>
+            </div>
+
+            {/* ROW 2: Buy Now */}
+            <div className={styles.actionRowSecondary}>
+              <button 
+                className={styles.buyNowBtn}
+                disabled={!canPerformAction}
+                style={{ opacity: !canPerformAction ? 0.5 : 1, cursor: !canPerformAction ? 'not-allowed' : 'pointer' }}
+                onClick={() => {
+                  if(product && canPerformAction) {
+                    router.push(`/checkout?product=${product.slug || ''}&id=${product.id}&size=${encodeURIComponent(selectedSize)}&qty=${Math.min(quantity, maxAddable)}`);
                   }
                 }}
-                label={isRestocking ? `RESTOCKING ${formattedTime}` : isOutOfStock ? "Sold Out" : isMaxInCart ? "Max in Cart" : "Add To Cart"}
-              />
+              >
+                {!canPerformAction ? (isRestocking ? `WAIT ${formattedTime}` : isOutOfStock ? 'Unavailable' : 'Limit Reached') : 'Buy Now'}
+              </button>
             </div>
-            <button 
-              className={styles.buyNowBtn}
-              disabled={!canPerformAction}
-              style={{ opacity: !canPerformAction ? 0.5 : 1, cursor: !canPerformAction ? 'not-allowed' : 'pointer' }}
-              onClick={() => {
-                if(product && canPerformAction) {
-                  router.push(`/checkout?product=${product.slug || ''}&id=${product.id}&size=${encodeURIComponent(selectedSize)}&qty=${Math.min(quantity, maxAddable)}`);
-                }
-              }}
-            >
-              {!canPerformAction ? (isRestocking ? `WAIT ${formattedTime}` : isOutOfStock ? 'Unavailable' : 'Limit Reached') : 'Buy Now'}
-            </button>
+
+            {/* ROW 3: Wishlist & Share */}
             <div className={styles.actionIconGroup}>
               <button 
                 className={styles.wishlistBtn}
                 onClick={toggleWishlist}
                 disabled={isWishlistLoading}
                 title="Add to Wishlist"
-                style={{ background: isInWishlist ? 'var(--color-primary)' : 'transparent', color: isInWishlist ? 'var(--color-background)' : 'inherit', border: isInWishlist ? '1px solid var(--color-primary)' : '1px solid rgba(var(--foreground-rgb), 0.1)' }}
+                style={{ background: isInWishlist ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)', color: isInWishlist ? 'var(--color-background)' : 'inherit' }}
               >
                 <Heart size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
               </button>
@@ -573,7 +599,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                 className={styles.wishlistBtn}
                 onClick={handleShare}
                 title="Share this Elite Product"
-                style={{ background: 'transparent', color: 'inherit', border: '1px solid var(--color-border)' }}
+                style={{ background: 'rgba(255,255,255,0.03)', color: 'inherit' }}
               >
                 <Share2 size={20} />
               </button>

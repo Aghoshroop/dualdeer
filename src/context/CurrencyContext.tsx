@@ -17,6 +17,8 @@ interface CurrencyContextType {
   toggleCurrency: () => void;
   setRegion: (code: string, curr: Currency) => void;
   rawFormat: (amountInINR: number | undefined) => number;
+  renderPrice: (amountInINR: number | undefined) => ReactNode;
+  renderProductPrice: (product: Partial<Product>) => ReactNode;
 }
 
 const defaultContextValue: CurrencyContextType = {
@@ -31,6 +33,8 @@ const defaultContextValue: CurrencyContextType = {
   toggleCurrency: () => {},
   setRegion: () => {},
   rawFormat: (amount) => amount || 0,
+  renderPrice: (amount) => `₹${(amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+  renderProductPrice: () => "₹0.00",
 };
 
 const CurrencyContext = createContext<CurrencyContextType>(defaultContextValue);
@@ -112,8 +116,31 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('userCurrency', curr);
   };
 
+  const renderPriceNode = (formattedStr: string) => {
+    const match = formattedStr.match(/^([^\d]+)([\d,]+)(\.\d+)?(.*)$/);
+    if (match) {
+      return (
+        <>
+          <span className="currency-symbol">{match[1]}</span>
+          <span className="price-integer">{match[2]}</span>
+          {match[3] && <span className="price-decimal">{match[3]}</span>}
+          {match[4]}
+        </>
+      );
+    }
+    return formattedStr;
+  };
+
+  const renderPrice = (amountInINR: number | undefined) => {
+    return renderPriceNode(formatPrice(amountInINR));
+  };
+
+  const renderProductPrice = (product: Partial<Product>) => {
+    return renderPriceNode(formatProductPrice(product));
+  };
+
   return (
-    <CurrencyContext.Provider value={{ currency, symbol, conversionRate, countryCode, formatPrice, formatProductPrice, getProductPrice, getProductMrp, toggleCurrency, setRegion, rawFormat }}>
+    <CurrencyContext.Provider value={{ currency, symbol, conversionRate, countryCode, formatPrice, formatProductPrice, getProductPrice, getProductMrp, toggleCurrency, setRegion, rawFormat, renderPrice, renderProductPrice }}>
       {children}
     </CurrencyContext.Provider>
   );

@@ -23,7 +23,7 @@ function CheckoutEngine() {
   const { cart, cartTotal: _globalSubtotal, clearCart } = useCart();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { currency, formatPrice, conversionRate, countryCode } = useCurrency();
+  const { currency, formatPrice, conversionRate, countryCode, renderPrice } = useCurrency();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<'shipping' | 'payment' | 'upi-verification'>('shipping');
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi' | 'international_card'>(currency === 'USD' ? 'international_card' : 'upi');
@@ -389,7 +389,7 @@ function CheckoutEngine() {
               </div>
               <div style={{ padding: '1.5rem', background: 'rgba(var(--foreground-rgb), 0.02)', borderRadius: '12px', border: '1px solid var(--color-border)', textAlign: 'center' }}>
                 <p style={{ marginBottom: '15px', fontSize: '1rem', color: 'var(--color-text)' }}>
-                  Please transfer exactly <strong style={{color: 'var(--color-primary)', fontSize: '1.2rem'}}>{formatPrice(total)}</strong> to proceed.
+                  Please transfer exactly <strong style={{color: 'var(--color-primary)', fontSize: '1.2rem'}}>{renderPrice(total)}</strong> to proceed.
                 </p>
                 
                 <div style={{ background: 'var(--color-foreground)', padding: '1rem', borderRadius: '12px', display: 'inline-block', marginBottom: '1.5rem' }}>
@@ -446,7 +446,7 @@ function CheckoutEngine() {
                   <span className={styles.itemName}>{item.name}</span>
                   <span className={styles.itemMeta}>Size: {item.size} | Qty: {item.quantity}</span>
                 </div>
-                <span className={styles.itemPrice}>{formatPrice(item.price * item.quantity)}</span>
+                <span className={styles.itemPrice}>{renderPrice(item.price * item.quantity)}</span>
               </div>
             ))}
           </div>
@@ -477,28 +477,28 @@ function CheckoutEngine() {
           <div className={styles.totals}>
              <div className={styles.summaryRow}>
                <span>Subtotal</span>
-               <span>{formatPrice(subtotal)}</span>
+               <span>{renderPrice(subtotal)}</span>
              </div>
              {bundleSavings > 0 && (
                <div className={`${styles.summaryRow} ${styles.discountRow}`} style={{ color: 'var(--color-primary)' }}>
                  <span>Duo Pack Savings</span>
-                 <span>-{formatPrice(bundleSavings)}</span>
+                 <span>-{renderPrice(bundleSavings)}</span>
                </div>
              )}
              {discountAmountCapped > 0 && (
                <div className={`${styles.summaryRow} ${styles.discountRow}`}>
                  <span>Discount</span>
-                 <span>-{formatPrice(discountAmountCapped)}</span>
+                 <span>-{renderPrice(discountAmountCapped)}</span>
                </div>
              )}
              <div className={styles.summaryRow}>
                <span>{isIndia ? 'Estimated GST (12%)' : 'Taxes (International)'}</span>
-               <span>{formatPrice(estimatedGst)}</span>
+               <span>{renderPrice(estimatedGst)}</span>
              </div>
              {estimatedGst > 0 && (
                <div className={`${styles.summaryRow} ${styles.discountRow}`} style={{ color: 'var(--color-primary)' }}>
                  <span>GST Waived</span>
-                 <span>-{formatPrice(estimatedGst)}</span>
+                 <span>-{renderPrice(estimatedGst)}</span>
                </div>
              )}
              <div className={styles.summaryRow}>
@@ -507,7 +507,7 @@ function CheckoutEngine() {
              </div>
              <div className={`${styles.summaryRow} ${styles.totalRow}`}>
                <span>Total</span>
-               <span>{formatPrice(total)}</span>
+               <span>{renderPrice(total)}</span>
              </div>
           </div>
 
@@ -521,7 +521,7 @@ function CheckoutEngine() {
               disabled={isSubmitting} 
               className={styles.submitBtn}
             >
-              {paymentMethod === 'upi' ? `Pay ${formatPrice(total)} Now` : paymentMethod === 'international_card' ? <><Globe size={16} style={{marginRight: '8px'}} /> Request Payment Link</> : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
+              {paymentMethod === 'upi' ? `Pay ${renderPrice(total)} Now` : paymentMethod === 'international_card' ? <><Globe size={16} style={{marginRight: '8px'}} /> Request Payment Link</> : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
             </button>
           ) : (
             <button onClick={handleSubmitOrder} disabled={isSubmitting || !utrNumber || utrNumber.length < 5} className={styles.submitBtn}>

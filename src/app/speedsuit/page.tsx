@@ -89,7 +89,7 @@ export default function SpeedSuitSeoPage() {
       </div>
       
       <div className="container-spacing" style={{ maxWidth: '1000px', margin: 'clamp(2rem, 10vw, 6rem) auto clamp(2rem, 10vw, 4rem)', padding: '0 clamp(0.5rem, 5vw, 2rem)', width: '100%', boxSizing: 'border-box' }}>
-        <h2 className="animate-block delay-1 compact-title" style={{ fontFamily: 'var(--font-logo), serif', fontSize: 'clamp(1rem, 8vw, 2.4rem)', borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem', marginBottom: 'clamp(1rem, 4vw, 2rem)', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+        <h2 className="animate-block delay-1 compact-title" style={{ fontFamily: 'var(--font-nevera), serif', fontSize: 'clamp(1rem, 8vw, 2.4rem)', borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem', marginBottom: 'clamp(1rem, 4vw, 2rem)', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
           Unmatched Biomechanical Benefits
         </h2>
         <div className="animate-block delay-1 compact-text" style={{ lineHeight: 1.8, fontSize: 'clamp(0.7rem, 4.5vw, 1.1rem)', opacity: 0.85, marginBottom: 'clamp(1.5rem, 8vw, 4rem)', display: 'flex', flexDirection: 'column', gap: 'clamp(0.5rem, 4vw, 1.5rem)', width: '100%' }}>
@@ -104,7 +104,7 @@ export default function SpeedSuitSeoPage() {
           </p>
         </div>
 
-        <h2 className="animate-block delay-2 compact-title" style={{ fontFamily: 'var(--font-logo), serif', fontSize: 'clamp(1rem, 8vw, 2.4rem)', borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem', marginBottom: 'clamp(1rem, 4vw, 2rem)', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+        <h2 className="animate-block delay-2 compact-title" style={{ fontFamily: 'var(--font-nevera), serif', fontSize: 'clamp(1rem, 8vw, 2.4rem)', borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem', marginBottom: 'clamp(1rem, 4vw, 2rem)', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
           Revolutionary Fabric Technology
         </h2>
         <div className="animate-block delay-2 compact-text" style={{ lineHeight: 1.8, fontSize: 'clamp(0.7rem, 4.5vw, 1.1rem)', opacity: 0.85, marginBottom: 'clamp(1.5rem, 8vw, 4rem)', display: 'flex', flexDirection: 'column', gap: 'clamp(0.5rem, 4vw, 1.5rem)', width: '100%' }}>
@@ -119,7 +119,7 @@ export default function SpeedSuitSeoPage() {
           </p>
         </div>
 
-        <h2 className="animate-block delay-3 compact-title" style={{ fontFamily: 'var(--font-logo), serif', fontSize: 'clamp(1rem, 8vw, 2.4rem)', borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem', marginBottom: 'clamp(1rem, 4vw, 2rem)', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+        <h2 className="animate-block delay-3 compact-title" style={{ fontFamily: 'var(--font-nevera), serif', fontSize: 'clamp(1rem, 8vw, 2.4rem)', borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem', marginBottom: 'clamp(1rem, 4vw, 2rem)', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
           Why SpeedSuits Are Drastically Better Than Regular Gym Wear
         </h2>
         <div className="animate-block delay-3 compact-text" style={{ lineHeight: 1.8, fontSize: 'clamp(0.7rem, 4.5vw, 1.1rem)', opacity: 0.85, marginBottom: 'clamp(1.5rem, 8vw, 4rem)', display: 'flex', flexDirection: 'column', gap: 'clamp(0.5rem, 4vw, 1.5rem)', width: '100%' }}>
@@ -135,7 +135,7 @@ export default function SpeedSuitSeoPage() {
         </div>
 
         <div className="premium-card animate-block opacity-0 delay-4 compact-card" style={{ textAlign: 'center', marginTop: 'clamp(2rem, 12vw, 6rem)', padding: 'clamp(1rem, 8vw, 4rem) clamp(0.5rem, 4vw, 2rem)', background: 'linear-gradient(135deg, rgba(var(--foreground-rgb), 0.03), rgba(var(--background-rgb), 0.5))', borderRadius: '12px', border: '1px solid var(--color-border)', backdropFilter: 'blur(10px)', width: '100%', boxSizing: 'border-box' }}>
-          <h3 className="compact-title" style={{ fontFamily: 'var(--font-logo), serif', fontSize: 'clamp(1rem, 8vw, 2rem)', marginBottom: 'clamp(0.5rem, 2vw, 1rem)', background: 'linear-gradient(90deg, #fff, #aaa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>Ready to Experience the SpeedSuit?</h3>
+          <h3 className="compact-title" style={{ fontFamily: 'var(--font-nevera), serif', fontSize: 'clamp(1rem, 8vw, 2rem)', marginBottom: 'clamp(0.5rem, 2vw, 1rem)', background: 'linear-gradient(90deg, #fff, #aaa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>Ready to Experience the SpeedSuit?</h3>
           <p className="compact-text" style={{ opacity: 0.8, marginBottom: 'clamp(1rem, 5vw, 2rem)', fontSize: 'clamp(0.7rem, 4vw, 1.1rem)', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>Shop the most highly-rated, affordable SpeedSuits directly in the DualDeer catalog today.</p>
           <Link href="/shop?category=speedsuit" className="compact-btn" style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', padding: 'clamp(0.5rem, 3vw, 1rem) clamp(0.8rem, 6vw, 3rem)', background: 'var(--color-foreground)', color: 'var(--color-background)', textDecoration: 'none', fontWeight: 600, borderRadius: '30px', textTransform: 'uppercase', letterSpacing: 'clamp(1px, 1.5vw, 2px)', fontSize: 'clamp(0.6rem, 3.5vw, 0.95rem)', boxShadow: '0 10px 20px rgba(var(--foreground-rgb), 0.1)', transition: 'transform 0.3s ease, box-shadow 0.3s ease', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}>
             Shop The Collection

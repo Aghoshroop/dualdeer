@@ -12,7 +12,7 @@
 }
 
 .header h1 {
-  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-family: var(--font-nevera), 'Playfair Display', serif;
   font-size: 3.5rem;
   font-weight: 300;
   text-transform: uppercase;
@@ -74,7 +74,7 @@
 .emptyCartTitle {
   position: relative;
   z-index: 1;
-  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-family: var(--font-nevera), 'Playfair Display', serif;
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 300;
   letter-spacing: 0.2em;
@@ -125,7 +125,7 @@
 }
 
 .quickAddTitle {
-  font-family: var(--font-logo), 'Inter', sans-serif;
+  font-family: var(--font-nevera), 'Inter', sans-serif;
   font-size: 1.2rem;
   font-weight: 400;
   letter-spacing: 0.2em;
@@ -287,7 +287,7 @@
 }
 
 .itemTop h3 {
-  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-family: var(--font-nevera), 'Playfair Display', serif;
   font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: 1px;
@@ -371,7 +371,7 @@
 }
 
 .summaryCard h2 {
-  font-family: var(--font-logo), 'Playfair Display', serif;
+  font-family: var(--font-nevera), 'Playfair Display', serif;
   font-size: 1.5rem;
   font-weight: 400;
   text-transform: uppercase;

@@ -15,7 +15,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 export default function CartPage() {
   const router = useRouter();
   const { cart, updateQuantity, removeFromCart, cartTotal: subtotal, addToCart, bundleSavings } = useCart();
-  const { formatPrice, countryCode, conversionRate } = useCurrency();
+  const { formatPrice, countryCode, conversionRate, renderPrice } = useCurrency();
   const [mounted, setMounted] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -141,7 +141,7 @@ export default function CartPage() {
                     <div className={styles.quickAddInfo}>
                       <div className={styles.quickAddText}>
                         <h4 className={styles.quickAddName}>{prod.name}</h4>
-                        <span className={styles.quickAddPrice}>{formatPrice(prod.price)}</span>
+                        <span className={styles.quickAddPrice}>{renderPrice(prod.price)}</span>
                       </div>
                       <button 
                         className={styles.quickAddBtn}
@@ -180,7 +180,7 @@ export default function CartPage() {
                         <h3>{item.name}</h3>
                         <p className={styles.itemMeta}>{item.color ? `Color: ${item.color} | ` : ''}Size: {item.size}</p>
                       </div>
-                      <p className={styles.itemPrice}>{formatPrice(item.price)}</p>
+                      <p className={styles.itemPrice}>{renderPrice(item.price)}</p>
                     </div>
 
                     <div className={styles.itemBottom}>
@@ -215,28 +215,28 @@ export default function CartPage() {
               
               <div className={styles.summaryRow}>
                 <span>Subtotal</span>
-                <span>{formatPrice(subtotal)}</span>
+                <span>{renderPrice(subtotal)}</span>
               </div>
               {bundleSavings > 0 && (
                 <div className={`${styles.summaryRow} ${styles.discountRow}`} style={{ color: 'var(--color-primary)' }}>
                   <span>Duo Pack Savings</span>
-                  <span>-{formatPrice(bundleSavings)}</span>
+                  <span>-{renderPrice(bundleSavings)}</span>
                 </div>
               )}
               {discount > 0 && (
                 <div className={`${styles.summaryRow} ${styles.discountRow}`}>
                   <span>Discount</span>
-                  <span>-{formatPrice(discount)}</span>
+                  <span>-{renderPrice(discount)}</span>
                 </div>
               )}
               <div className={styles.summaryRow}>
                 <span>{isIndia ? 'Estimated GST (12%)' : 'Taxes (International)'}</span>
-                <span>{formatPrice(estimatedGst)}</span>
+                <span>{renderPrice(estimatedGst)}</span>
               </div>
               {estimatedGst > 0 && (
                 <div className={`${styles.summaryRow} ${styles.discountRow}`} style={{ color: 'var(--color-primary)' }}>
                   <span>GST Waived</span>
-                  <span>-{formatPrice(estimatedGst)}</span>
+                  <span>-{renderPrice(estimatedGst)}</span>
                 </div>
               )}
               <div className={styles.summaryRow}>
@@ -267,7 +267,7 @@ export default function CartPage() {
               
               <div className={styles.totalRow}>
                 <span>Total</span>
-                <span>{formatPrice(total)}</span>
+                <span>{renderPrice(total)}</span>
               </div>
 
               <Link href="/checkout" className={styles.checkoutBtn} style={{ textDecoration: 'none', display: 'flex' }}>

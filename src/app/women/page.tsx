@@ -13,7 +13,7 @@ export default function WomenPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, renderPrice } = useCurrency();
   const router = useRouter();
 
   useEffect(() => {
@@ -145,9 +145,9 @@ export default function WomenPage() {
                   <h3 className={styles.bentoName}>{product.name}</h3>
                   <span className={styles.bentoPrice}>
                     {product.mrp && product.mrp > product.price && (
-                      <del style={{marginRight: '8px', opacity: 0.5, fontSize: '0.85em'}}>{formatPrice(product.mrp)}</del>
+                      <del style={{marginRight: '8px', opacity: 0.5, fontSize: '0.85em'}}>{renderPrice(product.mrp)}</del>
                     )}
-                    {formatPrice(product.price)}
+                    {renderPrice(product.price)}
                   </span>
                   <button 
                     className={styles.bentoAction}

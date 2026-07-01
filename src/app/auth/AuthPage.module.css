@@ -32,7 +32,7 @@
 }
 
 .logo {
-  font-family: var(--font-logo), 'Inter', sans-serif;
+  font-family: var(--font-nevera), 'Inter', sans-serif;
   font-size: 2.2rem;
   text-align: center;
   letter-spacing: 6px;
@@ -61,7 +61,7 @@
 }
 
 .greeting h2 {
-  font-family: var(--font-logo), 'Inter', sans-serif;
+  font-family: var(--font-nevera), 'Inter', sans-serif;
   font-size: 4rem;
   letter-spacing: 12px;
   text-transform: uppercase;

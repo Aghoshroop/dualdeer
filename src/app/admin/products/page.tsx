@@ -43,7 +43,8 @@ export default function AdminProductsPage() {
     image: '',
     images: [] as string[],
     stock: 0,
-    colors: ''
+    colors: '',
+    isSoldOut: false
   });
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -76,7 +77,7 @@ export default function AdminProductsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ name: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '' });
+    setFormData({ name: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '', isSoldOut: false });
     setEditingId(null);
     setShowModal(true);
   };
@@ -97,7 +98,8 @@ export default function AdminProductsPage() {
       image: product.image,
       images: product.images || [],
       stock: product.stock,
-      colors: product.colors ? product.colors.join(', ') : ''
+      colors: product.colors ? product.colors.join(', ') : '',
+      isSoldOut: product.isSoldOut || false
     });
     setEditingId(product.id!);
     setShowModal(true);
@@ -394,8 +396,8 @@ export default function AdminProductsPage() {
                   <td className={styles.mrp}>{product.mrp ? <del>${Number(product.mrp).toFixed(2)}</del> : '-'}</td>
                   <td>★ {product.rating || 5}</td>
                   <td>
-                    <span className={`${styles.stockBadge} ${product.stock > 10 ? styles.inStock : product.stock > 0 ? styles.lowStock : styles.outOfStock}`}>
-                      {product.stock} in stock
+                    <span className={`${styles.stockBadge} ${product.isSoldOut ? styles.outOfStock : product.stock > 10 ? styles.inStock : product.stock > 0 ? styles.lowStock : styles.outOfStock}`}>
+                      {product.isSoldOut ? 'Sold Out' : `${product.stock} in stock`}
                     </span>
                   </td>
                   <td>
@@ -543,6 +545,17 @@ export default function AdminProductsPage() {
                   disabled={!!(formData.sizes && formData.sizes.split(',').filter(s=>s.trim()).length > 0)}
                   style={formData.sizes && formData.sizes.split(',').filter(s=>s.trim()).length > 0 ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                 />
+              </div>
+
+              <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input 
+                  type="checkbox" 
+                  id="isSoldOut"
+                  checked={formData.isSoldOut} 
+                  onChange={(e) => setFormData({...formData, isSoldOut: e.target.checked})}
+                  style={{ width: 'auto' }}
+                />
+                <label htmlFor="isSoldOut" style={{ margin: 0, cursor: 'pointer' }}>Mark as Sold Out Manually</label>
               </div>
 
               <div className={styles.formGroup}>
