@@ -455,7 +455,7 @@ function ProductCard({ product, i, styles, wishlist, toggleWishlist, playInterac
         {/* Dynamic Carousel Dots */}
         {images.length > 1 && (
           <div className={styles.carouselDots}>
-            {images.map((_, idx) => (
+            {images.map((_img: string, idx: number) => (
               <span 
                 key={idx}
                 className={`${styles.dot} ${idx === activeImageIndex ? styles.activeDot : ''}`}
