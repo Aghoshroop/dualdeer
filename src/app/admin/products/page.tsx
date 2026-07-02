@@ -5,6 +5,74 @@ import styles from './ProductsPage.module.css';
 import { getProducts, getDeletedProducts, addProduct, updateProduct, deleteProduct, restoreProduct, hardDeleteProduct, Product, getContentBlock, updateContentBlock, getCategories } from '@/lib/firebaseUtils';
 import { uploadImageToImgBB } from '@/lib/uploadUtils';
 
+function CustomDropdown({ options, value, onChange, placeholder, disabled = false }: { options: string[], value: string, onChange: (val: string) => void, placeholder: string, disabled?: boolean }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  useEffect(() => {
+    const handleClick = () => setIsOpen(false);
+    if (isOpen) {
+      setTimeout(() => document.addEventListener('click', handleClick), 0);
+    }
+    return () => document.removeEventListener('click', handleClick);
+  }, [isOpen]);
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <div 
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        style={{ 
+          width: '100%', padding: '0.8rem', borderRadius: '8px', 
+          border: '1px solid var(--color-border)', 
+          background: 'rgba(var(--background-rgb), 0.4)', 
+          color: 'var(--color-text)', 
+          cursor: disabled ? 'not-allowed' : 'pointer', 
+          opacity: disabled ? 0.5 : 1,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          fontFamily: 'var(--font-inter), sans-serif',
+          fontSize: '0.95rem'
+        }}
+      >
+        <span>{value || placeholder}</span>
+        <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>▼</span>
+      </div>
+      {isOpen && !disabled && (
+        <div style={{ 
+          position: 'absolute', top: '100%', left: 0, width: '100%', 
+          maxHeight: '220px', overflowY: 'auto', 
+          background: 'var(--color-background)', 
+          border: '1px solid var(--color-border)', 
+          borderRadius: '8px', zIndex: 100, marginTop: '4px', 
+          boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+          fontFamily: 'var(--font-inter), sans-serif',
+          fontSize: '0.95rem'
+        }}>
+          {options.length === 0 && <div style={{ padding: '0.8rem', opacity: 0.5, color: 'var(--color-text)' }}>No options</div>}
+          {options.map(opt => (
+            <div 
+              key={opt}
+              onClick={() => { onChange(opt); setIsOpen(false); }}
+              style={{ 
+                padding: '0.8rem', cursor: 'pointer', 
+                borderBottom: '1px solid rgba(var(--foreground-rgb), 0.05)', 
+                color: 'var(--color-text)',
+                background: value === opt ? 'rgba(212, 175, 55, 0.1)' : 'transparent',
+                transition: 'background 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(var(--foreground-rgb), 0.1)'}
+              onMouseLeave={(e) => {
+                if (value !== opt) e.currentTarget.style.background = 'transparent';
+                else e.currentTarget.style.background = 'rgba(212, 175, 55, 0.1)';
+              }}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -446,36 +514,45 @@ export default function AdminProductsPage() {
 
               <div className={styles.formGroup}>
                 <label>Category</label>
-                <input 
-                  type="text" 
-                  list="category-suggestions"
-                  value={formData.category} 
-                  onChange={(e) => setFormData({...formData, category: e.target.value, subcategory: ''})}
-                  required
-                  placeholder="e.g. Menswear"
+                <CustomDropdown
+                  options={["Men", "Women", "Kids", "Unisex", ...categoriesList.filter((c: any) => !["Men", "Women", "Kids", "Unisex"].includes(c.name)).map((cat: any) => cat.name)]}
+                  value={formData.category}
+                  onChange={(val) => setFormData({...formData, category: val, subcategory: ''})}
+                  placeholder="Select Category"
                 />
-                <datalist id="category-suggestions">
-                  {categoriesList.map(cat => (
-                    <option key={cat.id || cat.name} value={cat.name} />
-                  ))}
-                </datalist>
               </div>
 
               <div className={styles.formGroup}>
                 <label>Sub Category</label>
-                <input 
-                  type="text" 
-                  list="subcategory-suggestions"
-                  value={formData.subcategory} 
-                  onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
-                  placeholder="e.g. T-Shirts"
+                <CustomDropdown
                   disabled={!formData.category}
+                  options={
+                    formData.category === "Men" ? [
+                      "T-Shirts", "Muscle Fit", "Shirts", "Jeans", "Trousers", "Shorts", 
+                      "Jackets", "Hoodies", "Sweatshirts", "Sweaters", "Suits", 
+                      "Activewear", "Innerwear", "Accessories", "Footwear", "Ethnic Wear", "Loungewear"
+                    ] :
+                    formData.category === "Women" ? [
+                      "Dresses", "Tops", "T-Shirts", "Muscle Fit", "Shirts", "Jeans", 
+                      "Trousers", "Skirts", "Shorts", "Jackets", "Coats", 
+                      "Hoodies", "Sweatshirts", "Sweaters", "Activewear", 
+                      "Lingerie", "Accessories", "Footwear", "Ethnic Wear", 
+                      "Jumpsuits", "Rompers", "Loungewear"
+                    ] :
+                    formData.category === "Kids" ? [
+                      "T-Shirts", "Shirts", "Jeans", "Shorts", "Dresses", 
+                      "Skirts", "Jackets", "Activewear", "Sleepwear", "Footwear", 
+                      "Toys", "Accessories"
+                    ] :
+                    formData.category === "Unisex" ? [
+                      "T-Shirts", "Muscle Fit", "Hoodies", "Sweatshirts", "Jackets", "Accessories", "Headwear"
+                    ] :
+                    categoriesList.find((c: any) => c.name === formData.category)?.subcategories || []
+                  }
+                  value={formData.subcategory}
+                  onChange={(val) => setFormData({...formData, subcategory: val})}
+                  placeholder="Select Sub Category"
                 />
-                <datalist id="subcategory-suggestions">
-                  {categoriesList.find(c => c.name === formData.category)?.subcategories?.map((sub: string) => (
-                    <option key={sub} value={sub} />
-                  ))}
-                </datalist>
               </div>
 
               <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>

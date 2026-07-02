@@ -23,6 +23,7 @@ export default function AdminCategoriesPage() {
     subcategories: '',
     status: 'active'
   });
+  const [seeding, setSeeding] = useState(false);
 
   useEffect(() => {
     loadCategories();
@@ -92,13 +93,89 @@ export default function AdminCategoriesPage() {
     }
   };
 
+  const handleSeedCategories = async () => {
+    if (!confirm("This will add comprehensive Men, Women, Kids, and Unisex categories to your database. Existing matching categories will be updated with new subcategories. Continue?")) return;
+    
+    setSeeding(true);
+    const presets = [
+      {
+        name: "Men",
+        status: "active" as const,
+        image: "",
+        subcategories: [
+          "T-Shirts", "Shirts", "Jeans", "Trousers", "Shorts", 
+          "Jackets", "Hoodies", "Sweatshirts", "Sweaters", "Suits", 
+          "Activewear", "Innerwear", "Accessories", "Footwear", "Ethnic Wear", "Loungewear"
+        ]
+      },
+      {
+        name: "Women",
+        status: "active" as const,
+        image: "",
+        subcategories: [
+          "Dresses", "Tops", "T-Shirts", "Shirts", "Jeans", 
+          "Trousers", "Skirts", "Shorts", "Jackets", "Coats", 
+          "Hoodies", "Sweatshirts", "Sweaters", "Activewear", 
+          "Lingerie", "Accessories", "Footwear", "Ethnic Wear", 
+          "Jumpsuits", "Rompers", "Loungewear"
+        ]
+      },
+      {
+        name: "Kids",
+        status: "active" as const,
+        image: "",
+        subcategories: [
+          "T-Shirts", "Shirts", "Jeans", "Shorts", "Dresses", 
+          "Skirts", "Jackets", "Activewear", "Sleepwear", "Footwear", 
+          "Toys", "Accessories"
+        ]
+      },
+      {
+        name: "Unisex",
+        status: "active" as const,
+        image: "",
+        subcategories: [
+          "T-Shirts", "Hoodies", "Sweatshirts", "Jackets", "Accessories", "Headwear"
+        ]
+      }
+    ];
+
+    try {
+      for (const preset of presets) {
+        const existingCat = categories.find(c => c.name.toLowerCase() === preset.name.toLowerCase());
+        if (existingCat) {
+          const mergedSubs = Array.from(new Set([...(existingCat.subcategories || []), ...preset.subcategories]));
+          await updateCategory(existingCat.id!, { subcategories: mergedSubs });
+        } else {
+          await addCategory(preset);
+        }
+      }
+      alert("Categories successfully seeded!");
+      loadCategories();
+    } catch (e) {
+      console.error(e);
+      alert("Failed to seed categories. Check console for details.");
+    }
+    setSeeding(false);
+  };
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>Categories Management</h1>
-        <button className={styles.addBtn} onClick={openAddModal}>
-          <Plus size={20} /> Add Category
-        </button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button 
+            className={styles.addBtn} 
+            onClick={handleSeedCategories} 
+            disabled={seeding}
+            style={{ background: '#4CAF50', border: '1px solid #45a049' }}
+          >
+            {seeding ? 'Seeding...' : 'Load Preset Categories'}
+          </button>
+          <button className={styles.addBtn} onClick={openAddModal}>
+            <Plus size={20} /> Add Category
+          </button>
+        </div>
       </header>
 
       <div className={styles.tableContainer}>
