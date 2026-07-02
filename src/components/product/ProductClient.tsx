@@ -38,6 +38,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   const [isZoomed, setIsZoomed] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
+  const [isShortDescExpanded, setIsShortDescExpanded] = useState(false);
   
   const [reviewName, setReviewName] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
@@ -473,9 +474,26 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
             </motion.div>
           )}
 
-          <p className={styles.shortDescription}>
-            {product.description || "Elite performance wear crafted for maximum aerodynamic efficiency."}
-          </p>
+          {(() => {
+            const desc = product.description || "Elite performance wear crafted for maximum aerodynamic efficiency.";
+            const isLong = desc.length > 150;
+            return (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <p className={styles.shortDescription} style={{ marginBottom: isLong ? '4px' : 'inherit' }}>
+                  {isLong && !isShortDescExpanded ? `${desc.substring(0, 150)}...` : desc}
+                </p>
+                {isLong && (
+                  <button 
+                    onClick={() => setIsShortDescExpanded(!isShortDescExpanded)}
+                    style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', padding: 0, fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    {isShortDescExpanded ? 'Read Less' : 'Read More'}
+                    <ChevronDown size={14} style={{ transform: isShortDescExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                  </button>
+                )}
+              </div>
+            );
+          })()}
 
           {product.colors && product.colors.length > 0 && (
             <div className={styles.colorSelector}>
@@ -671,7 +689,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
             onClick={() => setIsDescExpanded(!isDescExpanded)}
             aria-expanded={isDescExpanded}
           >
-            {isDescExpanded ? 'Show Less' : 'Read Full Description'}
+            {isDescExpanded ? 'Read Less' : 'Read More'}
             <ChevronDown size={16} style={{ 
               transform: isDescExpanded ? 'rotate(180deg)' : 'none', 
               transition: 'transform 0.3s ease' 

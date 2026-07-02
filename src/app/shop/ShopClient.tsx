@@ -107,16 +107,42 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const validCategories = initialCategories?.filter((cat: any) => {
-    const catName = cat.name.toUpperCase();
-    return initialProducts.some((p: any) => p.category?.toUpperCase() === catName);
-  }).map((cat: any) => {
-    const catName = cat.name.toUpperCase();
-    const validSubs = cat.subcategories?.filter((sub: string) => {
-      return initialProducts.some((p: any) => p.category?.toUpperCase() === catName && p.subcategory?.toUpperCase() === sub.toUpperCase());
-    }) || [];
-    return { ...cat, subcategories: validSubs };
-  }) || [];
+  const productCategoriesMap = new Map<string, Set<string>>();
+  const allSizes = new Set<string>();
+  
+  initialProducts.forEach((p: any) => {
+    if (p.category) {
+      const cat = p.category.toUpperCase();
+      if (!productCategoriesMap.has(cat)) {
+        productCategoriesMap.set(cat, new Set());
+      }
+      if (p.subcategory) {
+        productCategoriesMap.get(cat)!.add(p.subcategory.toUpperCase());
+      }
+    }
+    if (p.sizes && Array.isArray(p.sizes)) {
+      p.sizes.forEach((s: string) => allSizes.add(s.toUpperCase()));
+    }
+  });
+
+  const validCategories = Array.from(productCategoriesMap.entries()).map(([catName, subSet]) => {
+    const originalCat = initialProducts.find((p: any) => p.category?.toUpperCase() === catName)?.category || catName;
+    return {
+      id: catName,
+      name: originalCat,
+      subcategories: Array.from(subSet).map(subName => {
+        return initialProducts.find((p: any) => p.category?.toUpperCase() === catName && p.subcategory?.toUpperCase() === subName)?.subcategory || subName;
+      })
+    };
+  });
+
+  if (allSizes.size > 0) {
+    validCategories.push({
+      id: 'SIZES',
+      name: 'SIZES',
+      subcategories: Array.from(allSizes).sort() // sort sizes alphabetically if you want, but usually S M L XL etc.
+    });
+  }
 
   const categoriesList = validCategories.map((c: any) => c.name.toUpperCase());
   const activeCatObj = validCategories.find((c: any) => c.name.toUpperCase() === activeCategory);
@@ -146,20 +172,22 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
 
   const handleCategoryClick = (cat: string) => {
     playInteractionSound('click');
-    if (activeCategory === cat && !expandedCategory) {
-      setActiveCategory("");
-      setActiveSubcategory("");
-      setShowFilters(false);
-      return;
-    }
-    const catObj = initialCategories?.find((c: any) => c.name.toUpperCase() === cat);
-    if (catObj?.subcategories?.length > 0) {
-      // Toggle accordion
+    
+    const catObj = validCategories.find((c: any) => c.name.toUpperCase() === cat);
+    const hasSubs = catObj && catObj.subcategories && catObj.subcategories.length > 0;
+
+    if (hasSubs) {
+      // Toggle accordion, do NOT set activeCategory so it doesn't filter yet
       setExpandedCategory(expandedCategory === cat ? null : cat);
     } else {
       // Direct select and close
-      setActiveCategory(cat);
-      setActiveSubcategory("");
+      if (activeCategory === cat) {
+        setActiveCategory("");
+        setActiveSubcategory("");
+      } else {
+        setActiveCategory(cat);
+        setActiveSubcategory("");
+      }
       setShowFilters(false);
     }
   };
@@ -174,12 +202,19 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
   // Process live products
   const displayProducts = initialProducts.filter((p: any) => {
     if (activeCategory) {
-      const pCat = (p.category || "").toUpperCase();
-      if (pCat !== activeCategory) return false;
-      
-      if (activeSubcategory) {
-        const pSub = (p.subcategory || "").toUpperCase();
-        if (pSub !== activeSubcategory) return false;
+      if (activeCategory === 'SIZES') {
+        if (activeSubcategory) {
+          const productSizes = p.sizes ? p.sizes.map((s: string) => s.toUpperCase()) : [];
+          if (!productSizes.includes(activeSubcategory)) return false;
+        }
+      } else {
+        const pCat = (p.category || "").toUpperCase();
+        if (pCat !== activeCategory) return false;
+        
+        if (activeSubcategory) {
+          const pSub = (p.subcategory || "").toUpperCase();
+          if (pSub !== activeSubcategory) return false;
+        }
       }
     }
     return true;
@@ -252,8 +287,14 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
                   <h3>SORT BY</h3>
                   <div className={styles.sidebarList} style={{ marginBottom: '24px' }}>
                     <button 
-                      className={`${styles.sidebarItem} ${sortOption === "featured" ? styles.sidebarItemActive : ''}`}
-                      onClick={() => { setSortOption("featured"); playInteractionSound('click'); setShowFilters(false); }}
+                      className={`${styles.sidebarItem} ${sortOption === "featured" && !activeCategory ? styles.sidebarItemActive : ''}`}
+                      onClick={() => { 
+                        setSortOption("featured"); 
+                        setActiveCategory(""); 
+                        setActiveSubcategory(""); 
+                        playInteractionSound('click'); 
+                        setShowFilters(false); 
+                      }}
                     >
                       Show All
                     </button>
@@ -494,17 +535,19 @@ function ProductCard({ product, i, styles, wishlist, toggleWishlist, playInterac
           </div>
         </div>
         
-        <p className={styles.fitText}>Muscle Fit</p>
-        <p className={styles.colorText}>FOR MEN</p>
-        
-        <div className={styles.divider}></div>
+        <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}>
+          <p className={styles.fitText}>{product.subcategory || "Regular Fit"}</p>
+          <p className={styles.colorText}>{product.category ? product.category.toUpperCase() : "FOR MEN"}</p>
+          
+          <div className={styles.divider}></div>
 
-        <div className={styles.productPrice}>
-          <span className={styles.currentPrice}>{renderPrice(product.price)}</span>
-          {product.mrp && product.mrp > product.price && (
-            <span className={styles.originalPrice}>{renderPrice(product.mrp)}</span>
-          )}
-        </div>
+          <div className={styles.productPrice}>
+            <span className={styles.currentPrice}>{renderPrice(product.price)}</span>
+            {product.mrp && product.mrp > product.price && (
+              <span className={styles.originalPrice}>{renderPrice(product.mrp)}</span>
+            )}
+          </div>
+        </Link>
       </div>
     </motion.div>
   );
