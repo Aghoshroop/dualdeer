@@ -146,7 +146,7 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
 
   const categoriesList = validCategories.map((c: any) => c.name.toUpperCase());
   const activeCatObj = validCategories.find((c: any) => c.name.toUpperCase() === activeCategory);
-  const subcategoriesList = activeCatObj?.subcategories?.length > 0 ? activeCatObj.subcategories.map((s: string) => s.toUpperCase()) : [];
+  const subcategoriesList = (activeCatObj?.subcategories || []).map((s: string) => s.toUpperCase());
 
   const handleAddToCart = (e: React.MouseEvent, product: any) => {
     e.preventDefault();
