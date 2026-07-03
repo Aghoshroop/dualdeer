@@ -109,9 +109,14 @@ export default function SpeedSuitsIndiaClient({
                   <div className={styles.imageWrapper}>
                     <img src={product.image} alt={product.name} className={styles.productImage} />
                   </div>
+                  <div className={styles.productPriceRow}>
+                    {product.mrp && product.price > 0 && product.mrp > product.price && (
+                      <span className={styles.productMrp}>{renderPrice(product.mrp)}</span>
+                    )}
+                    <span className={styles.productPrice}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</span>
+                  </div>
                   <div className={styles.productInfo}>
                     <h4 className={styles.productName}>{product.name}</h4>
-                    <span className={styles.productPrice}>{renderPrice(product.price)}</span>
                     <button
                       className={styles.buyBtn}
                       onClick={(e) => {

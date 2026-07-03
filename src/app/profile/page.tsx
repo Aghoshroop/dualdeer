@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, ShoppingBag, Gift, Award, LogOut, ArrowLeft, Bookmark, LayoutDashboard } from 'lucide-react';
+import { User, Users, ShoppingBag, Gift, Award, LogOut, ArrowLeft, Bookmark, LayoutDashboard } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import styles from './ProfilePage.module.css';
@@ -11,6 +11,7 @@ import RewardGame from '@/components/profile/RewardGame';
 import OrderHistory from '@/components/profile/OrderHistory';
 import ProfileCart from '@/components/profile/ProfileCart';
 import ProfileWishlist from '@/components/profile/ProfileWishlist';
+import AffiliateProgram from '@/components/profile/AffiliateProgram';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -59,6 +60,8 @@ export default function ProfilePage() {
         return <ProfileWishlist user={user} />;
       case 'cart':
         return <ProfileCart />;
+      case 'affiliate':
+        return <AffiliateProgram user={user} />;
       default:
         return <EliteOverview user={user} setActiveTab={setActiveTab} />;
     }
@@ -124,6 +127,13 @@ export default function ProfilePage() {
             onClick={() => setActiveTab('cart')}
           >
             <Gift size={20} /> <span className={styles.navText}>Shopping Cart</span>
+          </button>
+          
+          <button 
+            className={`${styles.navBtn} ${activeTab === 'affiliate' ? styles.active : ''}`}
+            onClick={() => setActiveTab('affiliate')}
+          >
+            <Users size={20} /> <span className={styles.navText}>Affiliate Program</span>
           </button>
         </nav>
 

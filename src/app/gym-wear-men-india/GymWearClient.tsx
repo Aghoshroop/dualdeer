@@ -71,7 +71,12 @@ export default function GymWearClient({ initialProducts }: { initialProducts: Pr
                   </div>
                   <div className={styles.productInfo}>
                     <h4 className={styles.productName}>{product.name}</h4>
-                    <span className={styles.productPrice}>{renderPrice(product.price)}</span>
+                    <div className={styles.productPriceRow}>
+                      {product.mrp && product.price > 0 && product.mrp > product.price && (
+                        <span className={styles.productMrp}>{renderPrice(product.mrp)}</span>
+                      )}
+                      <span className={styles.productPrice}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</span>
+                    </div>
                   </div>
                 </Link>
               </motion.div>

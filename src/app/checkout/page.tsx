@@ -167,6 +167,10 @@ function CheckoutEngine() {
       appliedBundles: appliedBundles,
       discountAmount: discountAmountCapped,
       ...(appliedCoupon ? { appliedCoupon: appliedCoupon.code } : {}),
+      ...(appliedCoupon && appliedCoupon.affiliateId ? { 
+        affiliateId: appliedCoupon.affiliateId,
+        affiliateCommission: discountAmountCapped 
+      } : {}),
       status: (paymentMethod === 'international_card' ? 'payment_pending' : 'processing') as any,
       paymentMethod: paymentMethod,
       utrNumber: paymentMethod === 'upi' ? utrNumber : '',

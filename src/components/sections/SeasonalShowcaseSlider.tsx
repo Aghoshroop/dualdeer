@@ -183,7 +183,10 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
                   </div>
                   <div className={styles.mobileInfo}>
                      <h3 className={styles.mobileName}>{product.name}</h3>
-                     <div className={styles.mobilePrice}>{renderPrice(product.price)}</div>
+                     {product.mrp && product.price > 0 && product.mrp > product.price && (
+                       <div className={styles.mobileMrp}>{renderPrice(product.mrp)}</div>
+                     )}
+                     <div className={styles.mobilePrice}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</div>
                      <Link 
                         href={`/product/${product.slug}`} 
                         className={styles.mobileShopBtn}

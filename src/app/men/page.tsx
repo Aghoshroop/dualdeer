@@ -136,10 +136,10 @@ export default function MenPage() {
                 <div className={styles.bentoOverlay}>
                   <h3 className={styles.bentoName}>{product.name}</h3>
                   <span className={styles.bentoPrice}>
-                    {product.mrp && product.mrp > product.price && (
+                    {product.mrp && product.price > 0 && product.mrp > product.price && (
                       <del style={{marginRight: '8px', opacity: 0.5, fontSize: '0.85em'}}>{renderPrice(product.mrp)}</del>
                     )}
-                    {renderPrice(product.price)}
+                    {renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}
                   </span>
                   <button 
                     className={styles.bentoAction}

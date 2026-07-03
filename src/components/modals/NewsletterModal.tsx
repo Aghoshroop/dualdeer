@@ -15,9 +15,8 @@ export default function NewsletterModal() {
   useEffect(() => {
     // Only mount on client and only fire if they haven't seen it yet
     const hasSubscribed = localStorage.getItem('dualdeer_newsletter') === 'subscribed';
-    const isDismissedSession = sessionStorage.getItem('dualdeer_newsletter_dismissed') === 'true';
     
-    if (!hasSubscribed && !isDismissedSession) {
+    if (!hasSubscribed) {
       // Engage the drop after 5 seconds of active browsing
       const timer = setTimeout(() => setIsOpen(true), 5000);
       return () => clearTimeout(timer);
@@ -26,10 +25,6 @@ export default function NewsletterModal() {
 
   const closeDrop = () => {
     setIsOpen(false);
-    // We use sessionStorage for dismissals so it keeps coming back on new visits if not filled
-    if (status !== 'success') {
-       sessionStorage.setItem('dualdeer_newsletter_dismissed', 'true');
-    }
   };
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -46,6 +41,21 @@ export default function NewsletterModal() {
       if (!stored.includes('FIRST15')) {
         stored.push('FIRST15');
         localStorage.setItem('dualdeer_unlocked_coupons', JSON.stringify(stored));
+      }
+
+      // Ensure coupon exists in database globally
+      try {
+        await setDoc(doc(db, 'coupons', 'FIRST15'), {
+          code: 'FIRST15',
+          discountType: 'percentage',
+          discountValue: 15,
+          active: true,
+          usageLimitType: 'once_per_user',
+          applyTo: 'total_cart',
+          createdAt: new Date()
+        }, { merge: true });
+      } catch (e) {
+        console.error("Failed to auto-create coupon in db", e);
       }
 
       // Save coupon to Firestore if logged in

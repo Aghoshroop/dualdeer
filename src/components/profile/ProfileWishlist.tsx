@@ -85,7 +85,7 @@ export default function ProfileWishlist({ user }: { user: any }) {
                 <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <h4>{product.name}</h4>
                 </Link>
-                <p className={styles.price}>{renderPrice(product.price)}</p>
+                <p className={styles.price}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</p>
                 <button 
                   className={styles.addCartBtn}
                   onClick={() => {

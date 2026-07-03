@@ -118,10 +118,10 @@ export default function FeaturedProducts() {
                       <h3 className={styles.name}>{product.name}</h3>
                     </Link>
                     <div className={styles.priceRow}>
-                      {product.mrp && product.mrp > product.price && (
+                      {product.mrp && product.price > 0 && product.mrp > product.price && (
                         <span className={styles.mrp}>{renderPrice(product.mrp)}</span>
                       )}
-                      <span className={styles.price}>{renderPrice(product.price)}</span>
+                      <span className={styles.price}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</span>
                     </div>
 
                     {product.colors && product.colors.length > 0 && (

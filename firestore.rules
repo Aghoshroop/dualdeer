@@ -5,6 +5,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return request.auth != null &&
+        'email' in request.auth.token &&
         request.auth.token.email in [
           'aviroopghosh283@gmail.com',
           'hello@dualdeer.com'
@@ -115,13 +116,19 @@ service cloud.firestore {
     match /coupons/{couponId} {
       allow read: if true;
 
-      allow update: if
+      allow create: if isAdmin() || (
+        request.auth != null && 
+        request.resource.data.affiliateId == request.auth.uid
+      );
+
+      allow update: if isAdmin() || (
         request.resource.data
           .diff(resource.data)
           .affectedKeys()
-          .hasOnly(['active', 'usedBy']);
+          .hasOnly(['active', 'usedBy'])
+      );
 
-      allow write: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     match /subscribers/{subscriberId} {
@@ -167,6 +174,19 @@ service cloud.firestore {
     match /notifications/{docId} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    match /affiliates/{userId} {
+      allow get: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+      allow list: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+    }
+
+    match /withdrawal_requests/{docId} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.affiliateId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.affiliateId == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
 
     match /{document=**} {

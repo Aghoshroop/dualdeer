@@ -175,10 +175,12 @@
   flex: 1;
   position: relative;
   z-index: 5;
+  min-width: 0;
 }
 
 .tabContent {
   width: 100%;
+  min-width: 0;
 }
 
 @media (max-width: 1200px) {

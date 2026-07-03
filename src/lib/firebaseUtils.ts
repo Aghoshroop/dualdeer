@@ -90,6 +90,28 @@ export interface Coupon {
   usageLimitType?: 'single_use' | 'once_per_user' | 'unlimited';
   applyTo?: 'total_cart' | 'first_item';
   usedBy?: string[];
+  affiliateId?: string; // Optional link to an affiliate
+  createdAt?: Timestamp;
+}
+
+export interface Affiliate {
+  id?: string;
+  userId: string;
+  name: string;
+  code: string;
+  earnings: number; // Available balance
+  pendingEarnings: number; // Commission waiting for delivery
+  totalWithdrawn: number;
+  status: 'active' | 'suspended';
+  createdAt?: Timestamp;
+}
+
+export interface WithdrawalRequest {
+  id?: string;
+  affiliateId: string;
+  amount: number;
+  paymentMethodDetails: string; // e.g., UPI ID
+  status: 'pending' | 'approved' | 'paid' | 'rejected';
   createdAt?: Timestamp;
 }
 
@@ -120,6 +142,8 @@ export interface Order {
   discountAmount?: number;
   appliedCoupon?: string;
   status: 'payment_pending' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned';
+  affiliateId?: string;
+  affiliateCommission?: number;
   cancellationReason?: string;
   returnReason?: string;
   paymentMethod?: string;
@@ -836,3 +860,124 @@ export const getVideosByCategory = async (category: string): Promise<Video[]> =>
 
 export const addVideo = (data: Omit<Video, 'id'>) => addDocument('videos', data);
 export const deleteVideo = (id: string) => deleteDocument('videos', id);
+
+// ========================
+// Affiliate Program
+// ========================
+
+export const registerAffiliate = async (userId: string, name: string, code: string) => {
+  // 1. Create Coupon
+  const couponData: Omit<Coupon, 'id'> = {
+    code: code.toUpperCase(),
+    discountType: 'percentage',
+    discountValue: 5,
+    active: true,
+    isPublic: true, // Visible in user accounts if needed
+    usageLimitType: 'unlimited',
+    applyTo: 'first_item',
+    affiliateId: userId,
+    createdAt: Timestamp.now()
+  };
+  await addDoc(collection(db, 'coupons'), couponData);
+
+  // 2. Create Affiliate
+  const affiliateData: Omit<Affiliate, 'id'> = {
+    userId,
+    name,
+    code: code.toUpperCase(),
+    earnings: 0,
+    pendingEarnings: 0,
+    totalWithdrawn: 0,
+    status: 'active',
+    createdAt: Timestamp.now()
+  };
+  await setDoc(doc(db, 'affiliates', userId), affiliateData);
+};
+
+export const getAffiliate = async (userId: string): Promise<Affiliate | null> => {
+  try {
+    const docSnap = await getDoc(doc(db, 'affiliates', userId));
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as Affiliate;
+    }
+  } catch (e) {
+    console.error("Error fetching affiliate:", e);
+  }
+  return null;
+};
+
+export const getAffiliates = async (): Promise<Affiliate[]> => {
+  return getCollectionData<Affiliate>('affiliates');
+};
+
+export const processAffiliateCommission = async (orderId: string, orderData: Order) => {
+  if (!orderData.affiliateId || !orderData.affiliateCommission || orderData.affiliateCommission <= 0) return;
+  
+  try {
+    // Only process if the order status is actually delivered.
+    // Also, we need to make sure we don't process it twice.
+    // We can check if it's already processed, but for now we just rely on the status change edge.
+    // We will update the affiliate doc:
+    const affiliateRef = doc(db, 'affiliates', orderData.affiliateId);
+    
+    // We can't easily check if processed here without a transaction or marking the order. 
+    // We'll trust the caller to only call this once when status changes to 'delivered'.
+    
+    // Increment the earnings
+    const snap = await getDoc(affiliateRef);
+    if (snap.exists()) {
+       const aff = snap.data() as Affiliate;
+       await updateDoc(affiliateRef, {
+          earnings: (aff.earnings || 0) + orderData.affiliateCommission
+       });
+       
+       // Optional: We can mark the order as commission paid
+       await updateDoc(doc(db, 'orders', orderId), {
+          affiliateCommissionPaid: true
+       });
+    }
+  } catch(e) {
+    console.error("Failed to process commission", e);
+  }
+};
+
+export const requestWithdrawal = async (affiliateId: string, amount: number, upiId: string) => {
+  // 1. Create withdrawal request
+  await addDoc(collection(db, 'withdrawal_requests'), {
+    affiliateId,
+    amount,
+    paymentMethodDetails: upiId,
+    status: 'pending',
+    createdAt: Timestamp.now()
+  });
+
+  // 2. Add to pendingWithdrawal (do not deduct from earnings until approved)
+  const affiliateRef = doc(db, 'affiliates', affiliateId);
+  const snap = await getDoc(affiliateRef);
+  if (snap.exists()) {
+     const aff = snap.data() as Affiliate & { pendingWithdrawal?: number };
+     await updateDoc(affiliateRef, {
+        pendingWithdrawal: (aff.pendingWithdrawal || 0) + amount
+     });
+  }
+};
+
+export const getWithdrawalRequests = async (): Promise<WithdrawalRequest[]> => {
+  const reqs = await getCollectionData<WithdrawalRequest>('withdrawal_requests');
+  return reqs.sort((a, b) => b.createdAt!.toMillis() - a.createdAt!.toMillis());
+};
+
+export const approveWithdrawalRequest = async (requestId: string, affiliateId: string, amount: number) => {
+  await updateDoc(doc(db, 'withdrawal_requests', requestId), { status: 'paid' });
+  
+  const affiliateRef = doc(db, 'affiliates', affiliateId);
+  const snap = await getDoc(affiliateRef);
+  if (snap.exists()) {
+     const aff = snap.data() as Affiliate & { pendingWithdrawal?: number };
+     await updateDoc(affiliateRef, {
+        earnings: Math.max(0, (aff.earnings || 0) - amount),
+        pendingWithdrawal: Math.max(0, (aff.pendingWithdrawal || 0) - amount),
+        totalWithdrawn: (aff.totalWithdrawn || 0) + amount
+     });
+  }
+};

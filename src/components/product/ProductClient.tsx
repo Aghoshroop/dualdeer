@@ -442,8 +442,8 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
           </div>
 
           <div className={styles.pricing}>
-            <span className={styles.offerPrice}>{renderPrice(product.price)}</span>
-            {product.mrp && product.mrp > product.price && (
+            <span className={styles.offerPrice}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</span>
+            {product.mrp && product.price > 0 && product.mrp > product.price && (
               <del className={styles.mrpPrice}>{renderPrice(product.mrp)}</del>
             )}
           </div>

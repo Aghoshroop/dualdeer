@@ -50,17 +50,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cart, isLoaded]);
 
   const addToCart = (item: CartItem) => {
+    // If offer price is 0 but MRP exists, charge the MRP
+    const processedItem = { ...item };
+    if (processedItem.price === 0 && processedItem.mrp) {
+      processedItem.price = processedItem.mrp;
+      processedItem.mrp = undefined;
+    }
+
     setCart(prev => {
       // Check if product with exact same ID and Size exists
-      const existing = prev.find(p => p.id === item.id && p.size === item.size);
+      const existing = prev.find(p => p.id === processedItem.id && p.size === processedItem.size);
       if (existing) {
         return prev.map(p => 
-          (p.id === item.id && p.size === item.size)
-            ? { ...p, quantity: p.quantity + item.quantity }
+          (p.id === processedItem.id && p.size === processedItem.size)
+            ? { ...p, quantity: p.quantity + processedItem.quantity }
             : p
         );
       }
-      return [...prev, item];
+      return [...prev, processedItem];
     });
   };
 

@@ -20,6 +20,12 @@
   overflow: hidden;
 }
 
+@media (max-width: 350px) {
+  .gameContainer {
+    padding: 1.5rem 1rem;
+  }
+}
+
 .pointsBadge {
   position: absolute;
   top: 1.5rem;
@@ -46,6 +52,12 @@
   -webkit-text-fill-color: transparent;
 }
 
+@media (max-width: 350px) {
+  .gameTitle {
+    font-size: 1.5rem;
+  }
+}
+
 .gameDescription {
   color: var(--color-text-muted);
   max-width: 500px;
@@ -65,8 +77,19 @@
   box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.8rem;
   transition: all 0.3s ease;
+  white-space: normal;
+  text-align: center;
+}
+
+@media (max-width: 350px) {
+  .playBtn {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    width: 100%;
+  }
 }
 
 .playBtn:hover:not(:disabled) {
@@ -137,10 +160,17 @@
   background: var(--color-border);
   border: 1px solid var(--color-border);
   border-radius: 16px;
+  border-radius: 16px;
   padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+@media (max-width: 350px) {
+  .statCard {
+    padding: 1rem;
+  }
 }
 
 .statIconBox {
@@ -155,10 +185,15 @@
 }
 
 .statValue {
-  font-size: 2.5rem;
   font-weight: 800;
   color: var(--color-text);
   margin-bottom: 0.2rem;
+}
+
+@media (max-width: 350px) {
+  .statValue {
+    font-size: 1.8rem;
+  }
 }
 
 .statLabel {
@@ -321,6 +356,8 @@
 .overviewWrapper {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  width: 100%;
 }
 
 .tierStatus {
@@ -558,6 +595,228 @@
   }
   .actionText h4 {
     font-size: 0.9rem;
+  }
+}
+
+/* Responsive Affiliate Forms */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.inputGroupDark {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.5rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.formInput {
+  flex: 1 1 0%;
+  min-width: 0;
+  padding: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.formInputDark {
+  flex: 1 1 0%;
+  min-width: 0;
+  padding: 0.8rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.inputSuffix {
+  display: flex;
+  align-items: center;
+  padding: 0 0.8rem;
+  background: #334155;
+  color: #00ffcc;
+  font-weight: 800;
+  font-size: 1rem;
+  box-sizing: border-box;
+  text-align: center;
+  justify-content: center;
+}
+
+.maxBtn {
+  padding: 0 1.2rem;
+  background: #334155;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-sizing: border-box;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.submitBtnActive {
+  background: #00ffcc;
+  color: #000;
+  cursor: pointer;
+}
+
+.submitBtnDisabled {
+  background: #334155;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.affiliateCardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.affiliateCardGrid .statCard {
+  flex-direction: column !important;
+  align-items: flex-start;
+}
+
+.couponDisplayBox {
+  display: flex;
+  background: #0f172a;
+  border: 1px dashed #334155;
+  border-radius: 8px;
+  padding: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.couponText {
+  font-size: clamp(1rem, 5vw, 1.5rem);
+  font-weight: 800;
+  color: #00ffcc;
+  letter-spacing: 1px;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+.copyBtn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Strictly Vertical Mobile Layout for all small screens */
+@media (max-width: 600px) {
+  .statCard {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    text-align: center !important;
+  }
+  .affiliateCardGrid {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+  .inputGroup, .inputGroupDark {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    background: transparent;
+    border: none;
+  }
+  .formInput, .formInputDark {
+    width: 100%;
+    text-align: center;
+    border-radius: 8px;
+    background: #0f172a;
+    border: 1px solid #334155;
+  }
+  .inputSuffix {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+  .maxBtn, .submitBtn, .playBtn {
+    width: 100%;
+    padding: 1rem;
+  }
+  .couponDisplayBox {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    text-align: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+  .couponText {
+    width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    background: #0f172a;
+    border: 1px dashed #334155;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  .couponDisplayBox button {
+    width: 100%;
+    background: #334155 !important;
+    padding: 1rem !important;
+    border-radius: 8px;
+    justify-content: center;
   }
 }
 

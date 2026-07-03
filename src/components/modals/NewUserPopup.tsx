@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { X, Gift, ArrowRight, Copy, CheckCircle2 } from 'lucide-react';
 import styles from './NewUserPopup.module.css';
 import Link from 'next/link';
@@ -14,9 +14,8 @@ export default function NewUserPopup() {
     let timer: NodeJS.Timeout;
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       const hasSeen = localStorage.getItem('dualdeer_newuser_popup') === 'dismissed'; // if they saved it permanently
-      const isDismissedSession = sessionStorage.getItem('dualdeer_newuser_popup_dismissed') === 'true';
       
-      if (!user && !hasSeen && !isDismissedSession) {
+      if (!user && !hasSeen) {
         timer = setTimeout(() => {
           setIsOpen(true);
           // Save to local storage so it syncs when they sign up
@@ -39,7 +38,6 @@ export default function NewUserPopup() {
 
   const closePopup = () => {
     setIsOpen(false);
-    sessionStorage.setItem('dualdeer_newuser_popup_dismissed', 'true');
   };
 
   const copyCode = () => {
@@ -77,9 +75,24 @@ export default function NewUserPopup() {
           <div className={styles.actions}>
             <Link 
               href="/auth" 
-              onClick={() => {
+              onClick={async () => {
                 setIsOpen(false);
                 localStorage.setItem('dualdeer_newuser_popup', 'dismissed');
+                // Ensure coupon exists in database globally
+                try {
+                  const { doc, setDoc } = require('firebase/firestore');
+                  await setDoc(doc(db, 'coupons', 'WELCOME15'), {
+                    code: 'WELCOME15',
+                    discountType: 'percentage',
+                    discountValue: 15,
+                    active: true,
+                    usageLimitType: 'once_per_user',
+                    applyTo: 'total_cart',
+                    createdAt: new Date()
+                  }, { merge: true });
+                } catch (e) {
+                  console.error("Failed to auto-create coupon in db", e);
+                }
               }} 
               className={styles.primaryBtn}
             >

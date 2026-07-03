@@ -542,8 +542,8 @@ function ProductCard({ product, i, styles, wishlist, toggleWishlist, playInterac
           <div className={styles.divider}></div>
 
           <div className={styles.productPrice}>
-            <span className={styles.currentPrice}>{renderPrice(product.price)}</span>
-            {product.mrp && product.mrp > product.price && (
+            <span className={styles.currentPrice}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</span>
+            {product.mrp && product.price > 0 && product.mrp > product.price && (
               <span className={styles.originalPrice}>{renderPrice(product.mrp)}</span>
             )}
           </div>

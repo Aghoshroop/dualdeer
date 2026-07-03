@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Users, ShoppingBag, Tags, Settings, LogOut, Ticket, FileText, Package, Menu, X, Bell, Zap, Video } from 'lucide-react';
+import { LayoutDashboard, Users, ShoppingBag, Tags, Settings, LogOut, Ticket, FileText, Package, Menu, X, Bell, Zap, Video, Handshake } from 'lucide-react';
 import styles from './AdminLayout.module.css';
 import AdminAuthWrapper from '@/components/admin/AdminAuthWrapper';
 import { auth } from '@/lib/firebase';
@@ -38,6 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <Link href="/admin/categories" className={styles.link} onClick={closeMenu}><Tags size={20} /> Categories</Link>
             <Link href="/admin/coupons" className={styles.link} onClick={closeMenu}><Ticket size={20} /> Coupons</Link>
+            <Link href="/admin/affiliates" className={styles.link} onClick={closeMenu}><Handshake size={20} /> Affiliates</Link>
             <Link href="/admin/content" className={styles.link} onClick={closeMenu}><FileText size={20} /> Site Content</Link>
             <Link href="/admin/banners" className={styles.link} onClick={closeMenu}><LayoutDashboard size={20} /> Hero Slider</Link>
             <Link href="/admin/videos" className={styles.link} onClick={closeMenu}><Video size={20} /> Videos</Link>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { getAllOrders, updateOrder, deleteOrder, Order } from '@/lib/firebaseUtils';
+import { getAllOrders, updateOrder, deleteOrder, Order, processAffiliateCommission } from '@/lib/firebaseUtils';
 import { Package, RefreshCw, Send, CheckCircle, PackageSearch, Trash2, Filter } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
 import styles from './Orders.module.css';
@@ -27,6 +27,12 @@ export default function AdminOrdersPage() {
     setMutatingId(orderId);
     try {
       await updateOrder(orderId, { status: newStatus });
+      
+      const targetOrder = orders.find(o => o.id === orderId);
+      if (newStatus === 'delivered' && targetOrder && targetOrder.affiliateId) {
+        await processAffiliateCommission(orderId, targetOrder);
+      }
+
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
     } catch (e) {
       console.error("Status mutation failed:", e);

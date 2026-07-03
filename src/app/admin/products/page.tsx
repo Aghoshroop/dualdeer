@@ -80,6 +80,7 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [categoriesList, setCategoriesList] = useState<any[]>([]);
   const [lastDeleted, setLastDeleted] = useState<{ id: string, product: Product } | null>(null);
+  const [hasOfferPrice, setHasOfferPrice] = useState(true);
   
   // Trash State
   const [viewingTrash, setViewingTrash] = useState(false);
@@ -147,6 +148,7 @@ export default function AdminProductsPage() {
   const openAddModal = () => {
     setFormData({ name: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '', isSoldOut: false });
     setEditingId(null);
+    setHasOfferPrice(true);
     setShowModal(true);
   };
 
@@ -170,6 +172,8 @@ export default function AdminProductsPage() {
       isSoldOut: product.isSoldOut || false
     });
     setEditingId(product.id!);
+    // If price equals MRP or price is 0, then there is no real offer price
+    setHasOfferPrice(!(product.price === product.mrp || product.price === 0));
     setShowModal(true);
   };
 
@@ -192,6 +196,11 @@ export default function AdminProductsPage() {
       stock: calculatedStock,
       colors: formData.colors ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : []
     };
+    
+    if (!hasOfferPrice) {
+      payload.price = payload.mrp || 0;
+      payload.priceUSD = payload.mrpUSD || 0;
+    }
     
     // Convert 'sizes' string into string array
     // removing 'sizes' string from saving directly if it was meant to be an array but it's fine as the payload overwrites it
@@ -635,9 +644,21 @@ export default function AdminProductsPage() {
                 <label htmlFor="isSoldOut" style={{ margin: 0, cursor: 'pointer' }}>Mark as Sold Out Manually</label>
               </div>
 
-              <div className={styles.formGroup}>
-                <label>Offer Price (Selling Price)</label>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+              <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input 
+                  type="checkbox" 
+                  id="hasOfferPrice"
+                  checked={hasOfferPrice} 
+                  onChange={(e) => setHasOfferPrice(e.target.checked)}
+                  style={{ width: 'auto' }}
+                />
+                <label htmlFor="hasOfferPrice" style={{ margin: 0, cursor: 'pointer', fontWeight: 'bold' }}>Enable Offer Price / Discount</label>
+              </div>
+
+              {hasOfferPrice && (
+                <div className={styles.formGroup}>
+                  <label>Offer Price (Selling Price)</label>
+                  <div style={{ display: 'flex', gap: '1rem' }}>
                   <input 
                     type="number" 
                     value={formData.price} 
@@ -657,9 +678,10 @@ export default function AdminProductsPage() {
                   />
                 </div>
               </div>
+              )}
 
               <div className={styles.formGroup}>
-                <label>MRP (Original Price)</label>
+                <label>MRP (Original Price {hasOfferPrice ? '' : '- This will be the Selling Price'})</label>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <input 
                     type="number" 
