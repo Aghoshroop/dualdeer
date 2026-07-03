@@ -28,14 +28,24 @@ service cloud.firestore {
       allow update: if isAdmin() || (
         request.auth != null &&
         resource.data.userId == request.auth.uid &&
-        request.resource.data.diff(resource.data)
-          .affectedKeys()
-          .hasOnly(['status', 'cancellationReason']) &&
-        resource.data.status == 'processing' &&
-        request.resource.data.status == 'cancellation_requested'
+        (
+          (
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'cancellationReason']) &&
+            resource.data.status == 'processing' &&
+            request.resource.data.status == 'cancellation_requested'
+          ) ||
+          (
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'returnReason']) &&
+            resource.data.status == 'delivered' &&
+            request.resource.data.status == 'return_requested'
+          )
+        )
       );
 
-      allow delete: if isAdmin();
+      allow delete: if isAdmin() || (
+        request.auth != null &&
+        resource.data.userId == request.auth.uid
+      );
     }
 
     match /users/{userId} {

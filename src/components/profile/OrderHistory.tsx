@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { ShoppingBag, TrendingUp, PackageSearch, Package, Trash2 } from 'lucide-react';
-import { getUserOrders, updateOrder, Order } from '@/lib/firebaseUtils';
+import { getUserOrders, updateOrder, deleteOrder, Order } from '@/lib/firebaseUtils';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import styles from './ProfileComponents.module.css';
@@ -53,6 +53,18 @@ export default function OrderHistory({ user }: { user: any }) {
     } catch (e) {
       console.error("Cancellation request failed:", e);
       alert("Failed to request cancellation.");
+    }
+  };
+
+  const handleDeleteOrder = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm("Are you sure you want to permanently delete this order from your history?")) {
+      try {
+        await deleteOrder(id);
+      } catch (err) {
+        console.error("Failed to delete order:", err);
+        alert("Failed to delete order.");
+      }
     }
   };
 
@@ -123,84 +135,118 @@ export default function OrderHistory({ user }: { user: any }) {
           {orders.map((order) => (
             <div 
               key={order.id} 
-              className={styles.orderItem} 
-              style={{ cursor: 'pointer', transition: 'background 0.2s', position: 'relative' }}
-              onClick={() => setSelectedOrder(order)}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(var(--foreground-rgb), 0.02)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              className={styles.amzOrderCard} 
             >
-              <div className={styles.orderInfo}>
-                <h4>Order #{order.id?.substring(0, 8).toUpperCase()}</h4>
-                <p>Status: <span style={{ textTransform: 'capitalize', color: order.status === 'delivered' ? '#10b981' : (order.status === 'cancelled' ? '#ef4444' : (order.status === 'cancellation_requested' || order.status === 'return_requested') ? '#f59e0b' : (order.status === 'return_approved' || order.status === 'return_picked_up' || order.status === 'returned') ? '#8b5cf6' : 'var(--color-primary)') }}>{order.status.replace(/_/g, ' ')}</span> • {order.items.length} Items</p>
-                {/* Embedded Items List */}
-                <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(var(--foreground-rgb), 0.05)', paddingTop: '1rem' }}>
+              <div className={styles.amzOrderHeader}>
+                <div className={styles.amzHeaderLeft}>
+                  <div className={styles.amzHeaderBlock}>
+                    <span className={styles.amzHeaderLabel}>Order Placed</span>
+                    <span className={styles.amzHeaderValue}>
+                      {order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date(order.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </span>
+                  </div>
+                  <div className={styles.amzHeaderBlock}>
+                    <span className={styles.amzHeaderLabel}>Total</span>
+                    <span className={styles.amzHeaderValue}>
+                      {renderPrice(order.total)}
+                      {order.discountAmount && order.discountAmount > 0 ? ` (Saved ${renderPrice(order.discountAmount)})` : ''}
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.amzHeaderRight}>
+                  <span className={styles.amzHeaderLabel}>Order # {order.id?.substring(0, 12).toUpperCase()}</span>
+                  <span className={styles.amzOrderDetailsLink} onClick={() => setSelectedOrder(order)}>
+                    View order details
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.amzOrderBody}>
+                <div className={`${styles.amzStatusBanner} ${order.status === 'delivered' ? styles.amzStatusDelivered : ''}`}>
+                  {order.status === 'delivered' ? 'Delivered' : order.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </div>
+
+                <div className={styles.amzItemList}>
                   {order.items.map((item, idx) => (
-                    <div key={idx} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.8rem', fontSize: '0.9rem' }}>
-                      <span style={{ color: 'var(--color-text)', flex: '1 1 auto', wordBreak: 'break-word', minWidth: '120px' }}>
-                        {item.quantity}x {item.name}
-                        {item.size && <span style={{ marginLeft: '8px', padding: '2px 6px', background: 'rgba(var(--foreground-rgb), 0.05)', borderRadius: '4px', color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 700 }}>Size: {item.size}</span>}
-                      </span>
-                      <div className={styles.itemPrices}>
-                        {item.mrp > item.pricePaid && <span className={styles.mrp}>{renderPrice(item.mrp)}</span>}
-                        <span className={styles.paid}>{renderPrice(item.pricePaid)}</span>
+                    <div key={idx} className={styles.amzItem}>
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} className={styles.amzItemImage} />
+                      ) : (
+                        <div className={styles.amzItemImagePlaceholder}>No Image</div>
+                      )}
+                      
+                      <div className={styles.amzItemDetails}>
+                        <span className={styles.amzItemName} onClick={() => setSelectedOrder(order)}>{item.name}</span>
+                        {item.size && <span className={styles.amzItemMeta}>Size: {item.size}</span>}
+                        <span className={styles.amzItemMeta}>Qty: {item.quantity}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span className={styles.amzItemPrice}>{renderPrice(item.pricePaid)}</span>
+                          {item.mrp > item.pricePaid && (
+                            <span style={{ textDecoration: 'line-through', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>{renderPrice(item.mrp)}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className={styles.amzOrderActions}>
+                        {idx === 0 && order.status === 'processing' && cancellingOrderId !== order.id && (
+                          <button 
+                            className={styles.amzBtn}
+                            onClick={(e) => { e.stopPropagation(); setCancellingOrderId(order.id!); }}
+                          >
+                            Cancel items
+                          </button>
+                        )}
+                        {idx === 0 && cancellingOrderId === order.id && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                            <select 
+                              value={cancellationReason}
+                              onChange={(e) => setCancellationReason(e.target.value)}
+                              style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--color-border)', background: 'var(--color-surface, var(--color-background))', color: 'var(--color-text)', fontSize: '0.85rem' }}
+                            >
+                              <option value="">Reason for cancellation</option>
+                              <option value="Ordered by mistake">Ordered by mistake</option>
+                              <option value="Changed my mind">Changed my mind</option>
+                              <option value="Found a cheaper alternative">Found cheaper</option>
+                              <option value="Delivery time is too long">Delivery too long</option>
+                              <option value="Other">Other</option>
+                            </select>
+                            <button 
+                              className={`${styles.amzBtn} ${styles.amzBtnPrimary}`}
+                              onClick={() => submitCancellation(order.id!)}
+                              disabled={!cancellationReason}
+                              style={{ opacity: cancellationReason ? 1 : 0.5 }}
+                            >
+                              Confirm cancellation
+                            </button>
+                            <button 
+                              className={styles.amzBtn}
+                              onClick={() => { setCancellingOrderId(null); setCancellationReason(''); }}
+                            >
+                              Go back
+                            </button>
+                          </div>
+                        )}
+                        {idx === 0 && order.status === 'delivered' && (
+                          <button className={styles.amzBtn}>
+                            Return items
+                          </button>
+                        )}
+                        <button className={styles.amzBtn}>
+                          Write a product review
+                        </button>
+                        {idx === 0 && cancellingOrderId !== order.id && (
+                          <button
+                            className={`${styles.amzBtn} ${styles.amzBtnDanger}`}
+                            onClick={(e) => handleDeleteOrder(order.id!, e)}
+                            style={{ marginTop: 'auto', border: 'none', background: 'transparent', boxShadow: 'none', textAlign: 'left', padding: '0.5rem 0' }}
+                          >
+                            <Trash2 size={16} style={{ verticalAlign: 'text-bottom', marginRight: '4px' }}/> Delete from history
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                <div style={{ fontSize: '1.5rem', fontWeight: '800' }}>{renderPrice(order.total)}</div>
-                {order.discountAmount && order.discountAmount > 0 && (
-                  <p style={{ fontSize: '0.8rem', color: '#10b981', marginTop: '0.5rem' }}>Saved {renderPrice(order.discountAmount)} with coupon</p>
-                )}
-                {order.status === 'processing' && cancellingOrderId !== order.id && (
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setCancellingOrderId(order.id!); }}
-                    style={{ background: 'none', border: 'none', color: '#f59e0b', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600, opacity: 0.8 }}
-                    onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                    onMouseLeave={e => e.currentTarget.style.opacity = '0.8'}
-                  >
-                    Request Cancel
-                  </button>
-                )}
-                {cancellingOrderId === order.id && (
-                  <div onClick={e => e.stopPropagation()} style={{ marginTop: '1rem', background: 'rgba(var(--foreground-rgb), 0.03)', padding: '1rem', borderRadius: '8px', width: '250px', textAlign: 'left' }}>
-                    <h5 style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text)' }}>Reason for Cancellation:</h5>
-                    <select 
-                      value={cancellationReason}
-                      onChange={(e) => setCancellationReason(e.target.value)}
-                      style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid var(--color-border)', background: 'var(--color-background)', color: 'var(--color-text)', marginBottom: '1rem' }}
-                    >
-                      <option value="">Select a reason...</option>
-                      <option value="Ordered by mistake">Ordered by mistake</option>
-                      <option value="Changed my mind">Changed my mind</option>
-                      <option value="Found a cheaper alternative">Found a cheaper alternative</option>
-                      <option value="Delivery time is too long">Delivery time is too long</option>
-                      <option value="Other">Other</option>
-                    </select>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      <button 
-                        onClick={() => { setCancellingOrderId(null); setCancellationReason(''); }}
-                        style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid var(--color-border)', background: 'transparent', color: 'var(--color-text)', cursor: 'pointer', fontSize: '0.8rem' }}
-                      >
-                        Back
-                      </button>
-                      <button 
-                        onClick={() => submitCancellation(order.id!)}
-                        disabled={!cancellationReason}
-                        style={{ padding: '6px 12px', borderRadius: '4px', border: 'none', background: '#ef4444', color: '#fff', cursor: cancellationReason ? 'pointer' : 'not-allowed', fontSize: '0.8rem', opacity: cancellationReason ? 1 : 0.5 }}
-                      >
-                        Submit
-                      </button>
-                    </div>
-                  </div>
-                )}
-                {order.status === 'cancellation_requested' && (
-                  <span style={{ color: '#f59e0b', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600 }}>Cancellation Pending</span>
-                )}
-                {order.status === 'cancelled' && (
-                  <span style={{ color: '#ef4444', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600 }}>Cancelled</span>
-                )}
               </div>
             </div>
           ))}
