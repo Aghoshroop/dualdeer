@@ -102,6 +102,7 @@ export interface Affiliate {
   earnings: number; // Available balance
   pendingEarnings: number; // Commission waiting for delivery
   totalWithdrawn: number;
+  pendingWithdrawal?: number;
   status: 'active' | 'suspended';
   createdAt?: Timestamp;
 }
