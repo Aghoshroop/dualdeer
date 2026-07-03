@@ -9,7 +9,7 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [mutatingId, setMutatingId] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<'recent' | 'price_high' | 'price_low' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled'>('recent');
+  const [activeFilter, setActiveFilter] = useState<'recent' | 'price_high' | 'price_low' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned'>('recent');
   const { formatPrice } = useCurrency();
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function AdminOrdersPage() {
     setLoading(false);
   };
 
-  const handleStatusChange = async (orderId: string, newStatus: 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled') => {
+  const handleStatusChange = async (orderId: string, newStatus: 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned') => {
     setMutatingId(orderId);
     try {
       await updateOrder(orderId, { status: newStatus });
@@ -56,7 +56,11 @@ export default function AdminOrdersPage() {
       case 'shipped':
       case 'delivered': 
       case 'cancellation_requested':
-      case 'cancelled': result = result.filter(o => o.status === activeFilter); break;
+      case 'cancelled':
+      case 'return_requested':
+      case 'return_approved':
+      case 'return_picked_up':
+      case 'returned': result = result.filter(o => o.status === activeFilter); break;
       case 'recent':
       default: break; // Already sorted latest by firebase utils
     }
@@ -69,7 +73,11 @@ export default function AdminOrdersPage() {
     if (status === 'delivered') return <CheckCircle size={14} color="#00ffcc" />;
     if (status === 'shipped') return <Send size={14} color="#3399ff" />;
     if (status === 'cancellation_requested') return <RefreshCw size={14} color="#f59e0b" />;
+    if (status === 'return_requested') return <RefreshCw size={14} color="#ec4899" />;
+    if (status === 'return_approved') return <Package size={14} color="#8b5cf6" />;
+    if (status === 'return_picked_up') return <Send size={14} color="#8b5cf6" style={{ transform: 'scaleX(-1)' }} />;
     if (status === 'cancelled') return <Trash2 size={14} color="#ef4444" />;
+    if (status === 'returned') return <CheckCircle size={14} color="#8b5cf6" />;
     return <RefreshCw size={14} color="#ffcc00" className={styles.spin} />;
   };
 
@@ -97,6 +105,8 @@ export default function AdminOrdersPage() {
           <button onClick={() => setActiveFilter('processing')} className={`${styles.filterBtn} ${activeFilter === 'processing' ? styles.activeF : ''}`}>Pending Actions</button>
           <button onClick={() => setActiveFilter('shipped')} className={`${styles.filterBtn} ${activeFilter === 'shipped' ? styles.activeF : ''}`}>Shipped</button>
           <button onClick={() => setActiveFilter('delivered')} className={`${styles.filterBtn} ${activeFilter === 'delivered' ? styles.activeF : ''}`}>Delivered</button>
+          <button onClick={() => setActiveFilter('return_requested')} className={`${styles.filterBtn} ${activeFilter === 'return_requested' ? styles.activeF : ''}`} style={{ color: activeFilter === 'return_requested' ? '#ec4899' : 'inherit' }}>Return Requests</button>
+          <button onClick={() => setActiveFilter('returned')} className={`${styles.filterBtn} ${activeFilter === 'returned' ? styles.activeF : ''}`}>Returned</button>
           <button onClick={() => setActiveFilter('cancellation_requested')} className={`${styles.filterBtn} ${activeFilter === 'cancellation_requested' ? styles.activeF : ''}`} style={{ color: activeFilter === 'cancellation_requested' ? '#f59e0b' : 'inherit' }}>Cancel Requests</button>
           <button onClick={() => setActiveFilter('cancelled')} className={`${styles.filterBtn} ${activeFilter === 'cancelled' ? styles.activeF : ''}`}>Cancelled</button>
         </div>
@@ -145,12 +155,6 @@ export default function AdminOrdersPage() {
                     ) : (
                       <span className={styles.guestMarker}>Anonymous User: {order.userId}</span>
                     )}
-                    {order.cancellationReason && (
-                      <div style={{ marginTop: '0.8rem', padding: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', borderLeft: '3px solid #f59e0b', borderRadius: '4px' }}>
-                        <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#f59e0b', textTransform: 'uppercase', marginBottom: '4px' }}>Cancellation Reason</span>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text)' }}>{order.cancellationReason}</span>
-                      </div>
-                    )}
                   </td>
                   
                   <td className={styles.manifestCol}>
@@ -181,9 +185,21 @@ export default function AdminOrdersPage() {
                   </td>
                   
                   <td>
-                    <div className={`${styles.statusBadge} ${styles[order.status]}`} style={order.status === 'cancellation_requested' ? { background: 'rgba(245,158,11,0.2)', color: '#f59e0b', borderColor: '#f59e0b' } : order.status === 'cancelled' ? { background: 'rgba(239,68,68,0.2)', color: '#ef4444', borderColor: '#ef4444' } : {}}>
+                    <div className={`${styles.statusBadge} ${styles[order.status]}`} style={order.status === 'cancellation_requested' ? { background: 'rgba(245,158,11,0.2)', color: '#f59e0b', borderColor: '#f59e0b' } : order.status === 'return_requested' ? { background: 'rgba(236,72,153,0.2)', color: '#ec4899', borderColor: '#ec4899' } : order.status === 'cancelled' ? { background: 'rgba(239,68,68,0.2)', color: '#ef4444', borderColor: '#ef4444' } : (order.status === 'returned' || order.status === 'return_approved' || order.status === 'return_picked_up') ? { background: 'rgba(139,92,246,0.2)', color: '#8b5cf6', borderColor: '#8b5cf6' } : {}}>
                       <StatusIcon status={order.status} /> {order.status.replace('_', ' ').toUpperCase()}
                     </div>
+                    {order.cancellationReason && (
+                      <div style={{ marginTop: '0.8rem', padding: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', borderLeft: '3px solid #f59e0b', borderRadius: '4px' }}>
+                        <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', marginBottom: '2px' }}>Reason:</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--color-text)' }}>{order.cancellationReason}</span>
+                      </div>
+                    )}
+                    {order.returnReason && (
+                      <div style={{ marginTop: '0.8rem', padding: '0.5rem', background: 'rgba(236, 72, 153, 0.1)', borderLeft: '3px solid #ec4899', borderRadius: '4px' }}>
+                        <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#ec4899', textTransform: 'uppercase', marginBottom: '2px' }}>Return Reason:</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--color-text)' }}>{order.returnReason}</span>
+                      </div>
+                    )}
                   </td>
                   
                   <td>
@@ -199,6 +215,10 @@ export default function AdminOrdersPage() {
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
+                        <option value="return_requested">Return Requested</option>
+                        <option value="return_approved">Return Approved</option>
+                        <option value="return_picked_up">Return Picked Up</option>
+                        <option value="returned">Returned</option>
                         <option value="cancellation_requested">Cancel Requested</option>
                         <option value="cancelled">Cancelled</option>
                       </select>
@@ -206,8 +226,27 @@ export default function AdminOrdersPage() {
                       
                       {order.status === 'cancellation_requested' && (
                         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexDirection: 'column' }}>
-                          <button onClick={() => handleStatusChange(order.id as string, 'cancelled')} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Cancel Order</button>
-                          <button onClick={() => handleStatusChange(order.id as string, 'processing')} style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Reject Request</button>
+                          <button onClick={() => handleStatusChange(order.id as string, 'cancelled')} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Approve Cancel</button>
+                          <button onClick={() => handleStatusChange(order.id as string, 'processing')} style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Reject Cancel</button>
+                        </div>
+                      )}
+
+                      {order.status === 'return_requested' && (
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexDirection: 'column' }}>
+                          <button onClick={() => handleStatusChange(order.id as string, 'return_approved')} style={{ background: '#8b5cf6', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Approve Return</button>
+                          <button onClick={() => handleStatusChange(order.id as string, 'delivered')} style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Reject Return</button>
+                        </div>
+                      )}
+
+                      {order.status === 'return_approved' && (
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexDirection: 'column' }}>
+                          <button onClick={() => handleStatusChange(order.id as string, 'return_picked_up')} style={{ background: '#8b5cf6', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Mark as Picked Up</button>
+                        </div>
+                      )}
+
+                      {order.status === 'return_picked_up' && (
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexDirection: 'column' }}>
+                          <button onClick={() => handleStatusChange(order.id as string, 'returned')} style={{ background: '#10b981', color: '#fff', border: 'none', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>Mark as Returned (Completed)</button>
                         </div>
                       )}
 

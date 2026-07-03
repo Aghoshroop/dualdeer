@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { addSubscriber } from '@/lib/firebaseUtils';
+import { auth, db } from '@/lib/firebase';
+import { doc, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore';
 import { X, Mail, Tag, ArrowRight, Copy, CheckCircle2 } from 'lucide-react';
 import styles from './NewsletterModal.module.css';
 
@@ -12,8 +14,10 @@ export default function NewsletterModal() {
 
   useEffect(() => {
     // Only mount on client and only fire if they haven't seen it yet
-    const hasSeen = localStorage.getItem('dualdeer_newsletter');
-    if (!hasSeen) {
+    const hasSubscribed = localStorage.getItem('dualdeer_newsletter') === 'subscribed';
+    const isDismissedSession = sessionStorage.getItem('dualdeer_newsletter_dismissed') === 'true';
+    
+    if (!hasSubscribed && !isDismissedSession) {
       // Engage the drop after 5 seconds of active browsing
       const timer = setTimeout(() => setIsOpen(true), 5000);
       return () => clearTimeout(timer);
@@ -22,9 +26,9 @@ export default function NewsletterModal() {
 
   const closeDrop = () => {
     setIsOpen(false);
-    // Mark as dismissed so we don't spam them on next reload
+    // We use sessionStorage for dismissals so it keeps coming back on new visits if not filled
     if (status !== 'success') {
-       localStorage.setItem('dualdeer_newsletter', 'dismissed');
+       sessionStorage.setItem('dualdeer_newsletter_dismissed', 'true');
     }
   };
 
@@ -36,6 +40,29 @@ export default function NewsletterModal() {
       await addSubscriber(email);
       setStatus('success');
       localStorage.setItem('dualdeer_newsletter', 'subscribed');
+      
+      // Save coupon locally
+      const stored = JSON.parse(localStorage.getItem('dualdeer_unlocked_coupons') || '[]');
+      if (!stored.includes('FIRST15')) {
+        stored.push('FIRST15');
+        localStorage.setItem('dualdeer_unlocked_coupons', JSON.stringify(stored));
+      }
+
+      // Save coupon to Firestore if logged in
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        try {
+          const snap = await getDoc(userRef);
+          if (snap.exists()) {
+            await updateDoc(userRef, { unlockedCoupons: arrayUnion('FIRST15') });
+          } else {
+            await setDoc(userRef, { unlockedCoupons: ['FIRST15'], email: user.email, name: user.displayName });
+          }
+        } catch (e) {
+          console.error("Failed to save coupon to user profile", e);
+        }
+      }
     } catch (err) {
       console.error(err);
       setStatus('idle');

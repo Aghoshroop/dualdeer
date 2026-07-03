@@ -37,7 +37,7 @@ export default function ProfileCart() {
       <div className={styles.emptyContainer}>
         <ShoppingBag size={48} className={styles.emptyIcon} />
         <h2 className={styles.emptyTitle}>Your Cart is Empty</h2>
-        <p className={styles.emptySubtitle}>Explore the arsenal to gear up.</p>
+        <p className={styles.emptySubtitle}>Explore our collection to find your perfect fit.</p>
         <Link href="/shop" className={styles.shopBtn}>Browse Collection <ArrowRight size={16} /></Link>
       </div>
     );
@@ -47,7 +47,7 @@ export default function ProfileCart() {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.headerTitle}>Active Payload</h2>
+      <h2 className={styles.headerTitle}>Shopping Cart</h2>
       
       <div className={styles.cartList}>
         {cart.map(item => (

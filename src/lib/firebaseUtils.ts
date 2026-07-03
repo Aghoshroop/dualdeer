@@ -86,6 +86,7 @@ export interface Coupon {
   discountType: 'percentage' | 'fixed';
   discountValue: number;
   active: boolean;
+  isPublic?: boolean;
   usageLimitType?: 'single_use' | 'once_per_user' | 'unlimited';
   applyTo?: 'total_cart' | 'first_item';
   usedBy?: string[];
@@ -118,8 +119,9 @@ export interface Order {
   total: number;
   discountAmount?: number;
   appliedCoupon?: string;
-  status: 'payment_pending' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled';
+  status: 'payment_pending' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned';
   cancellationReason?: string;
+  returnReason?: string;
   paymentMethod?: string;
   utrNumber?: string;
   currency?: string;

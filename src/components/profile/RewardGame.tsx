@@ -13,6 +13,7 @@ export default function RewardGame({ user }: { user: any }) {
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [unlocked, setUnlocked] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { formatPrice, renderPrice } = useCurrency();
 
@@ -20,14 +21,35 @@ export default function RewardGame({ user }: { user: any }) {
     const loadData = async () => {
       if (!user?.uid) return;
       
+      let currentUnlocked: string[] = [];
+
       // 1. Fetch or Create User Profile in Firestore
       try {
         const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
-          setPoints(userSnap.data().points || 0);
+          const data = userSnap.data();
+          setPoints(data.points || 0);
+          
+          let firestoreUnlocked = data.unlockedCoupons || [];
+          
+          // Merge with localStorage
+          const localUnlocked = JSON.parse(localStorage.getItem('dualdeer_unlocked_coupons') || '[]');
+          
+          const combinedUnlocked = Array.from(new Set([...firestoreUnlocked, ...localUnlocked]));
+          
+          // If local has more than firestore, maybe we should update firestore? (optional, but good)
+          if (localUnlocked.length > 0 && combinedUnlocked.length > firestoreUnlocked.length) {
+            updateDoc(userRef, { unlockedCoupons: combinedUnlocked }).catch(console.error);
+          }
+          
+          currentUnlocked = combinedUnlocked;
+          setUnlocked(combinedUnlocked);
         } else {
-          await setDoc(userRef, { points: 0, email: user.email, name: user.displayName });
+          const localUnlocked = JSON.parse(localStorage.getItem('dualdeer_unlocked_coupons') || '[]');
+          await setDoc(userRef, { points: 0, email: user.email, name: user.displayName, unlockedCoupons: localUnlocked });
+          currentUnlocked = localUnlocked;
+          setUnlocked(localUnlocked);
         }
       } catch (e) {
         console.error("Firebase Rule Error: Cannot read or write users collection.", e);
@@ -36,8 +58,11 @@ export default function RewardGame({ user }: { user: any }) {
       // 2. Fetch Active Coupons from Admin panel global store
       try {
         const allCoupons = await getCoupons();
-        // Filter only active ones, or mock that certain ones are "won"
-        setCoupons(allCoupons.filter(c => c.active));
+        
+        // Filter only active ones that are marked as public OR explicitly unlocked by this user
+        setCoupons(allCoupons.filter(c => 
+          c.active && (c.isPublic || currentUnlocked.includes(c.code))
+        ));
       } catch (e) {
         console.error("Firebase Rule Error: Cannot read coupons collection.", e);
       }
@@ -75,18 +100,18 @@ export default function RewardGame({ user }: { user: any }) {
 
   return (
     <div>
-      <h2 className={styles.sectionTitle}><Award size={28} color="var(--color-primary)"/> Reward Nexus</h2>
+      <h2 className={styles.sectionTitle}><Award size={28} color="var(--color-primary)"/> Rewards & Coupons</h2>
       
       {/* Gamification Area */}
       <div className={styles.gameContainer}>
         <div className={styles.pointsBadge}>
-          <Coins size={18} /> {points} Elite Points
+          <Coins size={18} /> {points} Store Points
         </div>
 
-        <h3 className={styles.gameTitle}>Daily Data Mine</h3>
+        <h3 className={styles.gameTitle}>Daily Bonus Spin</h3>
         <p className={styles.gameDescription}>
-          Tap to run an extraction algorithm and uncover hidden Elite Points. 
-          Use your points in the future to unlock hidden luxury gear.
+          Tap to try your luck and win Store Points. 
+          Use your points in the future to unlock special discounts.
         </p>
 
         <motion.button 
@@ -100,7 +125,7 @@ export default function RewardGame({ user }: { user: any }) {
               <Sparkles size={24} />
             </motion.div>
           ) : (
-            <><Sparkles size={24} /> Extract Points</>
+            <><Sparkles size={24} /> Spin for Points</>
           )}
         </motion.button>
       </div>

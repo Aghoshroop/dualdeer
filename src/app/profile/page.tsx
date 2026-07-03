@@ -71,7 +71,7 @@ export default function ProfilePage() {
 
       {/* BACK NAVIGATION */}
       <button className={styles.backBtn} onClick={() => router.push('/')}>
-        <ArrowLeft size={16} /> <span className={styles.backText}>RETREAT</span>
+        <ArrowLeft size={16} /> <span className={styles.backText}>BACK TO STORE</span>
       </button>
 
       {/* SIDEBAR NAVIGATION */}
@@ -85,7 +85,7 @@ export default function ProfilePage() {
             )}
           </div>
           <div className={styles.headText}>
-            <h3>{user.displayName || 'Elite Operative'}</h3>
+            <h3>{user.displayName || 'Customer'}</h3>
             <p>{user.email}</p>
           </div>
         </div>
@@ -95,40 +95,40 @@ export default function ProfilePage() {
             className={`${styles.navBtn} ${activeTab === 'overview' ? styles.active : ''}`}
             onClick={() => setActiveTab('overview')}
           >
-            <LayoutDashboard size={20} /> <span className={styles.navText}>Command Center</span>
+            <LayoutDashboard size={20} /> <span className={styles.navText}>Dashboard</span>
           </button>
           
           <button 
             className={`${styles.navBtn} ${activeTab === 'orders' ? styles.active : ''}`}
             onClick={() => setActiveTab('orders')}
           >
-            <ShoppingBag size={20} /> <span className={styles.navText}>Payload History</span>
+            <ShoppingBag size={20} /> <span className={styles.navText}>Order History</span>
           </button>
           
           <button 
             className={`${styles.navBtn} ${activeTab === 'rewards' ? styles.active : ''}`}
             onClick={() => setActiveTab('rewards')}
           >
-            <Award size={20} /> <span className={styles.navText}>Reward Nexus</span>
+            <Award size={20} /> <span className={styles.navText}>Rewards & Coupons</span>
           </button>
 
           <button 
             className={`${styles.navBtn} ${activeTab === 'wishlist' ? styles.active : ''}`}
             onClick={() => setActiveTab('wishlist')}
           >
-            <Bookmark size={20} /> <span className={styles.navText}>Saved Tech</span>
+            <Bookmark size={20} /> <span className={styles.navText}>Wishlist</span>
           </button>
 
           <button 
             className={`${styles.navBtn} ${activeTab === 'cart' ? styles.active : ''}`}
             onClick={() => setActiveTab('cart')}
           >
-            <Gift size={20} /> <span className={styles.navText}>Active Bag</span>
+            <Gift size={20} /> <span className={styles.navText}>Shopping Cart</span>
           </button>
         </nav>
 
         <button className={styles.logoutBtn} onClick={handleLogout}>
-          <LogOut size={20} /> <span className={styles.navText}>Terminate Link</span>
+          <LogOut size={20} /> <span className={styles.navText}>Log Out</span>
         </button>
       </aside>
 

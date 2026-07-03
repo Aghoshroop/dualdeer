@@ -43,16 +43,16 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
   const activeOrders = orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').length;
   
   // Rank Logic
-  let rank = "Elite Aspirant";
+  let rank = "Bronze Member";
   let rankColor = "#94a3b8"; // slate
   let icon = <Shield size={24} />;
 
   if (totalSpent > 10000) {
-    rank = "Obsidian Vanguard";
+    rank = "Gold Member";
     rankColor = "#1e293b";
     icon = <Zap size={24} color="#f59e0b" />;
   } else if (totalSpent > 5000) {
-    rank = "Platinum Operative";
+    rank = "Silver Member";
     rankColor = "#94a3b8";
     icon = <Award size={24} color="#6366f1" />;
   }
@@ -75,7 +75,7 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
   return (
     <motion.div variants={container} initial="hidden" animate="show" className={styles.overviewWrapper}>
       <motion.h2 variants={item} className={styles.sectionTitle}>
-        <TrendingUp size={24} color="var(--color-primary)" /> Command Center
+        <TrendingUp size={24} color="var(--color-primary)" /> Dashboard
       </motion.h2>
 
       {/* TIER BADGE */}
@@ -84,7 +84,7 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
           {icon}
         </div>
         <div className={styles.tierInfo}>
-          <span className={styles.tierLabel}>Tactical Clearance</span>
+          <span className={styles.tierLabel}>Membership Tier</span>
           <h3 className={styles.tierTitle}>{rank}</h3>
         </div>
         <div className={styles.tierProgress}>
@@ -109,21 +109,21 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
           <div className={styles.statIconBox}><Package size={20} /></div>
           <div>
             <div className={styles.statValue}>{orders.length}</div>
-            <div className={styles.statLabel}>Total Payloads</div>
+            <div className={styles.statLabel}>Total Orders</div>
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statIconBox}><History size={20} /></div>
           <div>
             <div className={styles.statValue}>{activeOrders}</div>
-            <div className={styles.statLabel}>Active Missions</div>
+            <div className={styles.statLabel}>Active Orders</div>
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statIconBox}><CreditCard size={20} /></div>
           <div>
             <div className={styles.statValue}>{renderPrice(totalSpent)}</div>
-            <div className={styles.statLabel}>Investment</div>
+            <div className={styles.statLabel}>Total Spent</div>
           </div>
         </div>
       </motion.div>
@@ -137,8 +137,8 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
         >
           <div className={styles.actionIcon}><History size={20} /></div>
           <div className={styles.actionText}>
-            <h4>Tracking Nexus</h4>
-            <p>Monitor current field operations</p>
+            <h4>Order Tracking</h4>
+            <p>Track your recent orders</p>
           </div>
           <ChevronRight size={18} className={styles.actionArrow} />
         </motion.div>
@@ -150,8 +150,8 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
         >
           <div className={styles.actionIcon}><Award size={20} /></div>
           <div className={styles.actionText}>
-            <h4>Reward Synthesis</h4>
-            <p>Redeem tactical advantages</p>
+            <h4>Rewards & Coupons</h4>
+            <p>View your active discounts</p>
           </div>
           <ChevronRight size={18} className={styles.actionArrow} />
         </motion.div>
@@ -160,7 +160,7 @@ export default function EliteOverview({ user, setActiveTab }: EliteOverviewProps
       {/* LATEST ORDER SNEAK PEEK */}
       {!loading && orders.length > 0 && (
         <motion.div variants={item} className={styles.latestMission}>
-           <h3>Latest Transmission</h3>
+           <h3>Latest Order</h3>
            <div className={styles.missionCard}>
              <div className={styles.missionDot} style={{ background: orders[0].status === 'delivered' ? '#10b981' : orders[0].status === 'cancelled' ? '#ef4444' : '#f59e0b' }} />
              <div className={styles.missionSummary}>

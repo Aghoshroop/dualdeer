@@ -15,6 +15,7 @@ export default function AdminCouponsPage() {
     discountType: 'percentage' as 'percentage' | 'fixed',
     discountValue: 0,
     active: true,
+    isPublic: false,
     usageLimitType: 'once_per_user' as 'single_use' | 'once_per_user' | 'unlimited',
     applyTo: 'total_cart' as 'total_cart' | 'first_item',
   });
@@ -35,7 +36,7 @@ export default function AdminCouponsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ code: '', discountType: 'percentage', discountValue: 0, active: true, usageLimitType: 'once_per_user', applyTo: 'total_cart' });
+    setFormData({ code: '', discountType: 'percentage', discountValue: 0, active: true, isPublic: false, usageLimitType: 'once_per_user', applyTo: 'total_cart' });
     setEditingId(null);
     setShowModal(true);
   };
@@ -46,6 +47,7 @@ export default function AdminCouponsPage() {
       discountType: coupon.discountType,
       discountValue: coupon.discountValue,
       active: coupon.active,
+      isPublic: coupon.isPublic || false,
       usageLimitType: coupon.usageLimitType || 'unlimited',
       applyTo: coupon.applyTo || 'total_cart'
     });
@@ -102,9 +104,16 @@ export default function AdminCouponsPage() {
                     {coupon.discountType === 'percentage' ? `${coupon.discountValue}% OFF` : `$${coupon.discountValue} OFF`}
                   </td>
                   <td>
-                    <span className={`${styles.statusBadge} ${coupon.active ? styles.active : styles.inactive}`}>
-                      {coupon.active ? 'Active' : 'Inactive'}
-                    </span>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <span className={`${styles.statusBadge} ${coupon.active ? styles.active : styles.inactive}`}>
+                        {coupon.active ? 'Active' : 'Inactive'}
+                      </span>
+                      {coupon.isPublic && (
+                        <span className={styles.statusBadge} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                          Public
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td>
                     <span className={styles.usageBadge}>
@@ -200,6 +209,15 @@ export default function AdminCouponsPage() {
                 type="checkbox" 
                 checked={formData.active} 
                 onChange={(e) => setFormData({...formData, active: e.target.checked})}
+              />
+            </div>
+
+            <div className={`${styles.formGroup} ${styles.checkboxGroup}`}>
+              <label>Show in User Accounts (Public)</label>
+              <input 
+                type="checkbox" 
+                checked={formData.isPublic} 
+                onChange={(e) => setFormData({...formData, isPublic: e.target.checked})}
               />
             </div>
 

@@ -6,12 +6,15 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import styles from './ProfileComponents.module.css';
 import { useCurrency } from '@/context/CurrencyContext';
+import OrderDetailsModal from './OrderDetailsModal';
+import { AnimatePresence } from 'framer-motion';
 
 export default function OrderHistory({ user }: { user: any }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
   const [cancellationReason, setCancellationReason] = useState<string>('');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const { formatPrice, renderPrice } = useCurrency();
 
   useEffect(() => {
@@ -76,16 +79,26 @@ export default function OrderHistory({ user }: { user: any }) {
     return <div>Loading analytics...</div>;
   }
 
+  if (selectedOrder) {
+    return (
+      <OrderDetailsModal 
+        order={selectedOrder} 
+        user={user} 
+        onClose={() => setSelectedOrder(null)} 
+      />
+    );
+  }
+
   return (
     <div>
-      <h2 className={styles.sectionTitle}><TrendingUp size={28} color="var(--color-primary)"/> Your Analytics</h2>
+      <h2 className={styles.sectionTitle}><TrendingUp size={28} color="var(--color-primary)"/> Order Summary</h2>
       
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <div className={styles.statIconBox}><Package size={24} /></div>
           <div>
             <div className={styles.statValue}>{totalItemsOwned}</div>
-            <div className={styles.statLabel}>DualDeer Products Owned</div>
+            <div className={styles.statLabel}>Total Items Purchased</div>
           </div>
         </div>
 
@@ -93,7 +106,7 @@ export default function OrderHistory({ user }: { user: any }) {
           <div className={styles.statIconBox} style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}><TrendingUp size={24} /></div>
           <div className={styles.statCard}>
             <div className={styles.statValue}>{renderPrice(totalProfit)}</div>
-            <div className={styles.statLabel}>Total Value Retained</div>
+            <div className={styles.statLabel}>Total Savings</div>
           </div>
         </div>
       </div>
@@ -108,10 +121,17 @@ export default function OrderHistory({ user }: { user: any }) {
       ) : (
         <div className={styles.orderList}>
           {orders.map((order) => (
-            <div key={order.id} className={styles.orderItem}>
+            <div 
+              key={order.id} 
+              className={styles.orderItem} 
+              style={{ cursor: 'pointer', transition: 'background 0.2s', position: 'relative' }}
+              onClick={() => setSelectedOrder(order)}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(var(--foreground-rgb), 0.02)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
               <div className={styles.orderInfo}>
                 <h4>Order #{order.id?.substring(0, 8).toUpperCase()}</h4>
-                <p>Status: <span style={{ textTransform: 'capitalize', color: order.status === 'delivered' ? '#10b981' : order.status === 'cancelled' ? '#ef4444' : order.status === 'cancellation_requested' ? '#f59e0b' : 'var(--color-primary)' }}>{order.status.replace('_', ' ')}</span> • {order.items.length} Items</p>
+                <p>Status: <span style={{ textTransform: 'capitalize', color: order.status === 'delivered' ? '#10b981' : (order.status === 'cancelled' ? '#ef4444' : (order.status === 'cancellation_requested' || order.status === 'return_requested') ? '#f59e0b' : (order.status === 'return_approved' || order.status === 'return_picked_up' || order.status === 'returned') ? '#8b5cf6' : 'var(--color-primary)') }}>{order.status.replace(/_/g, ' ')}</span> • {order.items.length} Items</p>
                 {/* Embedded Items List */}
                 <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(var(--foreground-rgb), 0.05)', paddingTop: '1rem' }}>
                   {order.items.map((item, idx) => (
@@ -135,7 +155,7 @@ export default function OrderHistory({ user }: { user: any }) {
                 )}
                 {order.status === 'processing' && cancellingOrderId !== order.id && (
                   <button 
-                    onClick={() => setCancellingOrderId(order.id!)}
+                    onClick={(e) => { e.stopPropagation(); setCancellingOrderId(order.id!); }}
                     style={{ background: 'none', border: 'none', color: '#f59e0b', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600, opacity: 0.8 }}
                     onMouseEnter={e => e.currentTarget.style.opacity = '1'}
                     onMouseLeave={e => e.currentTarget.style.opacity = '0.8'}
@@ -144,7 +164,7 @@ export default function OrderHistory({ user }: { user: any }) {
                   </button>
                 )}
                 {cancellingOrderId === order.id && (
-                  <div style={{ marginTop: '1rem', background: 'rgba(var(--foreground-rgb), 0.03)', padding: '1rem', borderRadius: '8px', width: '250px', textAlign: 'left' }}>
+                  <div onClick={e => e.stopPropagation()} style={{ marginTop: '1rem', background: 'rgba(var(--foreground-rgb), 0.03)', padding: '1rem', borderRadius: '8px', width: '250px', textAlign: 'left' }}>
                     <h5 style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text)' }}>Reason for Cancellation:</h5>
                     <select 
                       value={cancellationReason}

@@ -13,10 +13,19 @@ export default function NewUserPopup() {
   useEffect(() => {
     let timer: NodeJS.Timeout;
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      const hasSeen = localStorage.getItem('dualdeer_newuser_popup');
+      const hasSeen = localStorage.getItem('dualdeer_newuser_popup') === 'dismissed'; // if they saved it permanently
+      const isDismissedSession = sessionStorage.getItem('dualdeer_newuser_popup_dismissed') === 'true';
       
-      if (!user && !hasSeen) {
-        timer = setTimeout(() => setIsOpen(true), 3000);
+      if (!user && !hasSeen && !isDismissedSession) {
+        timer = setTimeout(() => {
+          setIsOpen(true);
+          // Save to local storage so it syncs when they sign up
+          const stored = JSON.parse(localStorage.getItem('dualdeer_unlocked_coupons') || '[]');
+          if (!stored.includes('WELCOME15')) {
+            stored.push('WELCOME15');
+            localStorage.setItem('dualdeer_unlocked_coupons', JSON.stringify(stored));
+          }
+        }, 3000);
       } else {
         setIsOpen(false);
       }
@@ -30,7 +39,7 @@ export default function NewUserPopup() {
 
   const closePopup = () => {
     setIsOpen(false);
-    localStorage.setItem('dualdeer_newuser_popup', 'dismissed');
+    sessionStorage.setItem('dualdeer_newuser_popup_dismissed', 'true');
   };
 
   const copyCode = () => {
@@ -66,7 +75,14 @@ export default function NewUserPopup() {
           </div>
 
           <div className={styles.actions}>
-            <Link href="/auth" onClick={closePopup} className={styles.primaryBtn}>
+            <Link 
+              href="/auth" 
+              onClick={() => {
+                setIsOpen(false);
+                localStorage.setItem('dualdeer_newuser_popup', 'dismissed');
+              }} 
+              className={styles.primaryBtn}
+            >
               Create Identity to Save <ArrowRight size={16} />
             </Link>
           </div>
