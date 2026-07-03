@@ -873,7 +873,7 @@ export const registerAffiliate = async (userId: string, name: string, code: stri
     discountType: 'percentage',
     discountValue: 5,
     active: true,
-    isPublic: true, // Visible in user accounts if needed
+    isPublic: false, // Visible in user accounts if needed
     usageLimitType: 'unlimited',
     applyTo: 'first_item',
     affiliateId: userId,
