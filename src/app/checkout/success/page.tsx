@@ -10,6 +10,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { getOrder, Order } from '@/lib/firebaseUtils';
 import { useCart } from '@/context/CartContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import * as metaPixel from '@/lib/metaPixel';
 import styles from './Success.module.css';
 
 function CheckoutSuccessContent() {
@@ -60,6 +61,25 @@ function CheckoutSuccessContent() {
       setLoading(false);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (order && order.id) {
+      const storageKey = `pixel_purchase_${order.id}`;
+      if (!sessionStorage.getItem(storageKey)) {
+        sessionStorage.setItem(storageKey, 'true');
+        
+        metaPixel.event('Purchase', {
+          value: order.total,
+          currency: order.currency || 'INR',
+          order_id: order.id,
+          content_ids: order.items.map(item => item.productId),
+          content_name: order.items.map(item => item.name).join(', '),
+          content_type: 'product',
+          num_items: order.items.reduce((acc, item) => acc + item.quantity, 0)
+        });
+      }
+    }
+  }, [order]);
 
   const getStepClass = (stepName: 'validated' | 'processing' | 'shipped' | 'delivered') => {
     const currentStatus = order?.status || 'processing';

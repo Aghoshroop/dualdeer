@@ -90,7 +90,11 @@ export default function OrderDetailsModal({ order, user, onClose }: OrderDetails
     setIsDownloading(false);
   };
 
-  const orderDate = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : new Date(order.createdAt).toLocaleDateString();
+  const orderDateObj = order.createdAt?.toDate ? order.createdAt.toDate() : new Date((order.createdAt as any) || Date.now());
+  const orderDate = orderDateObj.toLocaleDateString();
+  const deliveryDateObj = order.updatedAt?.toDate ? order.updatedAt.toDate() : orderDateObj;
+  const returnDeadline = new Date(deliveryDateObj.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const isReturnEligible = Date.now() <= returnDeadline.getTime();
 
   return (
     <div className={styles.pageContainer}>
@@ -172,9 +176,14 @@ export default function OrderDetailsModal({ order, user, onClose }: OrderDetails
           {/* RETURN SECTION */}
           {order.status === 'delivered' && (
             <div className={`${styles.section} ${styles.noPrint}`}>
-              {!isReturning ? (
+              {!isReturnEligible ? (
+                <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', border: '1px solid #ef4444' }}>
+                  <h4 style={{ color: '#ef4444', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}><X size={18} /> Return Window Closed</h4>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--color-text)' }}>The 7-day return window for this order closed on {returnDeadline.toLocaleDateString()}.</p>
+                </div>
+              ) : !isReturning ? (
                 <button className={`${styles.actionBtn} ${styles.returnBtn}`} onClick={() => setIsReturning(true)}>
-                  <RotateCcw size={18} /> Request Return
+                  <RotateCcw size={18} /> Request Return (Eligible until {returnDeadline.toLocaleDateString()})
                 </button>
               ) : (
                 <div className={styles.returnForm}>

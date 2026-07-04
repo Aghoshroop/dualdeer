@@ -7,6 +7,7 @@ import styles from './AuthPage.module.css';
 import Link from 'next/link';
 import { auth } from '@/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import * as metaPixel from '@/lib/metaPixel';
 
 const TypewriterText = ({ text, onComplete }: { text: string; onComplete: () => void }) => {
   const [displayedText, setDisplayedText] = useState('');
@@ -73,10 +74,14 @@ export default function AuthPage() {
         const currentUsers = JSON.parse(localStorage.getItem('dualdeer_users') || '[]');
         localStorage.setItem('dualdeer_users', JSON.stringify([newUser, ...currentUsers]));
         localStorage.setItem('dualdeer_active_user', name || 'Elite User');
+        
+        metaPixel.initAdvancedMatching(email, phone);
+        metaPixel.event('CompleteRegistration', { content_name: 'Email Signup' });
       } else {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const userName = userCredential.user.displayName || email.split('@')[0] || 'Elite User';
         localStorage.setItem('dualdeer_active_user', userName);
+        metaPixel.initAdvancedMatching(email);
       }
 
       setLoading(false);
@@ -102,8 +107,10 @@ export default function AuthPage() {
       
       if (!currentUsers.find((u: any) => u.email === result.user.email)) {
         localStorage.setItem('dualdeer_users', JSON.stringify([newUser, ...currentUsers]));
+        metaPixel.event('CompleteRegistration', { content_name: 'Google Auth' });
       }
 
+      metaPixel.initAdvancedMatching(result.user.email || '', result.user.phoneNumber || '');
       setIsTransitioning(true);
     } catch (error) {
       console.error("Google Sign In Error", error);

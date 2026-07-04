@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { calculateBundleSavings } from '@/lib/bundleLogic';
+import * as metaPixel from '@/lib/metaPixel';
 
 export interface CartItem {
   id: string; // Product Firebase ID
@@ -56,6 +57,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       processedItem.price = processedItem.mrp;
       processedItem.mrp = undefined;
     }
+
+    // Fire Meta Pixel Event
+    metaPixel.event('AddToCart', {
+      content_name: processedItem.name,
+      content_ids: [processedItem.id],
+      content_type: 'product',
+      value: processedItem.price * processedItem.quantity,
+      currency: 'INR',
+      num_items: processedItem.quantity
+    });
 
     setCart(prev => {
       // Check if product with exact same ID and Size exists

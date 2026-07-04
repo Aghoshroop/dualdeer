@@ -16,6 +16,7 @@ import { useFomoStock } from '@/hooks/useFomoStock';
 import MobileProductGallery from './MobileProductGallery';
 
 import { useCurrency } from '@/context/CurrencyContext';
+import * as metaPixel from '@/lib/metaPixel';
 
 interface ProductClientProps {
   initialProduct: Product;
@@ -60,6 +61,18 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [wishlistRecordId, setWishlistRecordId] = useState<string | null>(null);
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  useEffect(() => {
+    if (product?.id) {
+      metaPixel.event('ViewContent', {
+        content_name: product.name,
+        content_ids: [product.id],
+        content_category: product.category || 'Apparel',
+        content_type: 'product',
+        value: product.price === 0 && product.mrp ? product.mrp : product.price,
+        currency: 'INR'
+      });
+    }
+  }, [product?.id]);
 
   useEffect(() => {
     // Auth Listener

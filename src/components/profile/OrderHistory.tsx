@@ -132,7 +132,13 @@ export default function OrderHistory({ user }: { user: any }) {
         </div>
       ) : (
         <div className={styles.orderList}>
-          {orders.map((order) => (
+          {orders.map((order) => {
+            const orderDateObj = order.createdAt?.toDate ? order.createdAt.toDate() : new Date((order.createdAt as any) || Date.now());
+            const deliveryDateObj = order.updatedAt?.toDate ? order.updatedAt.toDate() : orderDateObj;
+            const returnDeadline = new Date(deliveryDateObj.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const isReturnEligible = Date.now() <= returnDeadline.getTime();
+
+            return (
             <div 
               key={order.id} 
               className={styles.amzOrderCard} 
@@ -227,11 +233,16 @@ export default function OrderHistory({ user }: { user: any }) {
                           </div>
                         )}
                         {idx === 0 && order.status === 'delivered' && (
-                          <button className={styles.amzBtn}>
-                            Return items
+                          <button 
+                            className={styles.amzBtn} 
+                            onClick={() => setSelectedOrder(order)}
+                            disabled={!isReturnEligible}
+                            style={!isReturnEligible ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                          >
+                            {isReturnEligible ? 'Return items' : 'Return window closed'}
                           </button>
                         )}
-                        <button className={styles.amzBtn}>
+                        <button className={styles.amzBtn} onClick={() => setSelectedOrder(order)}>
                           Write a product review
                         </button>
                         {idx === 0 && cancellingOrderId !== order.id && (
@@ -249,7 +260,7 @@ export default function OrderHistory({ user }: { user: any }) {
                 </div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       )}
     </div>

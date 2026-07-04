@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc, query, where, Timestamp, orderBy, limit } from 'firebase/firestore';
+import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc, query, where, Timestamp, orderBy, limit, runTransaction } from 'firebase/firestore';
 import { db } from './firebase';
 
 // ========================
@@ -862,37 +862,104 @@ export const getVideosByCategory = async (category: string): Promise<Video[]> =>
 export const addVideo = (data: Omit<Video, 'id'>) => addDocument('videos', data);
 export const deleteVideo = (id: string) => deleteDocument('videos', id);
 
-// ========================
-// Affiliate Program
-// ========================
+const RESERVED_PREFIXES = [
+  'DUALDEER', 'ADMIN', 'SUPPORT', 'HELP', 'TEAM', 'OFFICIAL', 'OWNER', 
+  'SHOP', 'STORE', 'ROOT', 'API', 'SYSTEM', 'STAFF', 'TEST', 'NULL', 'UNDEFINED'
+];
 
-export const registerAffiliate = async (userId: string, name: string, code: string) => {
-  // 1. Create Coupon
-  const couponData: Omit<Coupon, 'id'> = {
-    code: code.toUpperCase(),
-    discountType: 'percentage',
-    discountValue: 5,
-    active: true,
-    isPublic: false, // Visible in user accounts if needed
-    usageLimitType: 'unlimited',
-    applyTo: 'first_item',
-    affiliateId: userId,
-    createdAt: Timestamp.now()
-  };
-  await addDoc(collection(db, 'coupons'), couponData);
+const PROFANITY_LIST = [
+  'BADWORD', 'XXX', 'SLUR', 'FUCK', 'SHIT', 'BITCH', 'CUNT', 'DICK', 'COCK', 'PUSSY', 'ASSHOLE'
+  // Extend as needed
+];
 
-  // 2. Create Affiliate
-  const affiliateData: Omit<Affiliate, 'id'> = {
-    userId,
-    name,
-    code: code.toUpperCase(),
-    earnings: 0,
-    pendingEarnings: 0,
-    totalWithdrawn: 0,
-    status: 'active',
-    createdAt: Timestamp.now()
-  };
-  await setDoc(doc(db, 'affiliates', userId), affiliateData);
+const normalizePrefix = (raw: string) => {
+  // Trim, remove all non-alphanumeric, convert to uppercase
+  return raw.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().trim();
+};
+
+export const checkAffiliatePrefix = async (rawPrefix: string): Promise<{status: 'available' | 'taken' | 'reserved' | 'profanity' | 'network_error' | 'permission_denied' | 'error', normalized: string}> => {
+  const prefix = normalizePrefix(rawPrefix);
+  
+  if (prefix.length < 3) return { status: 'error', normalized: prefix };
+  
+  if (RESERVED_PREFIXES.includes(prefix)) {
+    return { status: 'reserved', normalized: prefix };
+  }
+  
+  if (PROFANITY_LIST.some(p => prefix.includes(p))) {
+    return { status: 'profanity', normalized: prefix };
+  }
+
+  try {
+    const docSnap = await getDoc(doc(db, 'affiliate_codes', prefix));
+    if (docSnap.exists()) {
+      return { status: 'taken', normalized: prefix };
+    }
+    return { status: 'available', normalized: prefix };
+  } catch (e: any) {
+    console.error("Error checking prefix:", e);
+    if (e.code === 'unavailable' || e.message?.includes('offline')) {
+      return { status: 'network_error', normalized: prefix };
+    }
+    if (e.code === 'permission-denied') {
+      return { status: 'permission_denied', normalized: prefix };
+    }
+    return { status: 'error', normalized: prefix };
+  }
+};
+
+export const registerAffiliate = async (userId: string, name: string, rawPrefix: string) => {
+  const prefix = normalizePrefix(rawPrefix);
+  
+  if (prefix.length < 3) throw new Error("Prefix too short.");
+  if (RESERVED_PREFIXES.includes(prefix)) throw new Error("This affiliate name is reserved.");
+  if (PROFANITY_LIST.some(p => prefix.includes(p))) throw new Error("This affiliate name is not allowed.");
+
+  const finalCode = `${prefix}DUALDEER5`;
+  
+  const codeRef = doc(db, 'affiliate_codes', prefix);
+  const userRef = doc(db, 'affiliates', userId);
+  const couponRef = doc(collection(db, 'coupons'));
+
+  await runTransaction(db, async (transaction) => {
+    const codeDoc = await transaction.get(codeRef);
+    if (codeDoc.exists()) {
+      throw new Error("This affiliate name has just been taken. Please choose another.");
+    }
+
+    // 1. Reserve the code
+    transaction.set(codeRef, {
+      userId,
+      createdAt: Timestamp.now()
+    });
+
+    // 2. Create Coupon
+    const couponData: Omit<Coupon, 'id'> = {
+      code: finalCode,
+      discountType: 'percentage',
+      discountValue: 5,
+      active: true,
+      isPublic: false,
+      usageLimitType: 'unlimited',
+      applyTo: 'first_item',
+      affiliateId: userId,
+      createdAt: Timestamp.now()
+    };
+    transaction.set(couponRef, couponData);
+
+    // 3. Create Affiliate
+    const affiliateData: Omit<Affiliate, 'id'> = {
+      userId,
+      name,
+      code: finalCode,
+      earnings: 0,
+      pendingEarnings: 0,
+      totalWithdrawn: 0,
+      status: 'active',
+      createdAt: Timestamp.now()
+    };
+    transaction.set(userRef, affiliateData);
+  });
 };
 
 export const getAffiliate = async (userId: string): Promise<Affiliate | null> => {

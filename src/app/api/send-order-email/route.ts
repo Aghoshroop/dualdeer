@@ -13,10 +13,12 @@ export async function POST(request: Request) {
     // Note: The user needs to set SMTP_EMAIL and SMTP_PASSWORD in their environment variables.
     // For Gmail, an App Password should be used.
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: process.env.SMTP_HOST || 'smtp.titan.email',
+      port: Number(process.env.SMTP_PORT) || 465,
+      secure: process.env.SMTP_PORT === '587' ? false : true,
       auth: {
-        user: process.env.SMTP_EMAIL || 'aviroopghosh283@gmail.com',
-        pass: process.env.SMTP_PASSWORD || '', // User needs to provide this
+        user: process.env.SMTP_EMAIL || 'hello@dualdeer.com',
+        pass: process.env.SMTP_PASSWORD || '',
       },
     });
 

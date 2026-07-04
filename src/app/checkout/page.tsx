@@ -10,6 +10,7 @@ import { Lock, ChevronLeft, CreditCard, Wallet, Banknote, ShieldAlert, Globe } f
 import styles from './Checkout.module.css';
 import { useCurrency } from '@/context/CurrencyContext';
 import { calculateBundleSavings } from '@/lib/bundleLogic';
+import * as metaPixel from '@/lib/metaPixel';
 
 export default function CheckoutPage() {
   return (
@@ -121,6 +122,19 @@ function CheckoutEngine() {
   const tax = taxableAmount * taxRate;
   const shipping = subtotal > 0 ? (isIndia ? 0 : 20 * conversionRate) : 0;
   const total = taxableAmount + tax + shipping;
+
+  const [checkoutInitiated, setCheckoutInitiated] = useState(false);
+
+  useEffect(() => {
+    if (!loadingBuyNow && activeItems.length > 0 && !checkoutInitiated) {
+      metaPixel.event('InitiateCheckout', {
+        value: total,
+        currency: currency,
+        num_items: activeItems.reduce((acc: number, item: any) => acc + item.quantity, 0)
+      });
+      setCheckoutInitiated(true);
+    }
+  }, [loadingBuyNow, activeItems.length, total, currency, checkoutInitiated]);
 
   const handleApplyCoupon = async () => {
     setCouponError('');
