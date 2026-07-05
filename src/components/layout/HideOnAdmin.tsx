@@ -14,6 +14,6 @@ export default function HideOnAdmin({ children }: { children: React.ReactNode })
   // matches between server and client — prevents the Turbopack static flag error.
   if (!mounted) return <>{children}</>;
 
-  if (pathname?.startsWith('/admin')) return null;
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/auth') || pathname?.startsWith('/login')) return null;
   return <>{children}</>;
 }

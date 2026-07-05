@@ -38,6 +38,7 @@ export default function ReactionTestV2() {
       if (!user) {
         setAppState('unauthorized');
         sessionStorage.setItem('dualdeer_return_url', '/reaction-test');
+        router.push('/auth');
       } else {
         setCurrentUser(user);
         await initGame(user.uid);

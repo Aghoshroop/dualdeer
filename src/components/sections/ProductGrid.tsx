@@ -28,6 +28,15 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
   const [products, setProducts] = useState<Product[]>([]);
   const [title, setTitle] = useState(fallbackTitle);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    import('@/lib/firebase').then(({ auth }) => {
+      import('firebase/auth').then(({ onAuthStateChanged }) => {
+        onAuthStateChanged(auth, (user) => setCurrentUser(user));
+      });
+    });
+  }, []);
   const { addToCart } = useCart();
   const router = useRouter();
   const { formatPrice, renderPrice } = useCurrency();
@@ -139,12 +148,17 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
                         className={styles.actionCircle} 
                         aria-label="Add to Bag" 
                         onClick={(e) => { 
-                          e.preventDefault(); 
+                          e.preventDefault();
+                          if (!currentUser) {
+                            sessionStorage.setItem('dualdeer_return_url', '/');
+                            router.push('/auth');
+                            return;
+                          }
                           if (!product.isSoldOut && product.stock !== 0) {
                             addToCart({ ...product, size: 'M', quantity: 1 }); 
                           }
                         }}
-                        style={{ opacity: (product.isSoldOut || product.stock === 0) ? 0.5 : 1, cursor: (product.isSoldOut || product.stock === 0) ? 'not-allowed' : 'pointer' }}
+                        style={{ opacity: ((product.isSoldOut || product.stock === 0) && currentUser) ? 0.5 : 1, cursor: ((product.isSoldOut || product.stock === 0) && currentUser) ? 'not-allowed' : 'pointer' }}
                       ><ShoppingBag size={16} /></button>
                   </div>
                 </Link>
@@ -194,20 +208,32 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
                       <button
                         className={styles.buyNowBtn}
                         onClick={() => {
+                          if (!currentUser) {
+                            sessionStorage.setItem('dualdeer_return_url', '/');
+                            router.push('/auth');
+                            return;
+                          }
                           if (!product.isSoldOut && product.stock !== 0) {
                             router.push(`/checkout?buyNow=${product.id}&size=M&qty=1`);
                           }
                         }}
-                        disabled={product.isSoldOut || product.stock === 0}
-                        style={{ opacity: (product.isSoldOut || product.stock === 0) ? 0.5 : 1, cursor: (product.isSoldOut || product.stock === 0) ? 'not-allowed' : 'pointer' }}
+                        disabled={(product.isSoldOut || product.stock === 0) && currentUser !== null}
+                        style={{ opacity: ((product.isSoldOut || product.stock === 0) && currentUser) ? 0.5 : 1, cursor: ((product.isSoldOut || product.stock === 0) && currentUser) ? 'not-allowed' : 'pointer' }}
                       >
-                        {(product.isSoldOut || product.stock === 0) ? 'Stock Out' : 'Buy Now'}
+                        {(product.isSoldOut || product.stock === 0) ? 'Stock Out' : (!currentUser ? 'Sign In to Buy' : 'Buy Now')}
                       </button>
                       <AnimatedCartButton
                         size="small"
-                        onAdd={() => addToCart({ ...product, size: 'M', quantity: 1 })}
+                        onAdd={() => {
+                          if (!currentUser) {
+                            sessionStorage.setItem('dualdeer_return_url', '/');
+                            router.push('/auth');
+                            return;
+                          }
+                          addToCart({ ...product, size: 'M', quantity: 1 })
+                        }}
                         label={(product.isSoldOut || product.stock === 0) ? 'X' : '+'}
-                        disabled={product.isSoldOut || product.stock === 0}
+                        disabled={(product.isSoldOut || product.stock === 0) && currentUser !== null}
                       />
                   </div>
                 </div>

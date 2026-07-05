@@ -98,6 +98,15 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [gridLayout, setGridLayout] = useState<'grid-2' | 'grid-1'>('grid-2');
   const [sortOption, setSortOption] = useState<string>("featured");
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  React.useEffect(() => {
+    import('@/lib/firebase').then(({ auth }) => {
+      import('firebase/auth').then(({ onAuthStateChanged }) => {
+        onAuthStateChanged(auth, (user) => setCurrentUser(user));
+      });
+    });
+  }, []);
   const [isDesktop, setIsDesktop] = useState(true);
 
   React.useEffect(() => {
@@ -151,6 +160,11 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
   const handleAddToCart = (e: React.MouseEvent, product: any) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!currentUser) {
+      sessionStorage.setItem('dualdeer_return_url', '/shop');
+      router.push('/auth');
+      return;
+    }
     if (!product.isSoldOut && product.stock !== 0) {
       playInteractionSound('ring');
       addToCart({ id: product.id, name: product.name, price: product.price, mrp: product.mrp, image: product.image, size: 'M', quantity: 1 });

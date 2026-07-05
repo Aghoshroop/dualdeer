@@ -169,53 +169,7 @@ function SplashScreenContent() {
             transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
             style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
           >
-            {/* Glowing Filling Logo */}
-            <motion.div
-              initial={{ rotateY: 90, opacity: 0 }}
-              animate={{ rotateY: 0, opacity: 1 }}
-              transition={{ duration: 1.8, ease: "easeOut", delay: 0.2 }}
-              style={{
-                position: 'relative', marginBottom: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center',
-                width: '130px', height: '130px'
-              }}
-            >
-              <motion.div
-                animate={{ 
-                  y: [0, -12, 0],
-                  filter: [
-                    'drop-shadow(0px 0px 15px rgba(123,47,247,0.4))',
-                    'drop-shadow(0px 0px 35px rgba(123,47,247,0.9))',
-                    'drop-shadow(0px 0px 15px rgba(123,47,247,0.4))'
-                  ]
-                }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                style={{ width: '100%', height: '100%', position: 'relative' }}
-              >
-                {/* Background Unfilled Logo */}
-                <img 
-                  src="/favicon.ico" 
-                  alt="DualDeer Background" 
-                  style={{ 
-                    position: 'absolute', inset: 0, 
-                    width: '100%', height: '100%', objectFit: 'contain',
-                    filter: 'brightness(0) invert(1) opacity(0.15)' 
-                  }} 
-                />
-                
-                {/* Foreground Filled Logo */}
-                <img 
-                  src="/favicon.ico" 
-                  alt="DualDeer Filled" 
-                  style={{ 
-                    position: 'absolute', inset: 0, 
-                    width: '100%', height: '100%', objectFit: 'contain',
-                    filter: 'brightness(0) invert(1)',
-                    clipPath: `inset(${100 - progress}% 0 0 0)`, 
-                    transition: 'clip-path 0.1s ease-out' 
-                  }} 
-                />
-              </motion.div>
-            </motion.div>
+
 
             {/* Brand Typography */}
             <motion.h1

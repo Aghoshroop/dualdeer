@@ -29,7 +29,12 @@ export default function CartPage() {
   useEffect(() => {
     setMounted(true);
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+      if (!user) {
+        sessionStorage.setItem('dualdeer_return_url', '/cart');
+        router.push('/auth');
+      } else {
+        setCurrentUser(user);
+      }
     });
     
     // Fetch top 2 products for empty state recommendations

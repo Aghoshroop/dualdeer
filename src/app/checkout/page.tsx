@@ -46,6 +46,8 @@ function CheckoutEngine() {
         }));
       } else {
         setCurrentUser(null);
+        sessionStorage.setItem('dualdeer_return_url', '/checkout');
+        router.push('/auth');
       }
       setAuthLoading(false);
     });

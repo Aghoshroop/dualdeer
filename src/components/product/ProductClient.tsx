@@ -578,9 +578,14 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                 max={maxAddable > 0 ? maxAddable : 1}
                 onChange={setQuantity}
               />
-              <div style={{ flex: 1, pointerEvents: !canPerformAction ? 'none' : 'auto', opacity: !canPerformAction ? 0.5 : 1 }}>
+              <div style={{ flex: 1, pointerEvents: !canPerformAction && currentUser ? 'none' : 'auto', opacity: !canPerformAction && currentUser ? 0.5 : 1 }}>
                 <AnimatedCartButton
                   onAdd={() => {
+                    if (!currentUser) {
+                      sessionStorage.setItem('dualdeer_return_url', window.location.pathname);
+                      router.push('/auth');
+                      return;
+                    }
                     if (product && canPerformAction) {
                       addToCart({
                         id: product.id as string,
@@ -594,7 +599,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                       });
                     }
                   }}
-                  label={isRestocking ? `RESTOCKING ${formattedTime}` : isOutOfStock ? "Sold Out" : isMaxInCart ? "Max in Cart" : "Add To Bag"}
+                  label={!currentUser ? "Sign In to Buy" : isRestocking ? `RESTOCKING ${formattedTime}` : isOutOfStock ? "Sold Out" : isMaxInCart ? "Max in Cart" : "Add To Bag"}
                 />
               </div>
             </div>
@@ -603,15 +608,20 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
             <div className={styles.actionRowSecondary}>
               <button 
                 className={styles.buyNowBtn}
-                disabled={!canPerformAction}
-                style={{ opacity: !canPerformAction ? 0.5 : 1, cursor: !canPerformAction ? 'not-allowed' : 'pointer' }}
+                disabled={!canPerformAction && currentUser !== null}
+                style={{ opacity: !canPerformAction && currentUser ? 0.5 : 1, cursor: (!canPerformAction && currentUser) ? 'not-allowed' : 'pointer' }}
                 onClick={() => {
+                  if (!currentUser) {
+                    sessionStorage.setItem('dualdeer_return_url', window.location.pathname);
+                    router.push('/auth');
+                    return;
+                  }
                   if(product && canPerformAction) {
                     router.push(`/checkout?product=${product.slug || ''}&id=${product.id}&size=${encodeURIComponent(selectedSize)}&qty=${Math.min(quantity, maxAddable)}`);
                   }
                 }}
               >
-                {!canPerformAction ? (isRestocking ? `WAIT ${formattedTime}` : isOutOfStock ? 'Unavailable' : 'Limit Reached') : 'Buy Now'}
+                {!currentUser ? "Sign In to Checkout" : !canPerformAction ? (isRestocking ? `WAIT ${formattedTime}` : isOutOfStock ? 'Unavailable' : 'Limit Reached') : 'Buy Now'}
               </button>
             </div>
 
