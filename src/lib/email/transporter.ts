@@ -14,9 +14,6 @@ export const getTransporter = () => {
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS,
-    },
-    tls: {
-      ciphers: 'SSLv3', // Often required for robust handshakes depending on the environment
     }
   });
 };

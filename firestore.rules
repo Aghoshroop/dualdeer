@@ -150,6 +150,11 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    match /emailQueue/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
     match /projectX_bookings/{bookingId} {
       allow create: if true;
       allow read, update, delete: if isAdmin();

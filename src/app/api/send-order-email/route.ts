@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/sendEmail';
 import { getOrderConfirmationTemplate, OrderEmailData } from '@/lib/email/templates/orderConfirmation';
 import { getAdminOrderNotificationTemplate } from '@/lib/email/templates/adminOrderNotification';
-import { queueEmail } from '@/lib/firebaseUtils';
 
 export async function POST(request: Request) {
   try {
@@ -43,16 +42,6 @@ export async function POST(request: Request) {
       adminEmailSent = true;
     } else {
       errors.push(`Admin email failed: ${adminResult.error}`);
-      console.log(`[Email Pipeline] Queueing admin email for background retry`);
-      try {
-        await queueEmail({
-          to: adminEmailAddress,
-          subject: `New Order Placed - ${orderId}`,
-          html: adminHtml,
-        });
-      } catch (qErr) {
-        console.error(`[Email Pipeline] Failed to queue admin email:`, qErr);
-      }
     }
 
     // Send customer email independently
@@ -70,29 +59,17 @@ export async function POST(request: Request) {
         customerEmailSent = true;
       } else {
         errors.push(`Customer email failed: ${customerResult.error}`);
-        console.log(`[Email Pipeline] Queueing customer email for background retry`);
-        try {
-          await queueEmail({
-            to: orderData.shippingDetails.email,
-            subject: `Order Confirmation - ${orderId}`,
-            html: customerHtml,
-          });
-        } catch (qErr) {
-          console.error(`[Email Pipeline] Failed to queue customer email:`, qErr);
-        }
       }
     } else {
       console.log(`[Email Pipeline] No customer email provided for order ${orderId}`);
     }
 
     // Always return 200 OK to prevent breaking the checkout flow.
-    // The failed emails are now safely queued for background retries.
     return NextResponse.json({ 
       success: true, 
-      message: errors.length > 0 ? 'Emails queued for retry' : 'Email processed',
+      message: errors.length > 0 ? 'Emails processed with some errors' : 'Emails processed successfully',
       adminEmailSent,
       customerEmailSent,
-      queued: errors.length > 0,
       errors: errors.length > 0 ? errors : undefined
     });
   } catch (error: any) {
