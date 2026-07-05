@@ -146,7 +146,7 @@ export default function Cinematic3DSection() {
       
       {/* Mobile-Only Static View */}
       <div className={styles.mobileStaticWrapper}>
-        <Image src="/file_00000000c8e471fabb8aa20e8fed4be4.png" alt="Collection Preview" fill style={{ objectFit: 'cover' }} className={styles.mobileStaticImage} />
+        <Image src="/file_00000000c8e471fabb8aa20e8fed4be4.png" alt="Collection Preview" fill sizes="100vw" style={{ objectFit: 'cover' }} className={styles.mobileStaticImage} />
         <div className={styles.mobileOverlayContent}>
           <Link href="/shop" className={styles.ctaButton}>
             Explore Collection

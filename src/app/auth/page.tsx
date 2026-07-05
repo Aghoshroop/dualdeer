@@ -166,7 +166,7 @@ export default function AuthPage() {
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <Image src="/logo.png" alt="DualDeer" fill style={{ objectFit: 'contain' }} />
+                    <Image src="/logo.png" alt="DualDeer" fill sizes="100px" style={{ objectFit: 'contain' }} />
                   </motion.div>
                 </Link>
 

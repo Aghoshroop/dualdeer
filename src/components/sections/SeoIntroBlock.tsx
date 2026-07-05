@@ -31,7 +31,7 @@ export default function SeoIntroBlock({ h1, h2, h3, paragraphs, image, reverse =
         >
           <div className={styles.imageWrapper}>
             <div className={styles.glassBadge}>Premium Reserve</div>
-            <Image src="/speedsuit.png" alt="DualDeer SpeedSuit premium compression wear India" fill style={{ objectFit: 'cover' }} className={styles.image} />
+            <Image src="/speedsuit.png" alt="DualDeer SpeedSuit premium compression wear India" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} className={styles.image} />
           </div>
         </motion.div>
         <div className={styles.textColumn}>

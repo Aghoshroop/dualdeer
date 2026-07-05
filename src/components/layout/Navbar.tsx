@@ -230,9 +230,9 @@ export default function Navbar() {
   };
 
   const mainNavVariants = {
-    expandedTop: { height: isMobile ? "50px" : "80px", padding: isMobile ? "0 5px" : "0 3rem" },
-    expandedScrolled: { height: isMobile ? "50px" : "80px", padding: isMobile ? "0 5px" : "0 3rem" },
-    compact: { height: "60px", padding: "0 2rem" }
+    expandedTop: { height: isMobile ? "50px" : "80px", padding: isMobile ? "0 20px" : "0 3rem" },
+    expandedScrolled: { height: isMobile ? "50px" : "80px", padding: isMobile ? "0 20px" : "0 3rem" },
+    compact: { height: "60px", padding: isMobile ? "0 20px" : "0 2rem" }
   };
 
   const linksVariants = {

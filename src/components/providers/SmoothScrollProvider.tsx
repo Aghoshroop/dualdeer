@@ -11,6 +11,8 @@ export default function SmoothScrollProvider({ children }: { children: React.Rea
 
     gsap.registerPlugin(ScrollTrigger);
 
+    const isMobile = window.innerWidth <= 768;
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Apple-like smooth inertia
@@ -18,8 +20,16 @@ export default function SmoothScrollProvider({ children }: { children: React.Rea
       gestureOrientation: "vertical",
       smoothWheel: true,
       wheelMultiplier: 1,
+      // Disable smooth touch to let native iOS/Android scrolling take over (fixes lag)
+      syncTouch: false,
       touchMultiplier: 2,
     });
+
+    // Completely disable Lenis processing on mobile to save CPU/battery
+    if (isMobile) {
+      lenis.destroy();
+      return;
+    }
 
     // Synchronize Lenis scrolling with GSAP's ScrollTrigger
     lenis.on("scroll", ScrollTrigger.update);
