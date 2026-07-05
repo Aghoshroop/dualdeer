@@ -41,6 +41,21 @@ export interface Product {
   isSoldOut?: boolean;
 }
 
+export interface UpcomingProduct extends Omit<Product, 'stock' | 'status' | 'isSoldOut' | 'sizes' | 'colors'> {
+  launchDate?: string;
+  comingSoon: true;
+  notifyCount: number;
+}
+
+export interface ProductNotification {
+  id?: string;
+  productId: string;
+  userId: string;
+  email: string;
+  status: 'waiting' | 'sent';
+  createdAt: Timestamp;
+}
+
 export interface Review {
   id?: string;
   productId: string;
@@ -713,6 +728,26 @@ export const deleteReactionScoreV2 = async (id: string) => {
 // ========================
 // Global Notifications
 // ========================
+export interface AdminUser {
+  id?: string;
+  email: string;
+  name?: string;
+  role: 'super_admin' | 'admin' | 'manager';
+  createdAt?: Timestamp;
+}
+
+export interface QueuedEmail {
+  id?: string;
+  to: string;
+  subject: string;
+  html: string;
+  status: 'pending' | 'sent' | 'failed';
+  retryCount: number;
+  error?: string;
+  createdAt?: Timestamp;
+  lastAttempt?: Timestamp;
+}
+
 export interface AppNotification {
   id?: string;
   title: string;
@@ -1009,6 +1044,56 @@ export const processAffiliateCommission = async (orderId: string, orderData: Ord
   }
 };
 
+export const processRefund = async (orderId: string, amount: number, reason: string): Promise<void> => {
+  const orderRef = doc(db, 'orders', orderId);
+  const orderDoc = await getDoc(orderRef);
+  if (!orderDoc.exists()) throw new Error('Order not found');
+
+  await updateDoc(orderRef, {
+    refundStatus: 'processed',
+    refundAmount: amount,
+    refundReason: reason,
+    updatedAt: Timestamp.now()
+  });
+};
+
+// ========================
+// Email Queue Functions
+// ========================
+
+export const queueEmail = async (emailData: Omit<QueuedEmail, 'id' | 'createdAt' | 'status' | 'retryCount'>): Promise<string> => {
+  const colRef = collection(db, 'emailQueue');
+  const docRef = await addDoc(colRef, {
+    ...emailData,
+    status: 'pending',
+    retryCount: 0,
+    createdAt: Timestamp.now()
+  });
+  return docRef.id;
+};
+
+export const getPendingEmails = async (limitCount: number = 20): Promise<QueuedEmail[]> => {
+  const colRef = collection(db, 'emailQueue');
+  const q = query(colRef, where('status', '==', 'pending'), orderBy('createdAt', 'asc'), limit(limitCount));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as QueuedEmail));
+};
+
+export const updateQueuedEmailStatus = async (
+  id: string, 
+  status: 'sent' | 'failed' | 'pending', 
+  retryCount: number, 
+  error?: string
+): Promise<void> => {
+  const docRef = doc(db, 'emailQueue', id);
+  await updateDoc(docRef, {
+    status,
+    retryCount,
+    error: error || null,
+    lastAttempt: Timestamp.now()
+  });
+};
+
 export const requestWithdrawal = async (affiliateId: string, amount: number, upiId: string) => {
   // 1. Create withdrawal request
   await addDoc(collection(db, 'withdrawal_requests'), {
@@ -1047,5 +1132,121 @@ export const approveWithdrawalRequest = async (requestId: string, affiliateId: s
         pendingWithdrawal: Math.max(0, (aff.pendingWithdrawal || 0) - amount),
         totalWithdrawn: (aff.totalWithdrawn || 0) + amount
      });
+  }
+};
+
+// ========================
+// Upcoming Products & Launch Notifications
+// ========================
+
+export const getUpcomingProducts = async (): Promise<UpcomingProduct[]> => {
+  const products = await getCollectionData<UpcomingProduct>('upcomingProducts');
+  return products.sort((a, b) => b.createdAt!.toMillis() - a.createdAt!.toMillis());
+};
+
+export const addUpcomingProduct = async (product: Omit<UpcomingProduct, 'id' | 'notifyCount' | 'createdAt'>): Promise<string> => {
+  const docRef = await addDoc(collection(db, 'upcomingProducts'), {
+    ...product,
+    notifyCount: 0,
+    createdAt: Timestamp.now()
+  });
+  return docRef.id;
+};
+
+export const updateUpcomingProduct = async (id: string, data: Partial<UpcomingProduct>): Promise<void> => {
+  const docRef = doc(db, 'upcomingProducts', id);
+  await updateDoc(docRef, data);
+};
+
+export const deleteUpcomingProduct = async (id: string): Promise<void> => {
+  const docRef = doc(db, 'upcomingProducts', id);
+  await deleteDoc(docRef);
+};
+
+export const subscribeToProductNotification = async (productId: string, userId: string, email: string): Promise<{ success: boolean; message: string }> => {
+  const q = query(
+    collection(db, 'productNotifications'),
+    where('productId', '==', productId),
+    where('userId', '==', userId)
+  );
+  
+  const existingDocs = await getDocs(q);
+  if (!existingDocs.empty) {
+    return { success: false, message: 'Already subscribed' };
+  }
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const productRef = doc(db, 'upcomingProducts', productId);
+      const productDoc = await transaction.get(productRef);
+      
+      if (!productDoc.exists()) {
+        throw new Error('Product does not exist');
+      }
+
+      const currentCount = productDoc.data().notifyCount || 0;
+      transaction.update(productRef, { notifyCount: currentCount + 1 });
+      
+      const newNotificationRef = doc(collection(db, 'productNotifications'));
+      transaction.set(newNotificationRef, {
+        productId,
+        userId,
+        email,
+        status: 'waiting',
+        createdAt: Timestamp.now()
+      });
+    });
+    
+    return { success: true, message: 'Successfully subscribed' };
+  } catch (error) {
+    console.error('Subscription error:', error);
+    return { success: false, message: 'Failed to subscribe' };
+  }
+};
+
+export const getProductSubscribers = async (productId: string): Promise<ProductNotification[]> => {
+  const q = query(collection(db, 'productNotifications'), where('productId', '==', productId));
+  const snap = await getDocs(q);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProductNotification));
+};
+
+export const launchUpcomingProduct = async (productId: string): Promise<{ success: boolean; message: string; subscribers: ProductNotification[] }> => {
+  try {
+    const upcomingRef = doc(db, 'upcomingProducts', productId);
+    const upcomingSnap = await getDoc(upcomingRef);
+    
+    if (!upcomingSnap.exists()) {
+      return { success: false, message: 'Upcoming product not found', subscribers: [] };
+    }
+    
+    const productData = upcomingSnap.data() as UpcomingProduct;
+    const { comingSoon, notifyCount, launchDate, ...liveProductData } = productData;
+    
+    const liveProduct: Omit<Product, 'id'> = {
+      ...liveProductData,
+      stock: 100,
+      status: 'active',
+      isNew: true,
+      sizes: ['S', 'M', 'L', 'XL'],
+      createdAt: Timestamp.now()
+    };
+    
+    await addDoc(collection(db, 'products'), liveProduct);
+    const subscribers = await getProductSubscribers(productId);
+    await deleteDoc(upcomingRef);
+    
+    return { success: true, message: 'Launched successfully', subscribers };
+  } catch (error) {
+    console.error('Error launching product:', error);
+    return { success: false, message: 'Failed to launch', subscribers: [] };
+  }
+};
+
+export const markNotificationsAsSent = async (notificationIds: string[]): Promise<void> => {
+  try {
+    const promises = notificationIds.map(id => updateDoc(doc(db, 'productNotifications', id), { status: 'sent' }));
+    await Promise.all(promises);
+  } catch (error) {
+    console.error('Failed to mark notifications as sent:', error);
   }
 };

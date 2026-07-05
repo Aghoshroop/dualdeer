@@ -469,7 +469,7 @@ export default function AdminProductsPage() {
                   </td>
                   <td className={styles.productName}>{product.name}</td>
                   <td><span className={styles.categoryBadge}>{product.category}{product.subcategory ? ` > ${product.subcategory}` : ''}</span></td>
-                  <td className={styles.price}>${typeof formData.price === 'number' ? product.price.toFixed(2) : product.price}</td>
+                  <td className={styles.price}>${product.price != null ? Number(product.price).toFixed(2) : '0.00'}</td>
                   <td className={styles.mrp}>{product.mrp ? <del>${Number(product.mrp).toFixed(2)}</del> : '-'}</td>
                   <td>★ {product.rating || 5}</td>
                   <td>

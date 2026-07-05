@@ -10,6 +10,7 @@ import TrustStrip from "@/components/sections/TrustStrip";
 const Cinematic3DSection = dynamic(() => import("@/components/sections/Cinematic3DSection"), { ssr: true });
 const FeaturedProducts = dynamic(() => import("@/components/sections/FeaturedProducts"), { ssr: true });
 const BrandStory = dynamic(() => import("@/components/sections/BrandStory"), { ssr: true });
+const UpcomingProducts = dynamic(() => import("@/components/sections/UpcomingProducts"), { ssr: true });
 const TestimonialSlider = dynamic(() => import("@/components/sections/TestimonialSlider"), { ssr: true });
 const SeoIntroBlock = dynamic(() => import("@/components/sections/SeoIntroBlock"), { ssr: true });
 
@@ -51,6 +52,7 @@ export default function Home() {
       <Cinematic3DSection />
       <FeaturedProducts />
       <BrandStory />
+      <UpcomingProducts />
       <TestimonialSlider />
 
       {/* SEO & Brand Manifesto - Placed lower for pacing */}

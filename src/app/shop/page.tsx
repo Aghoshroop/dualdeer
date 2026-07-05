@@ -33,6 +33,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ShopPage() {
+  console.log('ShopPage is executing!');
   const [products, categories, backdropContent, heroContent] = await Promise.all([
     getProducts(),
     getCategories(),

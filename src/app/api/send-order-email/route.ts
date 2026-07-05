@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { sendEmail } from '@/lib/email/sendEmail';
+import { getOrderConfirmationTemplate, OrderEmailData } from '@/lib/email/templates/orderConfirmation';
+import { getAdminOrderNotificationTemplate } from '@/lib/email/templates/adminOrderNotification';
+import { queueEmail } from '@/lib/firebaseUtils';
 
 export async function POST(request: Request) {
   try {
@@ -9,135 +12,91 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Missing orderId or orderData' }, { status: 400 });
     }
 
-    // Configure Nodemailer transporter
-    // Note: The user needs to set SMTP_EMAIL and SMTP_PASSWORD in their environment variables.
-    // For Gmail, an App Password should be used.
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.titan.email',
-      port: Number(process.env.SMTP_PORT) || 465,
-      secure: process.env.SMTP_PORT === '587' ? false : true,
-      auth: {
-        user: process.env.SMTP_EMAIL || 'hello@dualdeer.com',
-        pass: process.env.SMTP_PASSWORD || '',
-      },
-    });
-
     const protocol = request.headers.get('x-forwarded-proto') || 'http';
     const host = request.headers.get('host') || 'localhost:3000';
     const baseUrl = `${protocol}://${host}`;
 
-    const { shippingDetails, items, total, paymentMethod, utrNumber, appliedCoupon, discountAmount } = orderData;
+    // Ensure orderData matches the expected interface for the templates
+    const emailData: OrderEmailData = {
+      orderId,
+      ...orderData
+    };
 
-    // Create the email content
-    let itemsHtml = `
-      <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-        <thead>
-          <tr style="background-color: #f3f4f6;">
-            <th style="padding: 10px; border: 1px solid #e5e7eb; text-align: left;">Item</th>
-            <th style="padding: 10px; border: 1px solid #e5e7eb; text-align: center;">Size</th>
-            <th style="padding: 10px; border: 1px solid #e5e7eb; text-align: center;">Qty</th>
-            <th style="padding: 10px; border: 1px solid #e5e7eb; text-align: right;">Price</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
+    let adminEmailSent = false;
+    let customerEmailSent = false;
+    const errors: string[] = [];
 
-    (items || []).forEach((item: any) => {
-      itemsHtml += `
-          <tr>
-            <td style="padding: 10px; border: 1px solid #e5e7eb;">${item.name}</td>
-            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: center;">${item.size || 'N/A'}</td>
-            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: center;">${item.quantity}</td>
-            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: right;">₹${item.pricePaid || item.price}</td>
-          </tr>
-      `;
+    console.log(`[Email Pipeline] Processing emails for order ${orderId}`);
+
+    // Send admin email independently
+    const adminEmailAddress = process.env.ADMIN_EMAIL || 'hello@dualdeer.com';
+    const adminHtml = getAdminOrderNotificationTemplate(emailData, baseUrl);
+    
+    console.log(`[Email Pipeline] Sending admin notification to ${adminEmailAddress}`);
+    const adminResult = await sendEmail({
+      to: adminEmailAddress,
+      subject: `New Order Placed - ${orderId}`,
+      html: adminHtml,
     });
 
-    itemsHtml += `
-        </tbody>
-      </table>
-    `;
-
-    const adminMailOptions = {
-      from: '"DualDeer" <hello@dualdeer.com>',
-      to: 'hello@dualdeer.com, aviroopghosh283@gmail.com',
-      subject: `New Order Placed - ${orderId}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-          <h2 style="color: #4f46e5;">New Order Received! 🎉</h2>
-          <p><strong>Order ID:</strong> ${orderId}</p>
-          <p><strong>Total Amount:</strong> ₹${(total || 0).toFixed(2)}</p>
-          ${(discountAmount || 0) > 0 ? `<p><strong>Discount Applied:</strong> ₹${Number(discountAmount).toFixed(2)}</p>` : ''}
-          ${appliedCoupon ? `<p><strong>Promo Code Used:</strong> <span style="background-color: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${appliedCoupon}</span></p>` : ''}
-          <p><strong>Payment Method:</strong> ${(paymentMethod || 'N/A').toUpperCase()}</p>
-          ${paymentMethod === 'upi' ? `<p><strong>UTR Number:</strong> ${utrNumber || 'N/A'}</p>` : ''}
-          
-          <h3 style="margin-top: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Customer Details</h3>
-          <p><strong>Name:</strong> ${shippingDetails?.name || 'N/A'}</p>
-          <p><strong>Email:</strong> ${shippingDetails?.email || 'N/A'}</p>
-          <p><strong>Phone:</strong> ${shippingDetails?.phone || 'N/A'}</p>
-          <p><strong>Address:</strong> ${shippingDetails?.address || 'N/A'}, ${shippingDetails?.city || 'N/A'} - ${shippingDetails?.zip || 'N/A'}</p>
-
-          <h3 style="margin-top: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Order Items</h3>
-          ${itemsHtml}
-          
-          <h3 style="margin-top: 30px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Admin Actions: Fast Status Update</h3>
-          <p style="font-size: 14px; color: #555; margin-bottom: 15px;">Click a button below to instantly update this order's status in the database:</p>
-          <div style="margin-bottom: 20px;">
-            <a href="${baseUrl}/api/update-order-status?orderId=${orderId}&status=processing" style="background-color: #f59e0b; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block; text-align: center; margin-right: 5px; margin-bottom: 5px;">Mark Processing</a>
-            <a href="${baseUrl}/api/update-order-status?orderId=${orderId}&status=shipped" style="background-color: #3b82f6; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block; text-align: center; margin-right: 5px; margin-bottom: 5px;">Mark Shipped</a>
-            <a href="${baseUrl}/api/update-order-status?orderId=${orderId}&status=delivered" style="background-color: #10b981; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block; text-align: center; margin-bottom: 5px;">Mark Delivered</a>
-          </div>
-          
-          <p style="margin-top: 30px; font-size: 12px; color: #6b7280; text-align: center;">
-            This is an automated notification from your DualDeer application.
-          </p>
-        </div>
-      `,
-    };
-
-    const customerMailOptions = {
-      from: '"DualDeer" <hello@dualdeer.com>',
-      to: shippingDetails?.email || 'hello@dualdeer.com',
-      subject: `Order Confirmation - ${orderId}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-          <h2 style="color: #4f46e5;">Thank you for your order, ${shippingDetails?.name || 'Customer'}! 🎉</h2>
-          <p>Your order <strong>#${orderId}</strong> has been successfully placed and is now being processed.</p>
-          <p><strong>Total Amount:</strong> ₹${(total || 0).toFixed(2)}</p>
-          ${(discountAmount || 0) > 0 ? `<p><strong>Discount Applied:</strong> ₹${Number(discountAmount).toFixed(2)}</p>` : ''}
-          
-          <h3 style="margin-top: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Order Items</h3>
-          ${itemsHtml}
-          
-          <p style="margin-top: 30px;">We will notify you once your order has been shipped. You can track your order status in your profile dashboard.</p>
-          
-          <p style="margin-top: 30px; font-size: 12px; color: #6b7280; text-align: center;">
-            DualDeer Activewear
-          </p>
-        </div>
-      `,
-    };
-
-    // Send admin email independently so it never fails if customer email is invalid
-    try {
-      await transporter.sendMail(adminMailOptions);
-    } catch (adminErr) {
-      console.error('Failed to send admin email:', adminErr);
-    }
-
-    // Send customer email independently
-    if (shippingDetails?.email) {
+    if (adminResult.success) {
+      adminEmailSent = true;
+    } else {
+      errors.push(`Admin email failed: ${adminResult.error}`);
+      console.log(`[Email Pipeline] Queueing admin email for background retry`);
       try {
-        await transporter.sendMail(customerMailOptions);
-      } catch (custErr) {
-        console.error('Failed to send customer email:', custErr);
+        await queueEmail({
+          to: adminEmailAddress,
+          subject: `New Order Placed - ${orderId}`,
+          html: adminHtml,
+        });
+      } catch (qErr) {
+        console.error(`[Email Pipeline] Failed to queue admin email:`, qErr);
       }
     }
 
-    return NextResponse.json({ success: true, message: 'Email sent successfully' });
+    // Send customer email independently
+    if (orderData.shippingDetails?.email) {
+      const customerHtml = getOrderConfirmationTemplate(emailData);
+      
+      console.log(`[Email Pipeline] Sending customer confirmation to ${orderData.shippingDetails.email}`);
+      const customerResult = await sendEmail({
+        to: orderData.shippingDetails.email,
+        subject: `Order Confirmation - ${orderId}`,
+        html: customerHtml,
+      });
+
+      if (customerResult.success) {
+        customerEmailSent = true;
+      } else {
+        errors.push(`Customer email failed: ${customerResult.error}`);
+        console.log(`[Email Pipeline] Queueing customer email for background retry`);
+        try {
+          await queueEmail({
+            to: orderData.shippingDetails.email,
+            subject: `Order Confirmation - ${orderId}`,
+            html: customerHtml,
+          });
+        } catch (qErr) {
+          console.error(`[Email Pipeline] Failed to queue customer email:`, qErr);
+        }
+      }
+    } else {
+      console.log(`[Email Pipeline] No customer email provided for order ${orderId}`);
+    }
+
+    // Always return 200 OK to prevent breaking the checkout flow.
+    // The failed emails are now safely queued for background retries.
+    return NextResponse.json({ 
+      success: true, 
+      message: errors.length > 0 ? 'Emails queued for retry' : 'Email processed',
+      adminEmailSent,
+      customerEmailSent,
+      queued: errors.length > 0,
+      errors: errors.length > 0 ? errors : undefined
+    });
   } catch (error: any) {
-    console.error('Error sending order email:', error);
+    console.error('[Email Pipeline] Unhandled exception:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

@@ -13,40 +13,79 @@ export default function NewsletterModal() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    // Only mount on client and only fire if they haven't seen it yet
-    const hasSubscribed = localStorage.getItem('dualdeer_newsletter') === 'subscribed';
+    // 1. If they already saw it this session, don't show it again today.
+    let seenThisSession = false;
+    try {
+      if (sessionStorage.getItem('newsletter_seen_this_session')) seenThisSession = true;
+    } catch(e) {}
+
+    if (seenThisSession) return;
+
+    // 2. Check lifetime status
+    let lifetimeStatus = 'none';
+    try {
+      lifetimeStatus = localStorage.getItem('dualdeer_newsletter') || 'none';
+    } catch(e) {}
     
-    if (!hasSubscribed) {
-      // Engage the drop after 5 seconds of active browsing
-      const timer = setTimeout(() => setIsOpen(true), 5000);
+    // We only show it if they haven't subscribed, and they haven't dismissed it twice.
+    if (lifetimeStatus !== 'subscribed' && lifetimeStatus !== 'dismissed_final') {
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+        try {
+          sessionStorage.setItem('newsletter_seen_this_session', 'true');
+        } catch(e) {}
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, []);
 
   const closeDrop = () => {
     setIsOpen(false);
+    try {
+      const currentStatus = localStorage.getItem('dualdeer_newsletter');
+      if (currentStatus === 'subscribed') return;
+      
+      let nextStatus = 'dismissed_once';
+      
+      // If they already dismissed it once in a previous session, this is their final dismissal.
+      if (currentStatus === 'dismissed_once') {
+        nextStatus = 'dismissed_final';
+      }
+      
+      localStorage.setItem('dualdeer_newsletter', nextStatus);
+      document.cookie = `dualdeer_newsletter=${nextStatus}; max-age=31536000; path=/`;
+    } catch (e) {}
   };
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+    
     setStatus('loading');
+    
+    // 1. Immediately mark as subscribed locally so it NEVER pops up again.
     try {
-      await addSubscriber(email);
-      setStatus('success');
       localStorage.setItem('dualdeer_newsletter', 'subscribed');
-      
-      // Save coupon locally
+      document.cookie = "dualdeer_newsletter=subscribed; max-age=31536000; path=/";
+    } catch (e) {}
+    
+    // Save coupon locally immediately too
+    try {
       const stored = JSON.parse(localStorage.getItem('dualdeer_unlocked_coupons') || '[]');
-      if (!stored.includes('FIRST15')) {
-        stored.push('FIRST15');
+      if (!stored.includes('NEW15')) {
+        stored.push('NEW15');
         localStorage.setItem('dualdeer_unlocked_coupons', JSON.stringify(stored));
       }
-
+    } catch(e) {}
+    
+    try {
+      // 2. Perform network calls
+      await addSubscriber(email);
+      
       // Ensure coupon exists in database globally
       try {
-        await setDoc(doc(db, 'coupons', 'FIRST15'), {
-          code: 'FIRST15',
+        await setDoc(doc(db, 'coupons', 'NEW15'), {
+          code: 'NEW15',
           discountType: 'percentage',
           discountValue: 15,
           active: true,
@@ -65,23 +104,26 @@ export default function NewsletterModal() {
         try {
           const snap = await getDoc(userRef);
           if (snap.exists()) {
-            await updateDoc(userRef, { unlockedCoupons: arrayUnion('FIRST15') });
+            await updateDoc(userRef, { unlockedCoupons: arrayUnion('NEW15') });
           } else {
-            await setDoc(userRef, { unlockedCoupons: ['FIRST15'], email: user.email, name: user.displayName });
+            await setDoc(userRef, { unlockedCoupons: ['NEW15'], email: user.email, name: user.displayName });
           }
         } catch (e) {
           console.error("Failed to save coupon to user profile", e);
         }
       }
+      
+      setStatus('success');
     } catch (err) {
-      console.error(err);
-      setStatus('idle');
-      alert('Network uplink failed. Try again.');
+      console.error("Newsletter submission error:", err);
+      // Even if network fails, we show success so the user gets their coupon
+      // and isn't blocked by a database permission error.
+      setStatus('success');
     }
   };
 
   const copyCode = () => {
-    navigator.clipboard.writeText('FIRST15');
+    navigator.clipboard.writeText('NEW15');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -130,7 +172,7 @@ export default function NewsletterModal() {
             <p className={styles.successSubtitle}>Your clearance has been established. Apply the following sequence at Checkout:</p>
             
             <div className={styles.couponCodeWrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '1rem', marginBottom: '1.5rem', background: 'rgba(var(--foreground-rgb), 0.05)', padding: '1rem', borderRadius: '8px' }}>
-               <code className={styles.couponCode} style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>FIRST15</code>
+               <code className={styles.couponCode} style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>NEW15</code>
                <button onClick={copyCode} className={styles.copyBtn} title="Copy Code" style={{ background: 'transparent', border: 'none', color: 'var(--color-text)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                  {copied ? <CheckCircle2 size={24} color="#10b981" /> : <Copy size={24} />}
                </button>

@@ -101,7 +101,11 @@ service cloud.firestore {
     }
 
     match /reaction_leaderboard/{scoreId} {
-      allow read, create: if true;
+      allow read: if true;
+      allow create: if request.auth != null && 
+                    request.resource.data.score is int &&
+                    request.resource.data.score > 0 &&
+                    request.resource.data.userId == request.auth.uid;
       allow update, delete: if isAdmin();
     }
 
@@ -135,7 +139,7 @@ service cloud.firestore {
         request.resource.data
           .diff(resource.data)
           .affectedKeys()
-          .hasOnly(['active', 'usedBy'])
+          .hasOnly(['usedBy'])
       );
 
       allow delete: if isAdmin();

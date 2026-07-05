@@ -318,7 +318,7 @@ export default function SupportAgent() {
                              transition={{ delay: 0.2, duration: 0.4 }}
                            >
                              {msg.products.map(p => (
-                                <a href={`/${p.category}/${p.id}`} key={p.id} className={styles.productCard}>
+                                <a href={`/product/${p.slug || p.id}`} key={p.id} className={styles.productCard}>
                                   <div className={styles.productImageWrapper}>
                                       <img src={p.images?.[0] || p.image || '/placeholder-product.png'} alt={p.name} className={styles.productImage} />
                                   </div>
