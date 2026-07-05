@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Copy, CheckCircle, XCircle, AlertTriangle, IndianRupee, HandCoins, ArrowRight, Share2, Send, ShieldCheck, Trophy, Sparkles, TrendingUp, Package, MousePointerClick, Star, Loader2 } from 'lucide-react';
 import { getAffiliate, registerAffiliate, requestWithdrawal, checkAffiliatePrefix, Affiliate, WithdrawalRequest } from '@/lib/firebaseUtils';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -22,6 +22,7 @@ export default function AffiliateProgram({ user }: AffiliateProgramProps) {
   const [affiliateCode, setAffiliateCode] = useState('');
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [awardedBonus, setAwardedBonus] = useState(0);
   
   // Validation State
   const [codeStatus, setCodeStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'reserved' | 'profanity' | 'network_error' | 'permission_denied' | 'error' | 'invalid' | 'rate_limited'>('idle');
@@ -61,6 +62,26 @@ export default function AffiliateProgram({ user }: AffiliateProgramProps) {
       unsubscribeW();
     };
   }, [user]);
+
+  // Animated Counter for Celebration
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, Math.round);
+
+  useEffect(() => {
+    if (showCelebration && awardedBonus > 0) {
+      count.set(0);
+      const animation = animate(count, awardedBonus, { duration: 1.5, ease: "easeOut" });
+      
+      const timer = setTimeout(() => {
+        setShowCelebration(false);
+      }, 6000);
+      
+      return () => {
+        animation.stop();
+        clearTimeout(timer);
+      };
+    }
+  }, [showCelebration, awardedBonus]);
 
   // Real-time Availability Engine
   useEffect(() => {
@@ -127,12 +148,11 @@ export default function AffiliateProgram({ user }: AffiliateProgramProps) {
     
     setRegistering(true);
     try {
-      await registerAffiliate(user.uid, user.displayName || 'Customer', rawPrefix);
+      const { awardedBonus: bonusAmount } = await registerAffiliate(user.uid, user.displayName || 'Customer', rawPrefix);
+      setAwardedBonus(bonusAmount);
       metaPixel.event('CompleteRegistration', { content_name: 'Affiliate Registration' });
       setShowCelebration(true);
-      setTimeout(() => {
-        setShowCelebration(false);
-      }, 3000);
+      // Removed the 3000ms auto-close so the premium popup handles its own lifecycle.
     } catch (e: any) {
       console.error(e);
       alert(e.message || "Failed to register. Please try again.");
@@ -208,12 +228,66 @@ export default function AffiliateProgram({ user }: AffiliateProgramProps) {
     );
   }
 
+  const celebrationPopup = (
+    <AnimatePresence>
+      {showCelebration && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+        >
+          <motion.div
+            initial={{ scale: 0.8, y: 30, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '24px', padding: '3rem 2rem', maxWidth: '420px', width: '90%', textAlign: 'center', boxShadow: '0 20px 60px rgba(162, 130, 197, 0.2), inset 0 1px 0 rgba(255,255,255,0.1)', position: 'relative', overflow: 'hidden' }}
+          >
+            {/* Purple luxury glow */}
+            <div style={{ position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle at 50% 0%, rgba(162, 130, 197, 0.15) 0%, transparent 60%)', pointerEvents: 'none' }} />
+            
+            <Trophy size={48} color="var(--color-primary)" style={{ margin: '0 auto 1.5rem', filter: 'drop-shadow(0 0 12px rgba(162, 130, 197, 0.5))' }} />
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--color-text)' }}>🎉 Congratulations!</h2>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginBottom: '2rem' }}>You've earned an Instant Referral Reward</p>
+            
+            <motion.div 
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.3, type: 'spring' }}
+              style={{ fontSize: '4rem', fontWeight: 900, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.2rem', marginBottom: '1.5rem', textShadow: '0 0 30px rgba(162, 130, 197, 0.4)' }}
+            >
+              <span style={{ fontSize: '2.5rem' }}>₹</span>
+              <motion.span>{rounded}</motion.span>
+            </motion.div>
+            
+            <p style={{ color: 'var(--color-text)', fontSize: '0.9rem', marginBottom: '2.5rem', lineHeight: 1.5, padding: '0 1rem' }}>
+              Your referral was successful and your reward has been instantly credited to your affiliate wallet.
+            </p>
+            
+            <button 
+              onClick={() => setShowCelebration(false)}
+              style={{ width: '100%', padding: '1rem', background: 'var(--color-foreground)', color: 'var(--color-background)', border: 'none', borderRadius: '50px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'transform 0.2s ease' }}
+              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              View Wallet <ArrowRight size={18} />
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
   // ==========================================
   // ENROLLMENT UI
   // ==========================================
-  if (!affiliate && !showCelebration) {
+
+  if (!affiliate) {
     return (
-      <div className={styles.container}>
+      <>
+        {celebrationPopup}
+        <div className={styles.container}>
         <motion.div 
           className={styles.onboardingHero}
           initial={{ opacity: 0, y: 20 }}
@@ -226,6 +300,11 @@ export default function AffiliateProgram({ user }: AffiliateProgramProps) {
           <p className={styles.onboardingSubtitle}>
             Your friends save 5%. You earn 5%. Paid directly to your UPI.
           </p>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', padding: '0.5rem 1rem', borderRadius: '50px', fontWeight: 700, fontSize: '0.85rem', boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)' }}>
+              <Sparkles size={16} /> Get up to ₹300 Instant Welcome Bonus!
+            </div>
+          </div>
         </motion.div>
 
         <div className={styles.timelineSteps}>
@@ -360,24 +439,7 @@ export default function AffiliateProgram({ user }: AffiliateProgramProps) {
           </button>
         </motion.div>
       </div>
-    );
-  }
-
-  if (showCelebration) {
-    return (
-      <div className={styles.emptyState} style={{ minHeight: '60vh' }}>
-        <motion.div 
-          initial={{ scale: 0 }} 
-          animate={{ scale: 1, rotate: 360 }} 
-          transition={{ type: "spring", damping: 10, stiffness: 100 }}
-        >
-          <div className={styles.emptyStateIcon} style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', width: '100px', height: '100px' }}>
-            <Trophy size={48} />
-          </div>
-        </motion.div>
-        <h2 className={styles.onboardingTitle} style={{ fontSize: '2.5rem', marginTop: '2rem' }}>Welcome to DualDeer Partners!</h2>
-        <p className={styles.onboardingSubtitle}>Your dashboard is being prepared...</p>
-      </div>
+      </>
     );
   }
 
@@ -396,7 +458,9 @@ export default function AffiliateProgram({ user }: AffiliateProgramProps) {
   const mockRevenue = 0;
 
   return (
-    <div className={styles.container}>
+    <>
+      {celebrationPopup}
+      <div className={styles.container}>
       
       {/* Hero Card */}
       <motion.div className={styles.dashboardHero}>
@@ -635,6 +699,7 @@ export default function AffiliateProgram({ user }: AffiliateProgramProps) {
         )}
       </div>
 
-    </div>
+      </div>
+    </>
   );
 }

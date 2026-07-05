@@ -943,7 +943,17 @@ export const checkAffiliatePrefix = async (rawPrefix: string): Promise<{status: 
   }
 };
 
-export const registerAffiliate = async (userId: string, name: string, rawPrefix: string) => {
+export const generateWeightedReward = (): number => {
+  const rand = Math.random() * 100;
+  if (rand < 62) return 200; // 62%
+  if (rand < 77) return 220; // 15% (62 + 15)
+  if (rand < 86) return 240; // 9%  (77 + 9)
+  if (rand < 92) return 260; // 6%  (86 + 6)
+  if (rand < 97) return 280; // 5%  (92 + 5)
+  return 300;                // 3%  (97 + 3)
+};
+
+export const registerAffiliate = async (userId: string, name: string, rawPrefix: string): Promise<{ awardedBonus: number }> => {
   const prefix = normalizePrefix(rawPrefix);
   
   if (prefix.length < 3) throw new Error("Prefix too short.");
@@ -951,6 +961,7 @@ export const registerAffiliate = async (userId: string, name: string, rawPrefix:
   if (PROFANITY_LIST.some(p => prefix.includes(p))) throw new Error("This affiliate name is not allowed.");
 
   const finalCode = `${prefix}DUALDEER5`;
+  const awardedBonus = generateWeightedReward();
   
   const codeRef = doc(db, 'affiliate_codes', prefix);
   const userRef = doc(db, 'affiliates', userId);
@@ -987,7 +998,7 @@ export const registerAffiliate = async (userId: string, name: string, rawPrefix:
       userId,
       name,
       code: finalCode,
-      earnings: 0,
+      earnings: awardedBonus, // Randomized Welcome Bonus
       pendingEarnings: 0,
       totalWithdrawn: 0,
       status: 'active',
@@ -995,6 +1006,8 @@ export const registerAffiliate = async (userId: string, name: string, rawPrefix:
     };
     transaction.set(userRef, affiliateData);
   });
+  
+  return { awardedBonus };
 };
 
 export const getAffiliate = async (userId: string): Promise<Affiliate | null> => {
