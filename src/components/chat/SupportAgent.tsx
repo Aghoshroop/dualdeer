@@ -100,20 +100,47 @@ export default function SupportAgent() {
   };
 
   // ------------------------
+  // 🧹 CLEAR CHAT
+  // ------------------------
+  const clearChat = () => {
+    setMessages([{
+      role: 'assistant',
+      content: "Memory wiped. Let's start fresh. What can I help you with?"
+    }]);
+    localStorage.removeItem('dualdeer_agent_memory');
+    localStorage.removeItem('dualdeer_session_memory');
+  };
+
+  // ------------------------
+  // 💡 SUGGESTED QUESTIONS
+  // ------------------------
+  const handleSuggestion = (question: string) => {
+    setInput(question);
+    // Use setTimeout to allow state to update before sending
+    setTimeout(() => {
+        handleSend(undefined, question);
+    }, 50);
+  };
+
+  // ------------------------
   // 🚀 SEND MESSAGE
   // ------------------------
-  const handleSend = async (e?: React.FormEvent) => {
+  const handleSend = async (e?: React.FormEvent, directInput?: string) => {
     if (e) e.preventDefault();
 
-    const cleanedInput = input.trim().toLowerCase();
+    const textToSend = directInput !== undefined ? directInput : input;
+    const cleanedInput = textToSend.trim().toLowerCase();
 
     if (!cleanedInput || isLoading) return;
 
     // ❌ Prevent duplicate spam
     const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === 'user' && lastMsg.content === cleanedInput) return;
+    if (lastMsg?.role === 'user' && lastMsg.content === cleanedInput) {
+       setInput(''); // clear input if it was a duplicate from text box
+       return; 
+    }
 
-    const userMessage: Message = { role: 'user', content: cleanedInput };
+    const userMessage: Message = { role: 'user', content: textToSend };
     const newHistory = [...messages, userMessage];
 
     setMessages(newHistory);
@@ -181,6 +208,13 @@ export default function SupportAgent() {
     setIsLoading(false);
   };
 
+  const suggestions = [
+    "What is a SpeedSuit?",
+    "Show me Mens gear",
+    "Track my order",
+    "Return policy"
+  ];
+
   return (
     <>
       {/* FAB WRAPPER */}
@@ -194,8 +228,6 @@ export default function SupportAgent() {
           if (typeof window !== 'undefined') {
             const isLeft = info.point.x < window.innerWidth / 2;
             setSnapSide(isLeft ? 'left' : 'right');
-            // Element is right: 10px. 
-            // Target X for left edge snap (10px gap on left)
             wrapperControls.start({
               x: isLeft ? 64 - window.innerWidth : 0,
               transition: { type: 'spring', stiffness: 300, damping: 25 }
@@ -214,125 +246,157 @@ export default function SupportAgent() {
           }}
           transition={{ duration: 0.4, type: "spring", bounce: 0.2 }}
         >
-          <MessageSquare size={20} />
+          <div className={styles.fabGlow}></div>
+          <Sparkles className={styles.fabIcon} size={22} />
         </motion.button>
       </motion.div>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className={styles.chatWindow}
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className={styles.chatWindowOverlay}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsOpen(false)}
           >
+            <motion.div
+              className={styles.chatWindow}
+              initial={{ y: '100%', scale: 0.9, opacity: 0 }}
+              animate={{ y: 0, scale: 1, opacity: 1 }}
+              exit={{ y: '100%', scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            >
 
-            {/* HEADER */}
-            <div className={styles.header}>
-              <div className={styles.headerInfo}>
-                <div className={styles.avatar}><Sparkles size={16} /></div>
-                <div>
-                  <h3 className={styles.headerTitle}>DualDeer Concierge</h3>
-                  <span className={styles.status}>AI Assistant</span>
+              {/* HEADER */}
+              <div className={styles.header}>
+                <div className={styles.headerInfo}>
+                  <div className={styles.avatarWrapper}>
+                     <div className={styles.avatar}><Sparkles size={16} /></div>
+                     <div className={styles.onlineDot}></div>
+                  </div>
+                  <div>
+                    <h3 className={styles.headerTitle}>Deer AI Concierge</h3>
+                    <span className={styles.status}>Always Active</span>
+                  </div>
+                </div>
+                <div className={styles.headerActions}>
+                   <button className={styles.clearBtn} onClick={clearChat} title="Reset Chat">
+                      Reset
+                   </button>
+                   <button className={styles.closeBtn} onClick={() => setIsOpen(false)}>
+                     <X size={20} />
+                   </button>
                 </div>
               </div>
-              <button className={styles.closeBtn} onClick={() => setIsOpen(false)}>
-                <X size={20} />
-              </button>
-            </div>
 
-             {/* MESSAGES */}
-            <div className={styles.messagesContainer}>
-               <AnimatePresence>
-                 {messages.map((msg, i) => (
-                   <motion.div 
-                     key={i} 
-                     className={`${styles.messageWrapper} ${msg.role === 'user' ? styles.userWrapper : styles.assistantWrapper}`}
-                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                     exit={{ opacity: 0, scale: 0.95 }}
-                     transition={{ duration: 0.2 }}
-                   >
-                     {msg.role === 'assistant' && (
-                       <div className={styles.assistantSidebar}>
+               {/* MESSAGES */}
+              <div className={styles.messagesContainer}>
+                 <AnimatePresence>
+                   {messages.map((msg, i) => (
+                     <motion.div 
+                       key={i} 
+                       className={`${styles.messageWrapper} ${msg.role === 'user' ? styles.userWrapper : styles.assistantWrapper}`}
+                       initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                       animate={{ opacity: 1, y: 0, scale: 1 }}
+                       transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                     >
+                       {msg.role === 'assistant' && (
                          <div className={styles.msgAvatar}>🦌</div>
-                         <span className={styles.avatarLabel}>DEER</span>
-                       </div>
-                     )}
-                     <div className={styles.messageContentBlock}>
-                       <div className={`${styles.messageBubble} ${msg.role === 'user' ? styles.userBubble : styles.assistantBubble}`}>
-                         {msg.content}
-                       </div>
-                       
-                       {msg.products && msg.products.length > 0 && (
-                         <motion.div 
-                           className={styles.productCarousel}
-                           initial={{ opacity: 0, y: 20 }}
-                           animate={{ opacity: 1, y: 0 }}
-                           transition={{ delay: 0.3, duration: 0.4 }}
-                         >
-                           {msg.products.map(p => (
-                              <div key={p.id} className={styles.productCard}>
-                                <div className={styles.productImageWrapper}>
-                                    <img src={p.images?.[0] || p.image || '/placeholder-product.png'} alt={p.name} className={styles.productImage} />
-                                </div>
-                                <div className={styles.productInfo}>
-                                  <h4 className={styles.productTitle}>{p.name}</h4>
-                                  <p className={styles.productPrice}>₹{p.price}</p>
-                                  <button className={styles.viewBtn}>View</button>
-                                </div>
-                              </div>
-                           ))}
-                         </motion.div>
                        )}
-                     </div>
-                   </motion.div>
-                 ))}
-               </AnimatePresence>
+                       <div className={styles.messageContentBlock}>
+                         <div className={`${styles.messageBubble} ${msg.role === 'user' ? styles.userBubble : styles.assistantBubble}`}>
+                           {msg.content}
+                         </div>
+                         
+                         {msg.products && msg.products.length > 0 && (
+                           <motion.div 
+                             className={styles.productCarousel}
+                             initial={{ opacity: 0, x: 20 }}
+                             animate={{ opacity: 1, x: 0 }}
+                             transition={{ delay: 0.2, duration: 0.4 }}
+                           >
+                             {msg.products.map(p => (
+                                <a href={`/${p.category}/${p.id}`} key={p.id} className={styles.productCard}>
+                                  <div className={styles.productImageWrapper}>
+                                      <img src={p.images?.[0] || p.image || '/placeholder-product.png'} alt={p.name} className={styles.productImage} />
+                                  </div>
+                                  <div className={styles.productInfo}>
+                                    <h4 className={styles.productTitle}>{p.name}</h4>
+                                    <p className={styles.productPrice}>₹{p.price}</p>
+                                    <button className={styles.viewBtn}>View details</button>
+                                  </div>
+                                </a>
+                             ))}
+                           </motion.div>
+                         )}
+                       </div>
+                     </motion.div>
+                   ))}
+                 </AnimatePresence>
 
-              {isLoading && (
-                <motion.div 
-                  className={`${styles.messageWrapper} ${styles.assistantWrapper}`}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                >
-                  <div className={styles.assistantSidebar}>
+                {isLoading && (
+                  <motion.div 
+                    className={`${styles.messageWrapper} ${styles.assistantWrapper}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
                     <div className={styles.msgAvatar}>🦌</div>
-                    <span className={styles.avatarLabel}>DEER</span>
-                  </div>
-                  <div className={styles.messageContentBlock}>
-                    <div className={`${styles.messageBubble} ${styles.assistantBubble} ${styles.typingBubble}`}>
-                      <span className={styles.dot}></span>
-                      <span className={styles.dot}></span>
-                      <span className={styles.dot}></span>
+                    <div className={styles.messageContentBlock}>
+                      <div className={`${styles.messageBubble} ${styles.assistantBubble} ${styles.typingBubble}`}>
+                        <span className={styles.dot}></span>
+                        <span className={styles.dot}></span>
+                        <span className={styles.dot}></span>
+                      </div>
                     </div>
-                  </div>
+                  </motion.div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* QUICK SUGGESTIONS */}
+              {messages.length < 3 && !isLoading && (
+                <motion.div 
+                   className={styles.suggestionsContainer}
+                   initial={{ opacity: 0, y: 10 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   transition={{ delay: 0.5 }}
+                >
+                   {suggestions.map((sug, idx) => (
+                      <button 
+                         key={idx} 
+                         className={styles.suggestionChip}
+                         onClick={() => handleSuggestion(sug)}
+                      >
+                        {sug}
+                      </button>
+                   ))}
                 </motion.div>
               )}
 
-              <div ref={messagesEndRef} />
-            </div>
+              {/* INPUT */}
+              <form onSubmit={handleSend} className={styles.inputForm}>
+                <div className={styles.inputWrapper}>
+                  <input
+                    className={styles.inputField}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type a message..."
+                  />
+                  <button 
+                    className={`${styles.sendBtn} ${input.trim() ? styles.sendBtnActive : ''}`} 
+                    type="submit" 
+                    disabled={!input.trim() || isLoading}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    <Send size={18} />
+                  </button>
+                </div>
+              </form>
 
-            {/* INPUT */}
-            <form onSubmit={handleSend} className={styles.inputForm}>
-              <input
-                className={styles.inputField}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask anything..."
-                // Removed disabled={isLoading} so users can type while AI thinks!
-              />
-              <button 
-                className={styles.sendBtn} 
-                type="submit" 
-                disabled={!input.trim() || isLoading}
-                onMouseDown={(e) => e.preventDefault()} // Prevents the button from stealing focus from the input!
-              >
-                <Send size={18} />
-              </button>
-            </form>
-
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

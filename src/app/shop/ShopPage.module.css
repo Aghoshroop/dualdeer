@@ -1349,3 +1349,14 @@
   }
 }
 
+/* =========================================
+   DESKTOP ONLY: Filter & Sort Sticky Fix
+========================================= */
+@media (min-width: 1024px) {
+  .collectionHeaderRow {
+    top: 0 !important;
+    padding-top: 100px !important; /* Covers the area behind the navbar */
+    padding-bottom: 24px !important;
+    background-color: var(--color-background) !important; /* Ensures no products bleed through */
+  }
+}

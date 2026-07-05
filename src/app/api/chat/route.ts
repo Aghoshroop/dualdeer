@@ -28,13 +28,8 @@ function includesFuzzy(msg: string, keyword: string): boolean {
 
 // 3. PRODUCT INTENT DETECTION (CRITICAL)
 const productKeywords = [
-  "shirt",
-  "tshirt",
-  "vest",
-  "hoodie",
-  "jacket",
-  "tracksuit",
-  "shorts"
+  "shirt", "tshirt", "vest", "hoodie", "jacket", "tracksuit", "shorts",
+  "speedsuit", "compression", "men", "women", "mens", "womens", "pant", "legging"
 ];
 
 function isProductQuery(msg: string): boolean {
@@ -42,7 +37,15 @@ function isProductQuery(msg: string): boolean {
 }
 
 function getMatchedProductKeyword(msg: string): string {
-  return productKeywords.find(k => includesFuzzy(msg, k)) || "vest";
+  // If no specific match, try to extract category from the query before falling back to vest
+  const found = productKeywords.find(k => includesFuzzy(msg, k));
+  if (found) return found;
+  
+  if (msg.includes("men") || msg.includes("boy") || msg.includes("guy")) return "men";
+  if (msg.includes("women") || msg.includes("girl") || msg.includes("lady")) return "women";
+  if (msg.includes("suit")) return "speedsuit";
+  
+  return "vest"; // Ultimate fallback
 }
 
 // 6. IMPROVE QUESTION UNDERSTANDING
@@ -160,19 +163,14 @@ export async function POST(req: Request) {
     // Update state for non-product queries
     currentState.lastQuery = normMsg;
 
-    // 5. question detection
-    if (isQuestion(normMsg, latestUserMessageOriginal)) {
-        const replyText = await deerOS.execute(latestUserMessageOriginal, lastSystemMessage);
+    // 5. DEER OS KNOWLEDGE & FAQ ROUTING
+    const replyText = await deerOS.execute(latestUserMessageOriginal, lastSystemMessage);
+    
+    if (replyText && !fallbackReplies.includes(replyText)) {
         return NextResponse.json({ reply: replyText, memory: context?.memory || {} });
     }
 
-    // 6. learning input
-    if (normMsg.match(/\b(is|are|means|causes|makes|improves|reduces)\b/)) {
-        const replyText = await deerOS.execute(latestUserMessageOriginal, lastSystemMessage);
-        return NextResponse.json({ reply: replyText, memory: context?.memory || {} });
-    }
-
-    // 7. fallback
+    // 6. fallback
     const randomFallback = fallbackReplies[Math.floor(Math.random() * fallbackReplies.length)];
     return NextResponse.json({
       reply: randomFallback,

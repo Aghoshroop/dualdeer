@@ -78,7 +78,7 @@ export class PrivacyEngine {
 // -------------------------------------------------------------
 // 2. INTENT ENGINE
 // -------------------------------------------------------------
-export type Intent = "question" | "product_search" | "learning_input" | "feedback" | "unknown";
+export type Intent = "question" | "product_search" | "learning_input" | "feedback" | "unknown" | "site_knowledge";
 
 export class IntentEngine {
   static detect(message: string): Intent {
@@ -86,6 +86,10 @@ export class IntentEngine {
     
     if (raw.match(/\b(buy|shop|looking for|recommend|price|cost|gear|shirt|tshirt|suit|speedsuit|pants|shorts)\b/)) {
         return "product_search";
+    }
+
+    if (FAQEngine.check(raw) !== null) {
+        return "site_knowledge";
     }
 
     if (raw.match(/\b(is|are|means|causes|makes|improves|reduces)\b/) && !raw.includes("what") && !raw.includes("who") && !raw.includes("?")) {
@@ -101,6 +105,113 @@ export class IntentEngine {
     }
     
     return "unknown";
+  }
+}
+
+// -------------------------------------------------------------
+// 2.5 SITE KNOWLEDGE & FAQ ENGINE
+// -------------------------------------------------------------
+export const SITE_KNOWLEDGE = [
+  {
+    keywords: ["shipping", "delivery", "track", "arrive", "ship", "deliver"],
+    answer: "We offer complimentary express shipping on all orders across India. Your performance gear is processed immediately for fast delivery."
+  },
+  {
+    keywords: ["return", "refund", "exchange", "back"],
+    answer: "We offer hassle-free complimentary returns and exchanges. If your gear doesn't fit perfectly, we've got you covered."
+  },
+  {
+    keywords: ["what is dualdeer", "about dualdeer", "brand", "who are you guys", "story", "dual deer"],
+    answer: "DualDeer is a premium luxury athleisure and high-performance activewear brand. We engineer gear for elite training, gym, and street-ready aesthetics."
+  },
+  {
+    keywords: ["speedsuit", "speed suit", "what is a speedsuit"],
+    answer: "The SpeedSuit is our signature high-performance compression wear. It's engineered for aerodynamics, muscle support, and ultimate comfort during intense training."
+  },
+  {
+    keywords: ["contact", "support", "help", "email", "talk to human", "customer service"],
+    answer: "You can reach our support team right here in this chat, or email us. We're always monitoring and ready to assist you."
+  },
+  {
+    keywords: ["men", "mens", "male", "guy", "boy"],
+    answer: "We have a dedicated Men's collection featuring premium compression shirts, tracksuits, and gym wear. Type 'show me mens gear' to see our top picks."
+  },
+  {
+    keywords: ["women", "womens", "female", "ladies", "girl"],
+    answer: "Our Women's collection features luxury activewear and performance gear designed for perfection. Type 'show me womens gear' to explore."
+  },
+  {
+    keywords: ["size", "sizing", "fit", "chart", "measure"],
+    answer: "Our gear is designed with an athletic, tailored fit. If you prefer a looser fit, we recommend sizing up. All our SpeedSuits offer high-stretch compression."
+  },
+  {
+    keywords: ["material", "fabric", "quality", "made of", "wash", "care"],
+    answer: "We use premium, moisture-wicking, high-stretch fabrics designed for both luxury feel and elite performance. Wash them cold to maintain the premium texture."
+  },
+  {
+    keywords: ["where", "location", "based", "india", "country"],
+    answer: "DualDeer provides premium SpeedSuits and activewear across India, delivering luxury performance gear right to your doorstep."
+  },
+  {
+    keywords: ["discount", "coupon", "sale", "promo", "code", "offer"],
+    answer: "We occasionally run exclusive drops and promotions. Keep an eye on our homepage or sign up for our newsletter to get early access to our luxury sales!"
+  },
+  {
+    keywords: ["payment", "pay", "cod", "cash on delivery", "card", "upi"],
+    answer: "We accept all major secure payment methods including UPI, Credit/Debit cards, and Net Banking to ensure a smooth checkout experience."
+  },
+  {
+    keywords: ["owner", "founder", "ceo", "who made", "creator"],
+    answer: "DualDeer is crafted with a passion for luxury performance and elite aesthetics, driven by a vision to redefine activewear in India."
+  },
+  {
+    keywords: ["cart", "bag", "basket", "checkout", "buy now"],
+    answer: "You can view your selected gear by clicking the shopping bag icon at the top right of your screen. Ready to checkout?"
+  },
+  {
+    keywords: ["account", "login", "register", "profile", "sign in", "sign up"],
+    answer: "You can manage your orders, wishlist, and preferences in your account. Just tap the User icon in the navigation bar to log in."
+  },
+  {
+    keywords: ["compression", "tight", "muscle support", "aerodynamic"],
+    answer: "Our compression wear (including the signature SpeedSuit) is engineered for muscle support, improved blood flow, aerodynamics, and sweat wicking. It's built for high-intensity training."
+  },
+  {
+    keywords: ["newsletter", "subscribe", "10%", "discount", "welcome"],
+    answer: "You can sign up for our newsletter to receive 10% off your first order and get early access to our exclusive luxury drops!"
+  },
+  {
+    keywords: ["who are you", "what are you", "ai", "bot"],
+    answer: "I'm Deer, your DualDeer Concierge AI. I'm engineered to know everything about our luxury activewear, help you find the perfect fit, and assist with any questions you have."
+  },
+  {
+    keywords: ["how to navigate", "menu", "find things", "where is"],
+    answer: "You can explore our collections via the top navigation bar (or the bottom dock on mobile). The User icon takes you to your account, and the Bag icon opens your cart."
+  }
+];
+
+export class FAQEngine {
+  static check(message: string): string | null {
+    const raw = message.toLowerCase();
+    
+    let bestMatch = null;
+    let maxMatches = 0;
+
+    for (const item of SITE_KNOWLEDGE) {
+      let matches = 0;
+      for (const kw of item.keywords) {
+        if (raw.includes(kw)) {
+          matches++;
+        }
+      }
+      if (matches > maxMatches) {
+        maxMatches = matches;
+        bestMatch = item.answer;
+      }
+    }
+
+    if (maxMatches > 0) return bestMatch;
+    return null;
   }
 }
 
@@ -339,6 +450,13 @@ export class DeerOSCoordinator {
        
        MemoryEngine.updateUser(this.userId, cleanInput).catch(()=>null);
        const prefs = this.userMemory?.preferences || [];
+
+       if (intent === "site_knowledge") {
+           const answer = FAQEngine.check(cleanInput);
+           if (answer) {
+               return answer;
+           }
+       }
 
        if (intent === "learning_input") {
            const fact = KnowledgeEngine.extractStructuredFact(cleanInput);
