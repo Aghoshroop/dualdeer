@@ -3,6 +3,9 @@ import React from 'react';
 export const metadata = {
   title: 'Privacy Policy | DualDeer Activewear',
   description: 'DualDeer privacy policy detailing how we collect, use, and protect your personal information.',
+  alternates: {
+    canonical: 'https://dualdeer.com/policies/privacy',
+  },
 };
 
 export default function PrivacyPolicyPage() {

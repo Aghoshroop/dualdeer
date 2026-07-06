@@ -3,6 +3,9 @@ import React from 'react';
 export const metadata = {
   title: 'Terms of Service | DualDeer Activewear',
   description: 'Terms and conditions for using the DualDeer website and purchasing our premium activewear.',
+  alternates: {
+    canonical: 'https://dualdeer.com/policies/terms',
+  },
 };
 
 export default function TermsOfServicePage() {

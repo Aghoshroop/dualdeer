@@ -4,6 +4,9 @@ import Link from 'next/link';
 export const metadata = {
   title: 'Contact Us | DualDeer Activewear',
   description: 'Get in touch with the DualDeer customer support team for inquiries about orders, sizing, or general questions.',
+  alternates: {
+    canonical: 'https://dualdeer.com/contact',
+  },
 };
 
 export default function ContactPage() {

@@ -6,6 +6,9 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'About Us | DualDeer Premium Activewear',
   description: 'Learn about the origin, philosophy, and advanced engineering behind DualDeer, India’s top luxury athleisure brand.',
+  alternates: {
+    canonical: 'https://dualdeer.com/about',
+  },
 };
 
 export default function AboutPage() {

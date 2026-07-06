@@ -3,6 +3,9 @@ import React from 'react';
 export const metadata = {
   title: 'Shipping Policy | DualDeer Activewear',
   description: 'Learn about DualDeer shipping rates, delivery times, and order tracking across India.',
+  alternates: {
+    canonical: 'https://dualdeer.com/policies/shipping',
+  },
 };
 
 export default function ShippingPolicyPage() {

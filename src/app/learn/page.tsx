@@ -6,6 +6,9 @@ import { guides } from './guidesData';
 export const metadata: Metadata = {
   title: 'Knowledge Center & Guides | DualDeer Activewear',
   description: 'Explore comprehensive guides on athletic apparel, moisture-wicking fabrics, compression wear, and sizing from DualDeer.',
+  alternates: {
+    canonical: 'https://dualdeer.com/learn',
+  },
   robots: {
     index: true,
     follow: true

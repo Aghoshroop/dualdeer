@@ -4,6 +4,9 @@ import Link from 'next/link';
 export const metadata = {
   title: 'Return & Exchange Policy | DualDeer Activewear',
   description: 'Understand the return and exchange process for DualDeer premium activewear. We offer a hassle-free 7-day return window.',
+  alternates: {
+    canonical: 'https://dualdeer.com/policies/returns',
+  },
 };
 
 export default function ReturnsPolicyPage() {
