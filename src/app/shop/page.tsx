@@ -43,13 +43,36 @@ export default async function ShopPage() {
 
   const liveCategories = categories.filter(c => c.status === 'active');
   
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Luxury Activewear Store (2026) | Premium Collections | DualDeer",
+    "description": "Shop the complete collection of DualDeer luxury activewear. Find premium speedsuits, compression t-shirts, and elite athletic wear for peak performance.",
+    "url": "https://dualdeer.com/shop",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "DualDeer",
+      "url": "https://dualdeer.com/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Luxury Activewear"
+    }
+  };
+
   return (
-    <ShopClient 
-      initialProducts={products?.map(serializeProduct) ?? []} 
-      initialCategories={liveCategories?.map(serializeCategory) ?? []} 
-      initialBackdrop={backdropContent?.imageUrl || ''}
-      initialHeroUrl={heroContent?.imageUrl || ''}
-      initialHeroText={heroContent?.title || ''}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
+      <ShopClient 
+        initialProducts={products?.map(serializeProduct) ?? []} 
+        initialCategories={liveCategories?.map(serializeCategory) ?? []} 
+        initialBackdrop={backdropContent?.imageUrl || ''}
+        initialHeroUrl={heroContent?.imageUrl || ''}
+        initialHeroText={heroContent?.title || ''}
+      />
+    </>
   );
 }

@@ -8,6 +8,8 @@ import { Product, Video as VideoType } from "@/lib/firebaseUtils";
 import { useCart } from "@/context/CartContext";
 import { useCurrency } from "@/context/CurrencyContext";
 import VideoPlayer from "@/components/ui/VideoPlayer";
+import WishlistButton from "@/components/ui/WishlistButton";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 export default function SpeedSuitsIndiaClient({ 
   initialProducts,
@@ -37,6 +39,14 @@ export default function SpeedSuitsIndiaClient({
 
   return (
     <main className={styles.main}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '1rem 2rem 0' }}>
+        <Breadcrumb items={[
+          { label: 'Home', href: '/' },
+          { label: 'Shop', href: '/shop' },
+          { label: 'SpeedSuits India' }
+        ]} />
+      </div>
+
       {/* 1. Cinematic Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroImageWrapper}>
@@ -105,9 +115,14 @@ export default function SpeedSuitsIndiaClient({
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
               >
-                <Link href={`/product/${product.slug}`} className={styles.productCard}>
-                  <div className={styles.imageWrapper}>
-                    <img src={product.image} alt={product.name} className={styles.productImage} />
+                <div className={styles.productCard}>
+                  <div className={styles.imageWrapper} style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}>
+                      <WishlistButton productId={product.id || ''} />
+                    </div>
+                    <Link href={`/product/${product.slug}`} style={{ display: 'block' }}>
+                      <img src={product.image} alt={product.name} className={styles.productImage} />
+                    </Link>
                   </div>
                   <div className={styles.productPriceRow}>
                     {product.mrp && product.price > 0 && product.mrp > product.price && (
@@ -131,7 +146,7 @@ export default function SpeedSuitsIndiaClient({
                       {(product.isSoldOut || product.stock === 0) ? 'Stock Out' : 'Pre-Order / Buy Now'}
                     </button>
                   </div>
-                </Link>
+                </div>
               </motion.div>
             ))}
           </div>

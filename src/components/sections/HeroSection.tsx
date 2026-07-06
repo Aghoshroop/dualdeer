@@ -160,6 +160,8 @@ export default function HeroSection() {
           ) : (
             <motion.div 
               className={`${styles.background} ${styles.desktopOnly}`} 
+              role="img"
+              aria-label={currentSlide.heading + " - DualDeer Premium Activewear"}
               style={{ 
                 backgroundImage: `url(${currentSlide.image})`,
                 y: yBg
@@ -184,6 +186,8 @@ export default function HeroSection() {
           ) : (
             <motion.div 
               className={`${styles.background} ${styles.mobileOnly}`} 
+              role="img"
+              aria-label={currentSlide.heading + " - DualDeer Premium Activewear"}
               style={{ 
                 backgroundImage: `url(${currentSlide.mobileImage || currentSlide.image})`,
                 y: yBg

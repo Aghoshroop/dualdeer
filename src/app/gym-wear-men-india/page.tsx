@@ -42,8 +42,29 @@ export default async function GymWearMenIndiaPage() {
       ((p as any).tags || []).some((t: string) => t.toLowerCase().includes("gym"))
   ).slice(0, 12);
 
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Gym Wear For Men in India (2026) | Premium Activewear | DualDeer",
+    "description": "Shop the finest high-performance gym wear for men in India. Discover elite compression, moisture-wicking shirts, and luxury athleisure by DualDeer.",
+    "url": "https://dualdeer.com/gym-wear-men-india",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "DualDeer",
+      "url": "https://dualdeer.com/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Men's Gym Wear"
+    }
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
       <GymWearClient initialProducts={gymWear?.map(serializeProduct) ?? []} />
     </>
   );

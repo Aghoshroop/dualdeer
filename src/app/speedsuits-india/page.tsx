@@ -47,8 +47,29 @@ export default async function SpeedSuitsIndiaPage() {
     createdAt: (v.createdAt as any)?.toMillis ? (v.createdAt as any).toMillis() : v.createdAt
   }));
 
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Premium Speedsuits in India (2026) | Elite Aerodynamic Gear | DualDeer",
+    "description": "Shop the most elite, high-performance speedsuits in India. DualDeer compression wear engineered for aerodynamics and luxury aesthetics.",
+    "url": "https://dualdeer.com/speedsuits-india",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "DualDeer",
+      "url": "https://dualdeer.com/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Speedsuits"
+    }
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
       <SpeedSuitsIndiaClient 
         initialProducts={speedsuits?.map(serializeProduct) ?? []} 
         initialVideos={videos as any[]}

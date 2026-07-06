@@ -14,8 +14,11 @@ import QuantitySelector from '@/components/ui/QuantitySelector';
 import AnimatedCartButton from '@/components/ui/AnimatedCartButton';
 import { useFomoStock } from '@/hooks/useFomoStock';
 import MobileProductGallery from './MobileProductGallery';
+import AeoSeoProductDetails from './AeoSeoProductDetails';
+import RelatedGuides from './RelatedGuides';
 
 import { useCurrency } from '@/context/CurrencyContext';
+import Breadcrumb from '@/components/ui/Breadcrumb';
 import * as metaPixel from '@/lib/metaPixel';
 
 interface ProductClientProps {
@@ -393,15 +396,12 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
         </div>
 
         <div className={styles.productInfo}>
-          <div className={styles.breadcrumbs} style={{ fontSize: '0.85rem', marginBottom: '1rem', opacity: 0.8, display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Home</Link>
-            <span>&gt;</span>
-            <Link href="/shop" style={{ color: 'inherit', textDecoration: 'none' }}>Shop</Link>
-            <span>&gt;</span>
-            <Link href={`/shop?category=${encodeURIComponent(product.category || '')}`} style={{ color: 'inherit', textDecoration: 'none' }}>{product.category || 'Category'}</Link>
-            <span>&gt;</span>
-            <span style={{ color: 'var(--color-primary)' }}>{product.name}</span>
-          </div>
+          <Breadcrumb items={[
+            { label: 'Home', href: '/' },
+            { label: 'Shop', href: '/shop' },
+            { label: product.category || 'Category', href: `/shop?category=${encodeURIComponent(product.category || '')}` },
+            { label: product.name }
+          ]} />
 
           <div className={styles.titleHeader}>
             <div className={styles.productBadges} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px' }}>
@@ -654,72 +654,8 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
         </div>
       </section>
 
-      <section className={styles.seoProductSection}>
-        <div className={styles.seoProductContainer}>
-          <div className={isDescExpanded ? styles.contentExpanded : styles.contentCollapsed}>
-            <h2>Why Choose the {product.name}</h2>
-            <p>
-              Experience a new standard in athletic comfort with the <strong>{product.name}</strong>. At <Link href="/" style={{ textDecoration: 'underline', color: 'inherit' }}>DualDeer</Link>, we understand that your workouts require apparel that moves with you. If you are searching for the <Link href="/best-gym-clothes-india" style={{ textDecoration: 'underline', color: 'inherit' }}>best gym clothes in India</Link>, this garment is designed specifically to provide excellent breathability, lasting comfort, and a clean, modern aesthetic. 
-            </p>
-            
-            <p>
-              Standard gym clothes often lose their shape or hold onto sweat during longer sessions. Our engineered fabric blend, found in collections like our <Link href="/speedsuits-india" style={{ textDecoration: 'underline', color: 'inherit' }}>SpeedSuits lineup</Link>, offers a fresh approach to your daily training. Whether you are lifting weights, running, or stretching, the {product.name} provides natural support without feeling restrictive.
-            </p>
-
-            <h3>Fabric Technology & Features</h3>
-            <ul>
-              <li><strong>Comfortable Compression:</strong> Gentle, supportive zones help reduce muscle fatigue and encourage better circulation, acting as ideal <Link href="/compression-tshirt-men" style={{ textDecoration: 'underline', color: 'inherit' }}>compression gear for men</Link> during heavy workouts.</li>
-              <li><strong>Designed for the Indian Climate:</strong> Our moisture-wicking technology actively pulls sweat away from the skin, keeping you cool even during intense humidity.</li>
-              <li><strong>Smooth, Flat Seams:</strong> We've utilized careful flatlock stitching to prevent chafing, so you can focus entirely on your movement rather than adjusting your clothing.</li>
-              <li><strong>Built to Last:</strong> High-quality durability ensures this piece remains a staple in your closet wash after wash.</li>
-            </ul>
-
-            <h3>Usage: How to Get the Most from the {product.name}</h3>
-            <ul>
-              <li><strong>Gym Wear for Men in India:</strong> Perfectly suited for indoor weight training, CrossFit, or high-intensity interval training (HIIT).</li>
-              <li><strong>Running & Outdoors:</strong> Lightweight and highly breathable, making it a great companion for track days or morning jogs.</li>
-              <li><strong>Everyday Athleisure:</strong> With its minimal branding and tailored fit, it transitions smoothly into casual wear for your daily routine.</li>
-            </ul>
-
-            <h3>DualDeer vs. Other Brands</h3>
-            <p>
-              Unlike standard activewear that relies heavily on 100% cotton or generic polyester, DualDeer garments use a custom hydrophobic blend. We prioritize actual performance metrics—like breathability and stretch—over flashy logos. Our focus is providing reliable, long-lasting gear tailored specifically for athletes who need clothing that works as hard as they do.
-            </p>
-
-            <h3>Frequently Asked Questions</h3>
-            <div className={styles.faqBlock} style={{ marginTop: '1.5rem' }}>
-              <div style={{ marginBottom: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.3rem' }}>Q: Is this suitable for intense workouts?</strong>
-                <p style={{ margin: 0, opacity: 0.8 }}>Yes, the {product.name} is built with four-way stretch fabric and moisture-wicking technology, making it incredibly comfortable for intense workouts.</p>
-              </div>
-              <div style={{ marginBottom: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.3rem' }}>Q: How do I wash and care for this item?</strong>
-                <p style={{ margin: 0, opacity: 0.8 }}>Machine wash cold with like colors inside out. Do not use fabric softeners or bleach. We highly recommend air drying or tumble drying on low to preserve the elasticity.</p>
-              </div>
-              <div style={{ marginBottom: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.3rem' }}>Q: How is the sizing?</strong>
-                <p style={{ margin: 0, opacity: 0.8 }}>It features an athletic, slightly compressive fit designed to sit close to the skin. If you prefer a looser, more casual <Link href="/gym-wear-men-india" style={{ textDecoration: 'underline', color: 'inherit' }}>gym wear</Link> style, please order one size up.</p>
-              </div>
-              <div style={{ marginBottom: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.3rem' }}>Q: Will it lose its shape over time?</strong>
-                <p style={{ margin: 0, opacity: 0.8 }}>No, our kinetic stretch fabric has strong shape-retention memory, meaning it snaps back to its original tailored fit even after repeated high-stress movement.</p>
-              </div>
-            </div>
-            
-          </div>
-          <button 
-            className={styles.readMoreBtn} 
-            onClick={() => setIsDescExpanded(!isDescExpanded)}
-            aria-expanded={isDescExpanded}
-          >
-            {isDescExpanded ? 'Read Less' : 'Read More'}
-            <ChevronDown size={16} style={{ 
-              transform: isDescExpanded ? 'rotate(180deg)' : 'none', 
-              transition: 'transform 0.3s ease' 
-            }} />
-          </button>
-        </div>
-      </section>
+      <AeoSeoProductDetails product={product} />
+      <RelatedGuides category={product.category} name={product.name} />
 
       <section className={styles.tabsSection}>
         <div className={styles.tabContent}>

@@ -1,0 +1,160 @@
+.aeoContainer {
+  margin-top: 4rem;
+  padding: 3rem 2rem;
+  background: rgba(var(--foreground-rgb), 0.02);
+  border-top: 1px solid rgba(var(--foreground-rgb), 0.1);
+  border-bottom: 1px solid rgba(var(--foreground-rgb), 0.1);
+  font-family: var(--font-primary), sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--color-primary);
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+.specsList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.specItem {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(var(--foreground-rgb), 0.05);
+  padding-bottom: 0.5rem;
+}
+
+.specTerm {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.specDesc {
+  opacity: 0.8;
+  text-align: right;
+  max-width: 60%;
+}
+
+.faqContainer {
+  max-width: 800px;
+  margin: 4rem auto 0;
+}
+
+.faqItem {
+  border-bottom: 1px solid rgba(var(--foreground-rgb), 0.1);
+  margin-bottom: 1rem;
+}
+
+.faqQuestion {
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 1rem 0;
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+}
+
+.faqQuestion::-webkit-details-marker {
+  display: none;
+}
+
+.faqQuestion::after {
+  content: '+';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+details[open] .faqQuestion::after {
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.faqAnswer {
+  padding-bottom: 1.5rem;
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+.directAnswer {
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.tableContainer {
+  max-width: 1200px;
+  margin: 4rem auto 0;
+  overflow-x: auto;
+}
+
+.recommendationTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: var(--color-background);
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.recommendationTable th,
+.recommendationTable td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(var(--foreground-rgb), 0.05);
+}
+
+.recommendationTable th {
+  background: rgba(var(--foreground-rgb), 0.03);
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.recommendationTable tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .aeoContainer {
+    padding: 2rem 1rem;
+  }
+}

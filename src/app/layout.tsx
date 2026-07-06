@@ -81,18 +81,54 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "DualDeer",
-    "url": "https://dualdeer.com",
-    "logo": "https://images.unsplash.com/photo-1550639525-c97d455acf70?q=80&w=200",
-    "sameAs": [
-      "https://instagram.com/dualdeerofficial",
-      "https://twitter.com/dualdeerofficial"
-    ],
-    "description": "Premium luxury athleisure, activewear, and performance menswear."
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "DualDeer",
+      "url": "https://dualdeer.com",
+      "logo": "https://images.unsplash.com/photo-1550639525-c97d455acf70?q=80&w=200",
+      "slogan": "The vanguard of human performance.",
+      "founder": {
+        "@type": "Person",
+        "name": "The DualDeer Team"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "support@dualdeer.com",
+        "availableLanguage": ["English", "Hindi"]
+      },
+      "sameAs": [
+        "https://instagram.com/dualdeerofficial",
+        "https://twitter.com/dualdeerofficial"
+      ],
+      "description": "Premium luxury athleisure, activewear, and performance menswear."
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "DualDeer",
+      "url": "https://dualdeer.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dualdeer.com/shop?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsActivityLocation",
+      "name": "DualDeer Activewear",
+      "url": "https://dualdeer.com",
+      "image": "https://images.unsplash.com/photo-1550639525-c97d455acf70?q=80&w=200",
+      "priceRange": "$$$",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IN"
+      }
+    }
+  ];
 
   return (
     <html lang="en" suppressHydrationWarning>

@@ -199,7 +199,12 @@ export default function Footer() {
               <div className={styles.linkList}>
                 <Link href="/reaction-test" className={styles.linkItem}>REACTION ARENA</Link>
                 <Link href="/profile" className={styles.linkItem}>OPERATIVE PORTAL</Link>
-                <Link href="#" className={styles.linkItem}>SHIPPING & RETURNS</Link>
+                <Link href="/policies/shipping" className={styles.linkItem}>SHIPPING POLICY</Link>
+                <Link href="/policies/returns" className={styles.linkItem}>RETURN POLICY</Link>
+                <Link href="/policies/privacy" className={styles.linkItem}>PRIVACY POLICY</Link>
+                <Link href="/policies/terms" className={styles.linkItem}>TERMS OF SERVICE</Link>
+                <Link href="/contact" className={styles.linkItem}>CONTACT SUPPORT</Link>
+                <Link href="/learn" className={styles.linkItem}>KNOWLEDGE CENTER</Link>
               </div>
             </motion.div>
           </div>

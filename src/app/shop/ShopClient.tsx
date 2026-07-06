@@ -9,6 +9,8 @@ import { useCurrency } from '@/context/CurrencyContext';
 import AnimatedCartButton from '@/components/ui/AnimatedCartButton';
 import { ShoppingBag, Heart, Check, LayoutGrid, Square, SlidersHorizontal, X, ChevronDown, ChevronUp } from 'lucide-react';
 import React from 'react';
+import WishlistButton from '@/components/ui/WishlistButton';
+import Breadcrumb from '@/components/ui/Breadcrumb';
 
 // UI Interaction Sound Generator (No external assets required)
 const playInteractionSound = (type: 'hover' | 'click' | 'ring') => {
@@ -248,6 +250,12 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
 
   return (
     <div className={styles.shopContainer}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '1rem 2rem 0', background: '#050505', position: 'relative', zIndex: 10 }}>
+        <Breadcrumb items={[
+          { label: 'Home', href: '/' },
+          { label: 'Shop', href: '/shop' }
+        ]} />
+      </div>
       
       {/* 1. Ultra-Cinematic Dark Hero Section */}
       <section className={styles.heroSection}>
@@ -497,12 +505,10 @@ function ProductCard({ product, i, styles, wishlist, toggleWishlist, playInterac
         )}
 
         {/* Wishlist Icon */}
-        <button 
-          className={styles.premiumWishlistBtn}
-          onClick={(e) => toggleWishlist(e, product.id)}
-        >
-          <Heart size={18} fill={wishlist.includes(product.id) ? '#ef4444' : 'none'} color={wishlist.includes(product.id) ? '#ef4444' : 'currentColor'} />
-        </button>
+        <WishlistButton 
+          productId={product.id} 
+          className={styles.premiumWishlistBtn} 
+        />
 
         <Link href={`/product/${product.slug}`}>
           {images.map((img: string, idx: number) => (

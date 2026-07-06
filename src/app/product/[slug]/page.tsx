@@ -107,6 +107,30 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           "@type": "Answer",
           "text": `Yes, our performance wear utilizes an ergonomic, body-mapped compression fit. If you prefer a more relaxed fit for casual gym wear, we recommend sizing up.`
         }
+      },
+      {
+        "@type": "Question",
+        "name": `Does the ${product.name} lose its shape over time?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `No. The inclusion of premium elastane gives the fabric strong shape-retention memory, meaning it snaps back to its original fit even after intense, repetitive stretching.`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `Is the ${product.name} suitable for the Indian climate?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Yes. The fabric is engineered specifically to handle high heat and humidity by rapidly pulling sweat away from the skin to evaporate on the surface.`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `What materials is the ${product.name} made from?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `It is crafted from a proprietary hydrophobic blend, typically consisting of advanced polyester for moisture-wicking and elastane (spandex) for 4-way kinetic stretch.`
+        }
       }
     ]
   };
@@ -123,6 +147,20 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       "@type": "Brand",
       "name": "DualDeer"
     },
+    "material": "Hydrophobic Polyester Blend, Elastane",
+    "color": product.colors ? product.colors.join(", ") : undefined,
+    "pattern": "Solid / Minimalist",
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "Athletes and fitness enthusiasts"
+    },
+    "isSimilarTo": [
+      {
+        "@type": "Product",
+        "name": "Other DualDeer Compression Gear",
+        "url": "https://dualdeer.com/shop"
+      }
+    ],
     "offers": [
       {
         "@type": "Offer",

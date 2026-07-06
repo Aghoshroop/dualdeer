@@ -6,6 +6,8 @@ import styles from "@/app/speedsuits-india/page.module.css";
 import { Product } from "@/lib/firebaseUtils";
 import { useCart } from "@/context/CartContext";
 import { useCurrency } from "@/context/CurrencyContext";
+import WishlistButton from "@/components/ui/WishlistButton";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 export default function GymWearClient({ initialProducts }: { initialProducts: Product[] }) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -23,6 +25,13 @@ export default function GymWearClient({ initialProducts }: { initialProducts: Pr
 
   return (
     <main className={styles.main}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '1rem 2rem 0', background: '#050505' }}>
+        <Breadcrumb items={[
+          { label: 'Home', href: '/' },
+          { label: 'Shop', href: '/shop' },
+          { label: 'Gym Wear For Men' }
+        ]} />
+      </div>
       <section className={styles.hero} style={{ background: '#050505', minHeight: '60vh' }}>
         <div className={styles.heroContent}>
           <motion.h1 
@@ -65,9 +74,14 @@ export default function GymWearClient({ initialProducts }: { initialProducts: Pr
         <div className={styles.productGrid} style={{ margin: '4rem 0' }}>
             {products.slice(0, 4).map((product, i) => (
               <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: i * 0.1 }}>
-                <Link href={`/product/${product.slug}`} className={styles.productCard}>
-                  <div className={styles.imageWrapper}>
-                    <img src={product.image} alt={product.name} className={styles.productImage} />
+                <div className={styles.productCard}>
+                  <div className={styles.imageWrapper} style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}>
+                      <WishlistButton productId={product.id || ''} />
+                    </div>
+                    <Link href={`/product/${product.slug}`} style={{ display: 'block' }}>
+                      <img src={product.image} alt={product.name} className={styles.productImage} />
+                    </Link>
                   </div>
                   <div className={styles.productInfo}>
                     <h4 className={styles.productName}>{product.name}</h4>
@@ -78,7 +92,7 @@ export default function GymWearClient({ initialProducts }: { initialProducts: Pr
                       <span className={styles.productPrice}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</span>
                     </div>
                   </div>
-                </Link>
+                </div>
               </motion.div>
             ))}
         </div>

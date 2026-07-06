@@ -1,0 +1,67 @@
+.relatedGuidesContainer {
+  margin: 4rem 0;
+  padding: 3rem 2rem;
+  background: rgba(var(--foreground-rgb), 0.02);
+  border-top: 1px solid rgba(var(--foreground-rgb), 0.1);
+  border-bottom: 1px solid rgba(var(--foreground-rgb), 0.1);
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.sectionSubtitle {
+  font-size: 1.1rem;
+  opacity: 0.7;
+  margin-bottom: 2.5rem;
+}
+
+.guidesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.guideCard {
+  background: var(--color-background);
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: left;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+.guideCard:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-primary);
+}
+
+.guideTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.guideDesc {
+  font-size: 0.95rem;
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.readMore {
+  font-weight: 600;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

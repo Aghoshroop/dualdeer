@@ -1,0 +1,100 @@
+.articleContainer {
+  min-height: 80vh;
+  padding: 8rem 2rem 4rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.breadcrumb {
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.breadcrumb a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.header {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(var(--foreground-rgb), 0.1);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.description {
+  font-size: 1.2rem;
+  color: var(--color-text);
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+.content {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--color-text);
+}
+
+.content h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+
+.content h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.content p {
+  margin-bottom: 1.5rem;
+}
+
+.content ul {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.content li {
+  margin-bottom: 0.5rem;
+}
+
+.content strong {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.directAnswer {
+  background: rgba(var(--foreground-rgb), 0.03);
+  border-left: 4px solid var(--color-primary);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  font-weight: 500;
+  border-radius: 0 8px 8px 0;
+}
+
+@media (max-width: 768px) {
+  .articleContainer {
+    padding: 6rem 1rem 3rem;
+  }
+  .title {
+    font-size: 2rem;
+  }
+  .content {
+    font-size: 1rem;
+  }
+}
