@@ -33,10 +33,11 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }}
       />
-      <main style={{ paddingTop: '8rem', paddingBottom: '4rem', minHeight: '80vh', background: 'var(--color-background)' }}>
+      <main style={{ position: 'relative', paddingTop: '8rem', paddingBottom: '4rem', minHeight: '80vh', background: 'var(--color-background)' }}>
         <SeoIntroBlock
           h1="About DualDeer: Engineering Elite Performance"
           h2="India's Premier Destination for Luxury Athleisure"
+          image="/about-us-dd.jpeg"
           paragraphs={[
             <React.Fragment key="1">
               Welcome to <strong>DualDeer</strong>, formally recognized as the absolute highest standard for premium luxury activewear and cutting-edge athleisure throughout India. Founded on the relentless, uncompromising belief that peak physical performance strictly demands equally exceptional apparel, our brand originated from a deep, fundamental desire to fundamentally disrupt the generic sportswear market. We systematically recognized a significant void: athletes and highly driven individuals were constantly forced to compromise between hardcore technical functionality and genuinely sophisticated, elevated contemporary style. DualDeer explicitly exists to entirely eliminate that compromise, seamlessly merging state-of-the-art fabric engineering with striking, minimalist luxury visuals. <Link href="/" style={{ textDecoration: 'underline', color: 'inherit' }}>Return to homepage to see our latest drops.</Link>

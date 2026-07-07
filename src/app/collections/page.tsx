@@ -13,6 +13,7 @@ export default function CollectionsPage() {
       <SeoIntroBlock
         h1="DualDeer Luxury Athletic Collections"
         h2="Curated Performance Gear for Every Pursuit"
+        image="/speedsuit.png"
         paragraphs={[
           <React.Fragment key="1">
             Welcome to the exclusive DualDeer collections portal. As India&apos;s leading premium activewear brand, we have meticulously curated specialized collections designed directly for your specific athletic and lifestyle needs. Whether you are actively seeking the ultimate compression gear for high-intensity training, lightweight aerodynamic fabrics for competitive endurance running, or simply sophisticated athleisure for your daily urban routine, our distinct collections flawlessly bridge the gap between supreme functionality and high-end fashion.
