@@ -14,7 +14,7 @@ import QuantitySelector from '@/components/ui/QuantitySelector';
 import AnimatedCartButton from '@/components/ui/AnimatedCartButton';
 import { useFomoStock } from '@/hooks/useFomoStock';
 import MobileProductGallery from './MobileProductGallery';
-import AeoSeoProductDetails from './AeoSeoProductDetails';
+import BrandProductDetails from './BrandProductDetails';
 import RelatedGuides from './RelatedGuides';
 
 import { useCurrency } from '@/context/CurrencyContext';
@@ -654,7 +654,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
         </div>
       </section>
 
-      <AeoSeoProductDetails product={product} />
+      <BrandProductDetails product={product} />
       <RelatedGuides category={product.category} name={product.name} />
 
       <section className={styles.tabsSection}>

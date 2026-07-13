@@ -1,14 +1,16 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { getAllOrders, updateOrder, deleteOrder, Order, processAffiliateCommission } from '@/lib/firebaseUtils';
-import { Package, RefreshCw, Send, CheckCircle, PackageSearch, Trash2, Filter } from 'lucide-react';
+import { Package, RefreshCw, Send, CheckCircle, PackageSearch, Trash2, Filter, Truck } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
 import styles from './Orders.module.css';
+import TrackingEditor from '@/components/admin/TrackingEditor';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [mutatingId, setMutatingId] = useState<string | null>(null);
+  const [trackingEditId, setTrackingEditId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<'recent' | 'price_high' | 'price_low' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned'>('recent');
   const { formatPrice } = useCurrency();
 
@@ -138,7 +140,8 @@ export default function AdminOrdersPage() {
             </thead>
             <tbody>
               {displayedOrders.map(order => (
-                <tr key={order.id}>
+                <React.Fragment key={order.id}>
+                  <tr>
                   <td>
                     <div className={styles.traceCode}>{order.id}</div>
                     <div className={styles.timeLabel}>
@@ -259,9 +262,30 @@ export default function AdminOrdersPage() {
                       <button onClick={() => handleDelete(order.id as string)} className={styles.deleteBtn}>
                         <Trash2 size={14} /> Hard Delete
                       </button>
+
+                      <button 
+                        onClick={() => setTrackingEditId(trackingEditId === order.id ? null : order.id as string)} 
+                        style={{ marginTop: '0.5rem', background: 'transparent', border: '1px solid var(--color-primary)', color: 'var(--color-primary)', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}
+                      >
+                        <Truck size={14} /> {trackingEditId === order.id ? 'Close Tracking' : 'Update Tracking'}
+                      </button>
                     </div>
                   </td>
                 </tr>
+                {trackingEditId === order.id && (
+                  <tr key={order.id + '-tracking'}>
+                    <td colSpan={5} style={{ padding: 0 }}>
+                      <TrackingEditor 
+                        order={order} 
+                        onClose={() => setTrackingEditId(null)} 
+                        onUpdate={(id, tracking) => {
+                          setOrders(prev => prev.map(o => o.id === id ? { ...o, tracking } : o));
+                        }}
+                      />
+                    </td>
+                  </tr>
+                )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>

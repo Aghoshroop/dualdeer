@@ -1,5 +1,5 @@
 import React from 'react';
-import SeoIntroBlock from '@/components/sections/SeoIntroBlock';
+import BrandIntroBlock from '@/components/sections/BrandIntroBlock';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
@@ -34,7 +34,7 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }}
       />
       <main style={{ position: 'relative', paddingTop: '8rem', paddingBottom: '4rem', minHeight: '80vh', background: 'var(--color-background)' }}>
-        <SeoIntroBlock
+        <BrandIntroBlock
           h1="About DualDeer: Engineering Elite Performance"
           h2="India's Premier Destination for Luxury Athleisure"
           image="/about-us-dd.jpeg"

@@ -1,0 +1,162 @@
+.trackerContainer {
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.input, .select {
+  padding: 0.75rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.input:focus, .select:focus {
+  border-color: var(--color-primary);
+}
+
+.saveBtn {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  align-self: flex-start;
+}
+
+.saveBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.5rem;
+}
+
+.timelineStage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.stageInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stageName {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.stageMeta {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.stageStatus {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.statusPending {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffb300;
+}
+
+.statusActive {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+}
+
+.statusCompleted {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.addStageForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(var(--primary-rgb), 0.05);
+  border: 1px dashed var(--color-primary);
+  border-radius: 6px;
+}
+
+.addStageRow {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.addBtn {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.addBtn:hover {
+  background: var(--color-primary);
+  color: #fff;
+}

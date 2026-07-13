@@ -141,6 +141,68 @@ export interface OrderItem {
   image?: string;
 }
 
+export interface TrackingStage {
+  stage: string;
+  status: 'pending' | 'active' | 'completed';
+  timestamp?: any;
+  note?: string;
+}
+
+export interface OwnedGear {
+  id?: string;
+  userId: string;
+  productId: string;
+  orderId: string;
+  name: string;
+  size?: string;
+  image?: string;
+  originalPrice: number;
+  purchaseDate: Timestamp;
+  status: 'active' | 'retired' | 'replaced' | 'returned';
+  gearHealth: 'new' | 'excellent' | 'good' | 'worn' | 'retired';
+  passportId: string; // Unique Serial/Passport ID
+  productVersion?: string;
+  manufacturingBatch?: string;
+}
+
+export interface GearEvent {
+  id?: string;
+  ownedGearId: string;
+  userId: string;
+  type: 'purchased' | 'delivered' | 'warranty_activated' | 'care_guide_viewed' | 'care_reminder_sent' | 'review_submitted' | 'exchange_requested' | 'warranty_claim' | 'health_updated' | 'usage_logged';
+  description: string;
+  timestamp: Timestamp;
+}
+
+export interface WarrantyRecord {
+  id?: string;
+  ownedGearId: string;
+  userId: string;
+  status: 'active' | 'expired' | 'claimed' | 'voided';
+  activationDate: Timestamp;
+  expirationDate: Timestamp;
+  coverageDetails: string;
+  claimHistory?: { date: Timestamp, reason: string, status: string }[];
+}
+
+export interface CareReminder {
+  id?: string;
+  ownedGearId: string;
+  userId: string;
+  message: string;
+  type: 'wash' | 'inspect' | 'store';
+  status: 'active' | 'dismissed' | 'snoozed';
+  createdAt: Timestamp;
+  snoozedUntil?: Timestamp;
+}
+
+export interface TrackingInfo {
+  courier?: string;
+  trackingNumber?: string;
+  estimatedDelivery?: any;
+  stages: TrackingStage[];
+}
+
 export interface Order {
   id?: string;
   userId: string;
@@ -158,6 +220,7 @@ export interface Order {
   discountAmount?: number;
   appliedCoupon?: string;
   status: 'payment_pending' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned';
+  tracking?: TrackingInfo;
   affiliateId?: string;
   affiliateCommission?: number;
   cancellationReason?: string;

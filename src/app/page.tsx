@@ -12,7 +12,8 @@ const FeaturedProducts = dynamic(() => import("@/components/sections/FeaturedPro
 const BrandStory = dynamic(() => import("@/components/sections/BrandStory"), { ssr: true });
 const UpcomingProducts = dynamic(() => import("@/components/sections/UpcomingProducts"), { ssr: true });
 const TestimonialSlider = dynamic(() => import("@/components/sections/TestimonialSlider"), { ssr: true });
-const SeoIntroBlock = dynamic(() => import("@/components/sections/SeoIntroBlock"), { ssr: true });
+const BrandIntroBlock = dynamic(() => import("@/components/sections/BrandIntroBlock"), { ssr: true });
+const BrandFaqBlock = dynamic(() => import("@/components/sections/BrandFaqBlock"), { ssr: true });
 
 export default function Home() {
   const storeJsonLd = {
@@ -55,9 +56,9 @@ export default function Home() {
       <UpcomingProducts />
       <TestimonialSlider />
 
-      {/* SEO & Brand Manifesto - Placed lower for pacing */}
+      {/* Brand Manifesto - Placed lower for pacing */}
       <div style={{ marginTop: '4rem', marginBottom: '2rem' }}>
-        <SeoIntroBlock
+        <BrandIntroBlock
           h1="High-Performance SpeedSuits in India | DualDeer"
           h2="Premium Activewear & Luxury Athleisure Brand"
           image="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1600&auto=format&fit=crop"
@@ -77,6 +78,8 @@ export default function Home() {
           ]}
         />
       </div>
+      
+      <BrandFaqBlock />
       </div>
     </main>
   );

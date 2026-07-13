@@ -1,12 +1,12 @@
 import React from 'react';
 import { Product } from '@/lib/firebaseUtils';
-import styles from './AeoSeoProductDetails.module.css';
+import styles from './BrandProductDetails.module.css';
 
 interface Props {
   product: Product;
 }
 
-export default function AeoSeoProductDetails({ product }: Props) {
+export default function BrandProductDetails({ product }: Props) {
   // Generate dynamic FAQs based on product category or name
   const isCompression = product.name.toLowerCase().includes('compression') || product.category?.toLowerCase() === 'compression';
   const isSpeedSuit = product.name.toLowerCase().includes('speedsuit');

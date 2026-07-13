@@ -8,6 +8,7 @@ import Link from 'next/link';
 import styles from './OrderDetails.module.css';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import OrderTracking from './OrderTracking';
 
 interface OrderDetailsModalProps {
   order: Order;
@@ -113,6 +114,10 @@ export default function OrderDetailsModal({ order, user, onClose }: OrderDetails
         </div>
 
         <div className={styles.modalBody}>
+          <div style={{ marginBottom: '2rem' }}>
+            <OrderTracking order={order} />
+          </div>
+
           {/* ITEMS SECTION */}
           <div className={`${styles.section} ${styles.noPrint}`}>
             <h4 className={styles.sectionTitle}>Items</h4>

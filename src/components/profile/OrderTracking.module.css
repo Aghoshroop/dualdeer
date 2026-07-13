@@ -1,0 +1,281 @@
+.trackingContainer {
+  background: var(--color-surface, var(--color-background));
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+[data-theme='dark'] .trackingContainer {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.trackingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+}
+
+.trackingTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text);
+}
+
+.courierInfo {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-align: right;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.trackingNumber {
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-top: 0.2rem;
+  font-family: monospace;
+}
+
+.expandIcon {
+  color: var(--color-text-muted);
+  transition: transform 0.3s ease;
+}
+
+/* Horizontal Timeline */
+.timelineHorizontal {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  margin-top: 1rem;
+  padding-top: 40px;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+.timelineHorizontal::-webkit-scrollbar {
+  height: 6px;
+}
+.timelineHorizontal::-webkit-scrollbar-thumb {
+  background: rgba(var(--foreground-rgb), 0.1);
+  border-radius: 3px;
+}
+
+.timelineItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+}
+
+.timelineIconWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.timelineIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface, var(--color-background));
+  border: 2px solid rgba(var(--foreground-rgb), 0.2);
+  color: rgba(var(--foreground-rgb), 0.4);
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.connector {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 16px);
+  right: calc(-50% + 16px);
+  height: 2px;
+  background: rgba(var(--foreground-rgb), 0.1);
+  z-index: 1;
+  transform: translateY(-50%);
+}
+
+.connectorCompleted {
+  background: var(--color-primary);
+}
+
+.timelineItem:last-child .connector {
+  display: none;
+}
+
+.timelineItem.completed .timelineIcon {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(var(--color-primary-rgb), 0.4);
+}
+
+.timelineItem.active .timelineIcon {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(var(--color-primary-rgb), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0); }
+}
+
+.timelineContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 0.5rem;
+}
+
+.timelineStage {
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.timelineItem.completed .timelineStage {
+  color: var(--color-text);
+}
+
+.timelineItem.active .timelineStage {
+  color: var(--color-primary);
+}
+
+.timelineItem.pending .timelineStage {
+  color: var(--color-text-muted);
+}
+
+.timelineTime {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.timelineNote {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  background: rgba(var(--foreground-rgb), 0.03);
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  border-bottom: 2px solid var(--color-primary);
+  margin-top: 0.5rem;
+  max-width: 100%;
+}
+
+.estDelivery {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.movingTruck {
+  position: absolute;
+  top: 5px;
+  z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(var(--color-primary-rgb), 0.3));
+}
+
+/* Vertical Timeline */
+.timelineVertical {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0 1rem 1rem;
+  border-left: 2px solid rgba(var(--foreground-rgb), 0.1);
+  margin-left: 1rem;
+  margin-top: 1rem;
+}
+
+.verticalItem {
+  display: flex;
+  gap: 1.5rem;
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.verticalItem:last-child {
+  padding-bottom: 0;
+}
+
+.verticalIcon {
+  position: absolute;
+  left: -1rem; /* center on the border-left of timelineVertical */
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface, var(--color-background));
+  border: 2px solid rgba(var(--foreground-rgb), 0.2);
+  color: rgba(var(--foreground-rgb), 0.4);
+  z-index: 2;
+}
+
+.verticalItem.completed .verticalIcon {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.verticalItem.active .verticalIcon {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  animation: pulse 2s infinite;
+}
+
+.verticalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+.verticalStage {
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.verticalItem.pending .verticalStage {
+  color: var(--color-text-muted);
+}
+
+.verticalTime {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.verticalNote {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  background: rgba(var(--foreground-rgb), 0.03);
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  border-left: 3px solid var(--color-primary);
+  margin-top: 0.5rem;
+}

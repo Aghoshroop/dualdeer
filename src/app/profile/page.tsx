@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Users, ShoppingBag, Gift, Award, LogOut, ArrowLeft, Bookmark, LayoutDashboard } from 'lucide-react';
+import { User, Users, ShoppingBag, Gift, Award, LogOut, ArrowLeft, Bookmark, LayoutDashboard, Package } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import styles from './ProfilePage.module.css';
@@ -12,6 +12,7 @@ import OrderHistory from '@/components/profile/OrderHistory';
 import ProfileCart from '@/components/profile/ProfileCart';
 import ProfileWishlist from '@/components/profile/ProfileWishlist';
 import AffiliateProgram from '@/components/profile/AffiliateProgram';
+import MyGear from '@/components/profile/MyGear';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -54,6 +55,8 @@ export default function ProfilePage() {
         return <EliteOverview user={user} setActiveTab={setActiveTab} />;
       case 'orders':
         return <OrderHistory user={user} />;
+      case 'gear':
+        return <MyGear user={user} />;
       case 'rewards':
         return <RewardGame user={user} />;
       case 'wishlist':
@@ -106,6 +109,13 @@ export default function ProfilePage() {
             onClick={() => setActiveTab('orders')}
           >
             <ShoppingBag size={20} /> <span className={styles.navText}>Order History</span>
+          </button>
+
+          <button 
+            className={`${styles.navBtn} ${activeTab === 'gear' ? styles.active : ''}`}
+            onClick={() => setActiveTab('gear')}
+          >
+            <Package size={20} /> <span className={styles.navText}>My Gear</span>
           </button>
           
           <button 

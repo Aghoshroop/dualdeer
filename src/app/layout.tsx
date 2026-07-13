@@ -103,7 +103,8 @@ export default function RootLayout({
         "https://instagram.com/dualdeerofficial",
         "https://twitter.com/dualdeerofficial"
       ],
-      "description": "Premium luxury athleisure, activewear, and performance menswear."
+      "description": "DualDeer is India's premier luxury athleisure and high-performance activewear brand, renowned for its signature SpeedSuit collection.",
+      "knowsAbout": ["Premium Activewear", "SpeedSuits", "Compression Wear", "Gym Clothing", "Athleisure"]
     },
     {
       "@context": "https://schema.org",
@@ -127,6 +128,36 @@ export default function RootLayout({
         "@type": "PostalAddress",
         "addressCountry": "IN"
       }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is DualDeer?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "DualDeer is a premium luxury activewear and athleisure brand in India, specializing in high-performance apparel engineered for elite athletes and modern professionals."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a SpeedSuit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A SpeedSuit is a proprietary high-performance compression garment designed by DualDeer. It features seamless, chafe-free construction and intelligent compression zones for superior muscle stabilization and recovery."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is DualDeer located?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "DualDeer is designed globally and based in India, delivering premium activewear and athleisure across the country."
+          }
+        }
+      ]
     }
   ];
 

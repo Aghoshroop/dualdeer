@@ -1,5 +1,5 @@
 import React from 'react';
-import SeoIntroBlock from '@/components/sections/SeoIntroBlock';
+import BrandIntroBlock from '@/components/sections/BrandIntroBlock';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
@@ -70,8 +70,8 @@ export default function SpeedSuitSeoPage() {
       `}} />
       
       <div className="animate-block">
-        <SeoIntroBlock
-          h1="Best Affordable SpeedSuits in India"
+        <BrandIntroBlock
+          h1="Experience the Pinnacle of Aerodynamic Performance"
           h2="Unleash Your Full Potential with the Ultimate Aerodynamic Armor"
           image="https://images.unsplash.com/photo-1548690312-e3b507d17a12?q=80&w=1600&auto=format&fit=crop"
           paragraphs={[

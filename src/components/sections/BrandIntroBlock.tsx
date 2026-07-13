@@ -1,11 +1,11 @@
 "use client";
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import styles from './SeoIntroBlock.module.css';
+import styles from './BrandIntroBlock.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
 
-interface SeoIntroBlockProps {
+interface BrandIntroBlockProps {
   h1: string;
   h2?: string;
   h3?: string;
@@ -16,7 +16,7 @@ interface SeoIntroBlockProps {
 
 const luxuryEase = [0.76, 0, 0.24, 1] as const;
 
-export default function SeoIntroBlock({ h1, h2, h3, paragraphs, image, reverse = false }: SeoIntroBlockProps) {
+export default function BrandIntroBlock({ h1, h2, h3, paragraphs, image, reverse = false }: BrandIntroBlockProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (

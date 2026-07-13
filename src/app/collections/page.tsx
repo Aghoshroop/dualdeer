@@ -1,5 +1,5 @@
 import React from 'react';
-import SeoIntroBlock from '@/components/sections/SeoIntroBlock';
+import BrandIntroBlock from '@/components/sections/BrandIntroBlock';
 import Link from 'next/link';
 
 export const metadata = {
@@ -10,7 +10,7 @@ export const metadata = {
 export default function CollectionsPage() {
   return (
     <main style={{ paddingTop: '8rem', paddingBottom: '4rem', minHeight: '80vh', background: 'var(--color-background)' }}>
-      <SeoIntroBlock
+      <BrandIntroBlock
         h1="DualDeer Luxury Athletic Collections"
         h2="Curated Performance Gear for Every Pursuit"
         image="/speedsuit.png"

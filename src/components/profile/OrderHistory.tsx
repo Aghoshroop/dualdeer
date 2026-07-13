@@ -7,6 +7,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import styles from './ProfileComponents.module.css';
 import { useCurrency } from '@/context/CurrencyContext';
 import OrderDetailsModal from './OrderDetailsModal';
+import OrderTracking from './OrderTracking';
 import { AnimatePresence } from 'framer-motion';
 
 export default function OrderHistory({ user }: { user: any }) {
@@ -168,11 +169,9 @@ export default function OrderHistory({ user }: { user: any }) {
               </div>
 
               <div className={styles.amzOrderBody}>
-                <div className={`${styles.amzStatusBanner} ${order.status === 'delivered' ? styles.amzStatusDelivered : ''}`}>
-                  {order.status === 'delivered' ? 'Delivered' : order.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </div>
+                <OrderTracking order={order} />
 
-                <div className={styles.amzItemList}>
+                <div className={styles.amzItemList} style={{ marginTop: '1.5rem' }}>
                   {order.items.map((item, idx) => (
                     <div key={idx} className={styles.amzItem}>
                       {item.image ? (
