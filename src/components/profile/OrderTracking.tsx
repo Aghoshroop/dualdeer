@@ -14,7 +14,7 @@ export default function OrderTracking({ order }: OrderTrackingProps) {
 
   const tracking = order.tracking || {};
   
-  const stages = (tracking.stages && tracking.stages.length > 0) ? tracking.stages : [
+  const stages = (order.tracking?.stages && order.tracking.stages.length > 0) ? order.tracking.stages : [
     { stage: 'Order Placed', status: 'completed', timestamp: order.createdAt },
     { stage: 'Processing', status: order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered' ? 'completed' : 'pending' },
     { stage: 'Shipped', status: order.status === 'shipped' || order.status === 'delivered' ? 'completed' : 'pending' },
