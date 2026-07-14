@@ -886,3 +886,100 @@
     justify-content: space-between;
   }
 }
+
+/* ==================================
+   ULTRA PREMIUM DARK MODE OVERRIDES
+   ================================== */
+[data-theme='dark'] .page {
+  background: #09090b !important;
+}
+
+[data-theme='dark'] .formSection,
+[data-theme='dark'] .summarySection {
+  background: #121214;
+  border: 1px solid #27272a;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme='dark'] .formSection h2,
+[data-theme='dark'] .summarySection h2 {
+  color: #a78bfa;
+  border-bottom-color: #27272a;
+}
+
+[data-theme='dark'] .input {
+  background: #18181b;
+  border-color: #3f3f46;
+  color: #f4f4f5;
+}
+
+[data-theme='dark'] .input:focus {
+  border-color: #8b5cf6;
+  background: #27272a;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+[data-theme='dark'] .paymentOption,
+[data-theme='dark'] .paymentOptionDisabled {
+  background: #121214;
+  border-color: #27272a;
+}
+
+[data-theme='dark'] .paymentOptionActive {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.05);
+}
+
+[data-theme='dark'] .submitBtn {
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+  color: #ffffff;
+  border: none;
+}
+
+[data-theme='dark'] .pageBackBtn {
+  color: #a1a1aa;
+}
+
+[data-theme='dark'] .payInfo h4 {
+  color: #f4f4f5;
+}
+
+[data-theme='dark'] .payInfo span {
+  color: #a1a1aa;
+}
+
+[data-theme='dark'] .payIcon {
+  color: #a1a1aa;
+}
+
+[data-theme='dark'] .couponInputWrapper {
+  background: #18181b;
+  border-color: #27272a;
+}
+
+[data-theme='dark'] .couponInput {
+  color: #f4f4f5;
+}
+
+[data-theme='dark'] .applyBtn {
+  background: #27272a;
+  color: #e4e4e7;
+  border-color: #3f3f46;
+}
+
+[data-theme='dark'] .totals {
+  border-top-color: #27272a;
+}
+
+[data-theme='dark'] .totalRow {
+  border-top-color: #3f3f46;
+}
+
+[data-theme='dark'] .itemImage {
+  border-color: #27272a;
+}
+
+[data-theme='dark'] .title {
+  border-bottom-color: #27272a;
+}
