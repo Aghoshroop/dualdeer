@@ -8,6 +8,8 @@ import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import AnimatedCartButton from "../ui/AnimatedCartButton";
 import { useCurrency } from "@/context/CurrencyContext";
+import { onAuthStateChanged } from 'firebase/auth';
+import { ProductCardSkeleton } from '@/components/ui/Skeleton';
 
 interface Product {
   id: string;
@@ -32,9 +34,7 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
 
   useEffect(() => {
     import('@/lib/firebase').then(({ auth }) => {
-      import('firebase/auth').then(({ onAuthStateChanged }) => {
-        onAuthStateChanged(auth, (user) => setCurrentUser(user));
-      });
+      onAuthStateChanged(auth, (user) => setCurrentUser(user));
     });
   }, []);
   const { addToCart } = useCart();
@@ -96,8 +96,8 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
           )}
           <AnimatePresence>
           {loading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className={styles.skeletonCard} />
+            Array.from({ length: 8 }).map((_, i) => (
+              <ProductCardSkeleton key={`skeleton-${i}`} />
             ))
           ) : products.length === 0 ? (
             <div className={styles.emptyGrid}>New collection arriving soon.</div>

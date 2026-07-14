@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { checkInWishlist, addToWishlist, removeFromWishlist } from '@/lib/firebaseUtils';
+import { useAuthToast } from '@/context/AuthToastContext';
 
 interface WishlistButtonProps {
   productId: string;
@@ -41,6 +42,7 @@ export default function WishlistButton({ productId, className = "", size = 18 }:
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [wishlistRecordId, setWishlistRecordId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { showAuthToast } = useAuthToast();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -72,8 +74,7 @@ export default function WishlistButton({ productId, className = "", size = 18 }:
     e.stopPropagation();
     
     if (!currentUser) {
-      sessionStorage.setItem('dualdeer_return_url', window.location.pathname);
-      router.push('/auth');
+      showAuthToast("Please log in to add items to your wishlist.");
       return;
     }
 

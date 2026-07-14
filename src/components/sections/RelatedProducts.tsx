@@ -4,6 +4,7 @@ import Link from "next/link";
 import styles from "./ProductGrid.module.css";
 import { useEffect, useState, useRef } from "react";
 import { getProducts, Product } from "@/lib/firebaseUtils";
+import { ProductCardSkeleton } from "@/components/ui/Skeleton";
 import { useCurrency } from "@/context/CurrencyContext";
 
 interface RelatedProductsProps {
@@ -40,7 +41,7 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
     });
   }, [category, excludeId]);
 
-  if (loading || products.length === 0) return null; // Hide the section if no related items found
+  if (!loading && products.length === 0) return null; // Hide the section if no related items found
 
   return (
     <section className={styles.section} style={{ paddingTop: '4rem', paddingBottom: '4rem', borderTop: '1px solid rgba(var(--foreground-rgb), 0.05)' }}>
@@ -70,7 +71,11 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
         </div>
 
         <div className={`${styles.grid} ${styles.horizontalScrollMobile}`} ref={scrollRef}>
-          {products.map((product, i) => (
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <ProductCardSkeleton key={`skeleton-${i}`} />
+            ))
+          ) : products.map((product, i) => (
             <Link 
               href={`/product/${product.slug || product.id}`} 
               key={product.id} 

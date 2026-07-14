@@ -1,0 +1,53 @@
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface, #1a1a1a) 25%, var(--color-border, #2a2a2a) 50%, var(--color-surface, #1a1a1a) 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.productCardSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.imageSkeleton {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 12px;
+}
+
+.infoSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.rowSkeleton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.colorsSkeleton {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.colorSkeleton {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}

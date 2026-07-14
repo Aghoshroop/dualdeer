@@ -11,11 +11,13 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
 import QuantitySelector from '@/components/ui/QuantitySelector';
 import { useCurrency } from '@/context/CurrencyContext';
+import { useAuthToast } from '@/context/AuthToastContext';
 
 export default function CartPage() {
   const router = useRouter();
   const { cart, updateQuantity, removeFromCart, cartTotal: subtotal, addToCart, bundleSavings } = useCart();
   const { formatPrice, countryCode, conversionRate, renderPrice } = useCurrency();
+  const { showAuthToast } = useAuthToast();
   const [mounted, setMounted] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -29,12 +31,7 @@ export default function CartPage() {
   useEffect(() => {
     setMounted(true);
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        sessionStorage.setItem('dualdeer_return_url', '/cart');
-        router.push('/auth');
-      } else {
-        setCurrentUser(user);
-      }
+      setCurrentUser(user);
     });
     
     // Fetch top 2 products for empty state recommendations
@@ -81,6 +78,15 @@ export default function CartPage() {
   };
 
   // Prevent hydration mismatch by returning null or a skeleton until mounted
+  const handleCheckoutClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!currentUser) {
+      showAuthToast("Please log in to securely checkout.");
+    } else {
+      router.push('/checkout');
+    }
+  };
+
   if (!mounted) return null;
 
   return (
@@ -275,11 +281,11 @@ export default function CartPage() {
                 <span>{renderPrice(total)}</span>
               </div>
 
-              <Link href="/checkout" className={styles.checkoutBtn} style={{ textDecoration: 'none', display: 'flex' }}>
+              <button onClick={handleCheckoutClick} className={styles.checkoutBtn} style={{ border: 'none', cursor: 'pointer', display: 'flex', width: '100%', justifyContent: 'center' }}>
                 <Lock size={16} />
                 SECURE CHECKOUT
                 <ArrowRight size={16} className={styles.arrow} />
-              </Link>
+              </button>
 
               <div className={styles.trustBadges}>
                 <p><ShieldCheck size={16} /> Client Protection Guaranteed</p>

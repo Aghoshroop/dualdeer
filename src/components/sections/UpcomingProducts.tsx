@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getUpcomingProducts, subscribeToProductNotification, UpcomingProduct } from '@/lib/firebaseUtils';
 import { auth } from '@/lib/firebase';
+import { Bell } from "lucide-react";
+import { ProductCardSkeleton } from '@/components/ui/Skeleton';
 import { onAuthStateChanged } from 'firebase/auth';
 import styles from './UpcomingProducts.module.css';
 
@@ -96,7 +98,11 @@ export default function UpcomingProducts() {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', opacity: 0.5 }}>Loading...</div>
+        <div className={styles.grid}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <ProductCardSkeleton key={`skeleton-${i}`} />
+          ))}
+        </div>
       ) : products.length === 1 ? (
         <div className={styles.heroLayout}>
           <div className={styles.heroCard}>

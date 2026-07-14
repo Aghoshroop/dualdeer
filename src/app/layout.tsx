@@ -16,6 +16,7 @@ import { Analytics } from "@vercel/analytics/react";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import MetaPixelTracker from "@/components/analytics/MetaPixelTracker";
 import { Suspense } from "react";
+import { AuthToastProvider } from "@/context/AuthToastContext";
 
 export const metadata: Metadata = {
   title: "DualDeer SpeedSuits India | Premium Compression & Gym Wear",
@@ -221,9 +222,11 @@ export default function RootLayout({
               <Navbar />
               <NewsletterModal />
             </HideOnAdmin>
-            <SmoothScrollProvider>
-              {children}
-            </SmoothScrollProvider>
+            <AuthToastProvider>
+              <SmoothScrollProvider>
+                {children}
+              </SmoothScrollProvider>
+            </AuthToastProvider>
             <HideOnAdmin>
               <SupportAgent />
               <Footer />

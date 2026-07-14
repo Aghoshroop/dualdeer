@@ -9,8 +9,8 @@ import Link from 'next/link';
 import { Lock, ChevronLeft, CreditCard, Wallet, Banknote, ShieldAlert, Globe } from 'lucide-react';
 import styles from './Checkout.module.css';
 import { useCurrency } from '@/context/CurrencyContext';
-import { calculateBundleSavings } from '@/lib/bundleLogic';
 import * as metaPixel from '@/lib/metaPixel';
+import { useAuthToast } from '@/context/AuthToastContext';
 
 export default function CheckoutPage() {
   return (
@@ -25,6 +25,7 @@ function CheckoutEngine() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { currency, formatPrice, conversionRate, countryCode, renderPrice } = useCurrency();
+  const { showAuthToast } = useAuthToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<'shipping' | 'payment' | 'upi-verification'>('shipping');
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi' | 'international_card'>(currency === 'USD' ? 'international_card' : 'cod');
@@ -46,8 +47,8 @@ function CheckoutEngine() {
         }));
       } else {
         setCurrentUser(null);
-        sessionStorage.setItem('dualdeer_return_url', '/checkout');
-        router.push('/auth');
+        showAuthToast("Please log in to proceed to checkout.");
+        router.push('/cart');
       }
       setAuthLoading(false);
     });

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ChevronRight, Play, Pause } from "lucide-react";
+import { ProductCardSkeleton } from '@/components/ui/Skeleton';
 import styles from "./SeasonalShowcaseSlider.module.css";
 import { useCart } from "@/context/CartContext";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -74,7 +75,13 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
   }, [activeProduct]);
 
   if (loading) {
-    return <div className={styles.loadingState}>LOADING COLLECTION...</div>;
+    return (
+      <div style={{ display: 'flex', gap: '2rem', padding: '2rem 5%', height: '80vh', alignItems: 'center' }}>
+        <div style={{ flex: 1 }}><ProductCardSkeleton /></div>
+        <div style={{ flex: 1, display: 'none' }} className={styles.desktopOnly}><ProductCardSkeleton /></div>
+        <div style={{ flex: 1, display: 'none' }} className={styles.desktopOnly}><ProductCardSkeleton /></div>
+      </div>
+    );
   }
 
   if (products.length === 0) {

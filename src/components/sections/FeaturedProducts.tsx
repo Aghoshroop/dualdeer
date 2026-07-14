@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import styles from "./ProductGrid.module.css";
 import { useEffect, useState } from "react";
+import { ShoppingBag, Eye, ArrowRight } from 'lucide-react';
+import { ProductCardSkeleton } from '@/components/ui/Skeleton';
 import { getProducts, Product } from "@/lib/firebaseUtils";
 import Magnetic from "../ui/Magnetic";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -57,7 +59,9 @@ export default function FeaturedProducts() {
           ${!loading && products.length === 2 ? styles.twoItemGrid : ''}
         `}>
           {loading ? (
-            <div style={{ color: 'var(--color-text)', textAlign: 'center', width: '100%', padding: '2rem' }}>Loading the Archives...</div>
+            Array.from({ length: 4 }).map((_, i) => (
+              <ProductCardSkeleton key={`skeleton-${i}`} />
+            ))
           ) : products.length === 0 ? (
             <div style={{ color: 'var(--color-text)', textAlign: 'center', width: '100%', padding: '2rem', opacity: 0.5 }}>Core collection updating. Add products unflagged as Seasonal via Admin.</div>
           ) : (

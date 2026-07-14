@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Product, getReviews, Review, addReview, checkInWishlist, addToWishlist, removeFromWishlist, updateReview, deleteReview } from '@/lib/firebaseUtils';
+import { useAuthToast } from '@/context/AuthToastContext';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
@@ -31,6 +32,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
 
   const { addToCart, cart } = useCart();
   const { formatPrice, renderPrice } = useCurrency();
+  const { showAuthToast } = useAuthToast();
   const router = useRouter();
   const [product, setProduct] = useState<Product>(initialProduct);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
@@ -103,7 +105,10 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   }, [product?.id]);
 
   const toggleWishlist = async () => {
-    if (!currentUser) return router.push('/auth');
+    if (!currentUser) {
+      showAuthToast("Please log in to manage your wishlist.");
+      return;
+    }
     if (!product || !product.id) return;
     
     setIsWishlistLoading(true);
@@ -147,6 +152,10 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentUser) {
+      showAuthToast("Please log in to submit a review.");
+      return;
+    }
     if (!product?.id) return;
     setIsSubmitting(true);
 
