@@ -11,10 +11,9 @@ interface OrderTrackingProps {
 
 export default function OrderTracking({ order }: OrderTrackingProps) {
   const [expanded, setExpanded] = useState(false);
-
-  const tracking = order.tracking || {};
+  const tracking: any = order.tracking || {};
   
-  const stages = (order.tracking?.stages && order.tracking.stages.length > 0) ? order.tracking.stages : [
+  const stages: any[] = (order.tracking?.stages && order.tracking.stages.length > 0) ? order.tracking.stages : [
     { stage: 'Order Placed', status: 'completed', timestamp: order.createdAt },
     { stage: 'Processing', status: order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered' ? 'completed' : 'pending' },
     { stage: 'Shipped', status: order.status === 'shipped' || order.status === 'delivered' ? 'completed' : 'pending' },
