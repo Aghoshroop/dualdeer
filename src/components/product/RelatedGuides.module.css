@@ -65,3 +65,21 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+@media (max-width: 768px) {
+  .relatedGuidesContainer {
+    padding: 2rem 1rem;
+  }
+  .guidesGrid {
+    grid-template-columns: 1fr;
+  }
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .relatedGuidesContainer {
+    padding: 1.5rem 0.5rem;
+  }
+}

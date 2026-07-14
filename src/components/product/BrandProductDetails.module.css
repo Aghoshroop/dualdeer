@@ -158,3 +158,67 @@ details[open] .faqQuestion::after {
     padding: 2rem 1rem;
   }
 }
+
+@media (max-width: 480px) {
+  .specItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .specDesc {
+    max-width: 100%;
+    text-align: left;
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
+  }
+  .sectionTitle {
+    font-size: 1.2rem;
+  }
+  
+  /* Transform Table to Cards to stop horizontal overflow forever */
+  .tableContainer {
+    width: 100%;
+    margin-top: 2rem;
+    overflow: hidden;
+  }
+  .recommendationTable {
+    display: block;
+    border: none;
+    background: transparent;
+  }
+  .recommendationTable thead {
+    display: none;
+  }
+  .recommendationTable tbody, .recommendationTable tr {
+    display: block;
+    width: 100%;
+  }
+  .recommendationTable tr {
+    margin-bottom: 1rem;
+    background: var(--color-background);
+    border: 1px solid rgba(var(--foreground-rgb), 0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+  .recommendationTable td {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.8rem;
+    border: none;
+    text-align: left;
+  }
+  .recommendationTable td:first-child {
+    color: var(--color-primary);
+    padding-bottom: 0.2rem;
+  }
+  .recommendationTable td:nth-child(2) {
+    font-weight: 600;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    font-size: 0.95rem;
+  }
+  .recommendationTable td:nth-child(3) {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    padding-top: 0.2rem;
+  }
+}

@@ -27,7 +27,7 @@ function CheckoutEngine() {
   const { currency, formatPrice, conversionRate, countryCode, renderPrice } = useCurrency();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<'shipping' | 'payment' | 'upi-verification'>('shipping');
-  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi' | 'international_card'>(currency === 'USD' ? 'international_card' : 'upi');
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi' | 'international_card'>(currency === 'USD' ? 'international_card' : 'cod');
   const [utrNumber, setUtrNumber] = useState('');
   const [upiTr] = useState(() => `DD${Math.floor(Math.random() * 10000000)}`);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -365,19 +365,17 @@ function CheckoutEngine() {
                 ) : (
                   <>
                   <div 
-                     className={`${styles.paymentOption} ${paymentMethod === 'upi' ? styles.paymentOptionActive : ''}`}
-                     onClick={() => setPaymentMethod('upi')}
+                     className={`${styles.paymentOptionDisabled}`}
+                     style={{ opacity: 0.7, cursor: 'not-allowed', position: 'relative' }}
                   >
                      <div className={styles.payIcon}><Wallet size={24} /></div>
                      <div className={styles.payInfo}>
                        <h4>Pre Online Payment (UPI)</h4>
-                       <span>Pay via UPI directly to the merchant</span>
+                       <span>Temporarily disabled for maintenance. Please use COD.</span>
                      </div>
-                     {paymentMethod === 'upi' && (
-                       <div className={styles.activeCheck}>
-                         <ShieldAlert size={16} color="#48bb78" /> Selected
-                       </div>
-                     )}
+                     <div className={styles.offlineTag}>
+                       MAINTENANCE
+                     </div>
                   </div>
 
                   <div 
@@ -541,7 +539,7 @@ function CheckoutEngine() {
               disabled={isSubmitting} 
               className={styles.submitBtn}
             >
-              {paymentMethod === 'upi' ? `Pay ${renderPrice(total)} Now` : paymentMethod === 'international_card' ? <><Globe size={16} style={{marginRight: '8px'}} /> Request Payment Link</> : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
+              {paymentMethod === 'upi' ? <>Pay {renderPrice(total)} Now</> : paymentMethod === 'international_card' ? <><Globe size={16} style={{marginRight: '8px'}} /> Request Payment Link</> : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
             </button>
           ) : (
             <button onClick={handleSubmitOrder} disabled={isSubmitting || !utrNumber || utrNumber.length < 5} className={styles.submitBtn}>
