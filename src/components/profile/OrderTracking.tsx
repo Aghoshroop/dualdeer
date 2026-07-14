@@ -12,16 +12,14 @@ interface OrderTrackingProps {
 export default function OrderTracking({ order }: OrderTrackingProps) {
   const [expanded, setExpanded] = useState(false);
 
-  const tracking = order.tracking || {
-    stages: [
-      { stage: 'Order Placed', status: 'completed', timestamp: order.createdAt },
-      { stage: 'Processing', status: order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered' ? 'completed' : 'pending' },
-      { stage: 'Shipped', status: order.status === 'shipped' || order.status === 'delivered' ? 'completed' : 'pending' },
-      { stage: 'Delivered', status: order.status === 'delivered' ? 'completed' : 'pending' }
-    ]
-  };
-
-  const stages = tracking.stages;
+  const tracking = order.tracking || {};
+  
+  const stages = (tracking.stages && tracking.stages.length > 0) ? tracking.stages : [
+    { stage: 'Order Placed', status: 'completed', timestamp: order.createdAt },
+    { stage: 'Processing', status: order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered' ? 'completed' : 'pending' },
+    { stage: 'Shipped', status: order.status === 'shipped' || order.status === 'delivered' ? 'completed' : 'pending' },
+    { stage: 'Delivered', status: order.status === 'delivered' ? 'completed' : 'pending' }
+  ];
   
   let lastActiveIndex = -1;
   stages.forEach((stage, idx) => {

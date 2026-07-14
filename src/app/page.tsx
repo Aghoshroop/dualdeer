@@ -61,7 +61,7 @@ export default function Home() {
         <BrandIntroBlock
           h1="High-Performance SpeedSuits in India | DualDeer"
           h2="Premium Activewear & Luxury Athleisure Brand"
-          image="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1600&auto=format&fit=crop"
+          image="/speedsuitgang.jpeg"
           paragraphs={[
             <React.Fragment key="1">
               Welcome to DualDeer, the definitive destination for <Link href="/shop" style={{ textDecoration: 'underline', color: 'var(--color-text)', textUnderlineOffset: '4px', fontWeight: 500 }}>premium activewear</Link> and high-end athleisure in India. Built upon a foundation of relentless innovation and an unwavering commitment to excellence, our brand is fundamentally redefining what it means to dress for performance, featuring our signature <Link href="/shop?category=speedsuit" style={{ textDecoration: 'underline', color: 'var(--color-text)', textUnderlineOffset: '4px', fontWeight: 500 }}>SpeedSuit collection</Link>. Our meticulously crafted gym apparel and streetwear don&apos;t just follow fleeting trends; they set rigorous new standards by seamlessly blending cutting-edge fabric technology with an avant-garde aesthetic that commands attention both inside and outside the gym.

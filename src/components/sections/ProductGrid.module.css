@@ -426,9 +426,47 @@
   }
   
   .horizontalScrollMobile .card {
-    min-width: 80vw !important;
+    min-width: 60vw !important;
     scroll-snap-align: start;
     flex-shrink: 0;
+  }
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.arrows {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.arrowBtn {
+  background: transparent;
+  border: 1px solid rgba(150, 150, 150, 0.3);
+  color: var(--color-text);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.arrowBtn:hover {
+  background: var(--color-text);
+  color: var(--color-background);
+}
+
+@media (max-width: 768px) {
+  .headerRight {
+    width: 100%;
+    justify-content: space-between;
+    flex-direction: row-reverse;
   }
 }
 

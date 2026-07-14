@@ -279,3 +279,54 @@
   border-left: 3px solid var(--color-primary);
   margin-top: 0.5rem;
 }
+
+@media (max-width: 600px) {
+  .trackingContainer {
+    padding: 1rem;
+  }
+  .trackingHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .courierInfo {
+    width: 100%;
+    justify-content: space-between;
+    text-align: left;
+  }
+  .timelineHorizontal {
+    overflow-x: visible;
+    padding-top: 30px;
+    gap: 2px;
+  }
+  .timelineItem {
+    min-width: 0;
+    flex: 1;
+    padding: 0 2px;
+  }
+  .timelineStage {
+    font-size: 0.65rem;
+    line-height: 1.1;
+    word-break: break-word;
+    hyphens: auto;
+  }
+  .timelineIcon {
+    width: 20px;
+    height: 20px;
+  }
+  .timelineIcon svg {
+    width: 12px;
+    height: 12px;
+  }
+  .connector {
+    left: calc(50% + 10px);
+    right: calc(-50% + 10px);
+  }
+  .movingTruck {
+    top: 5px;
+  }
+  .movingTruck svg {
+    width: 18px;
+    height: 18px;
+  }
+}

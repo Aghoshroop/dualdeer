@@ -15,6 +15,19 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { formatPrice, renderPrice } = useCurrency();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     if (!category) return;
@@ -43,10 +56,20 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
           >
             MORE LIKE THIS
           </motion.h2>
-          <Link href={`/shop?category=${encodeURIComponent(category)}`} className={styles.shopAll}>View Category</Link>
+          <div className={styles.headerRight}>
+            <div className={styles.arrows}>
+              <button onClick={scrollLeft} className={styles.arrowBtn} aria-label="Scroll left">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <button onClick={scrollRight} className={styles.arrowBtn} aria-label="Scroll right">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+            <Link href={`/shop?category=${encodeURIComponent(category)}`} className={styles.shopAll}>View Category</Link>
+          </div>
         </div>
 
-        <div className={`${styles.grid} ${styles.horizontalScrollMobile}`}>
+        <div className={`${styles.grid} ${styles.horizontalScrollMobile}`} ref={scrollRef}>
           {products.map((product, i) => (
             <Link 
               href={`/product/${product.slug || product.id}`} 
