@@ -6,7 +6,7 @@ import { Product, getReviews, Review, addReview, checkInWishlist, addToWishlist,
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
-import { Heart, CheckCircle, ChevronDown, Star, ChevronLeft, X, Share2, ImagePlus, Edit2, Trash2 } from 'lucide-react';
+import { Heart, CheckCircle, ChevronDown, Star, ChevronLeft, X, Share2, ImagePlus, Edit2, Trash2, User, ArrowRight, ShieldCheck, Award, Gem, Users, Quote } from 'lucide-react';
 import RelatedProducts from '@/components/sections/RelatedProducts';
 import Link from 'next/link';
 import styles from './ProductDetails.module.css';
@@ -779,41 +779,101 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                 </div>
 
                 <div className={styles.submitReviewArea}>
-                  <h3>Leave Your Verdict</h3>
-                  <p>Share your precise experience regarding fit, aerodynamic feel, and luxury quality.</p>
+                  {/* Magical Rays Decorative Background */}
+                  <div className={styles.magicalRaysContainer}>
+                    <div className={styles.magicRay1}></div>
+                    <div className={styles.magicRay2}></div>
+                    <div className={styles.magicRay3}></div>
+                  </div>
+                  
+                  <div className={styles.reviewFormLogoWrapper}>
+                    <img src="/logo.png" alt="DUALDEER" className={styles.reviewFormLogo} />
+                  </div>
+                  
+                  <div className={styles.reviewFormHeader}>
+                    <h3 className={styles.reviewTitle}>
+                      <span className={styles.titleDark}>SHARE YOUR</span> <span className={styles.highlightText}>EXPERIENCE</span>
+                    </h3>
+                    <div className={styles.headerLine}></div>
+                    <p className={styles.reviewSubtitle}>
+                      Your feedback helps us grow and deliver performance-driven<br/>
+                      gear you can trust. Be part of the <span className={styles.highlightText}>DUALDEER</span> community.
+                    </p>
+                  </div>
+                  
                   <form onSubmit={handleReviewSubmit} className={styles.reviewForm}>
                     <div className={styles.formGrids}>
-                      <input 
-                        type="text" 
-                        placeholder="Your Name" 
-                        required 
-                        value={reviewName}
-                        onChange={e => setReviewName(e.target.value)}
-                        className={styles.inputField} 
-                      />
-                      <select 
-                        required
-                        value={reviewRating}
-                        onChange={e => setReviewRating(Number(e.target.value))}
-                        className={styles.inputField}
-                      >
-                        <option value={5}>⭐⭐⭐⭐⭐ - 5 Stars</option>
-                        <option value={4}>⭐⭐⭐⭐ - 4 Stars</option>
-                        <option value={3}>⭐⭐⭐ - 3 Stars</option>
-                        <option value={2}>⭐⭐ - 2 Stars</option>
-                        <option value={1}>⭐ - 1 Star</option>
-                      </select>
+                      <div className={styles.inputWrapper}>
+                        <User size={20} className={styles.inputIcon} />
+                        <input 
+                          type="text" 
+                          placeholder="Your Name" 
+                          required 
+                          value={reviewName}
+                          onChange={e => setReviewName(e.target.value)}
+                          className={styles.inputFieldWithIcon} 
+                        />
+                      </div>
+                      <div className={styles.ratingWrapper}>
+                        <div className={styles.ratingLeft}>
+                          <span className={styles.ratingLabel}>YOUR RATING</span>
+                          <div className={styles.interactiveStars}>
+                            {[1,2,3,4,5].map(star => (
+                              <Star 
+                                key={star} 
+                                size={22} 
+                                className={styles.ratingStarIcon}
+                                fill={star <= reviewRating ? "var(--color-primary)" : "none"}
+                                color="var(--color-primary)"
+                                strokeWidth={1.5}
+                                onClick={() => setReviewRating(star)}
+                                style={{ cursor: 'pointer' }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <div className={styles.ratingDivider}></div>
+                        <div className={styles.ratingRight}>
+                           <span className={styles.selectRatingText}>Select Rating</span>
+                           <ChevronDown size={16} className={styles.ratingChevron} />
+                        </div>
+                        <select 
+                          required
+                          value={reviewRating}
+                          onChange={e => setReviewRating(Number(e.target.value))}
+                          className={styles.hiddenSelect}
+                        >
+                          <option value={5}>5 Stars</option>
+                          <option value={4}>4 Stars</option>
+                          <option value={3}>3 Stars</option>
+                          <option value={2}>2 Stars</option>
+                          <option value={1}>1 Star</option>
+                        </select>
+                      </div>
                     </div>
-                    <textarea 
-                      placeholder="Write your review here..."
-                      required
-                      value={reviewText}
-                      onChange={e => setReviewText(e.target.value)}
-                      className={styles.textArea}
-                    />
+                    
+                    <div className={styles.textareaWrapper}>
+                      <Quote size={24} className={styles.quoteIcon} fill="var(--color-primary)" color="var(--color-primary)" />
+                      <textarea 
+                        placeholder="Write your review here..."
+                        required
+                        value={reviewText}
+                        onChange={e => setReviewText(e.target.value)}
+                        className={styles.textArea}
+                        maxLength={1000}
+                      />
+                      <span className={styles.charCount}>{reviewText.length} / 1000</span>
+                    </div>
+
                     <div className={styles.imageUploadWrapper}>
                       <label className={styles.uploadBtn}>
-                        <ImagePlus size={16} /> Attach Image
+                        <div className={styles.uploadIconWrapper}>
+                          <ImagePlus size={24} className={styles.uploadIcon} />
+                        </div>
+                        <div className={styles.uploadTextGroup}>
+                          <span className={styles.uploadTitle}>ATTACH IMAGE <span className={styles.uploadOptional}>(OPTIONAL)</span></span>
+                          <span className={styles.uploadSubtitle}>Add photos to support your review</span>
+                        </div>
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -843,9 +903,21 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                         </div>
                       )}
                     </div>
-                    <button type="submit" disabled={isSubmitting} className={styles.submitBtn}>
-                      {isSubmitting ? 'Submitting...' : 'Submit Review'}
-                    </button>
+                    
+                    <div className={styles.submitActionsRow}>
+                      <button type="submit" disabled={isSubmitting} className={styles.submitBtn}>
+                        <ArrowRight size={20} className={styles.submitArrow} />
+                        {isSubmitting ? 'SUBMITTING...' : 'SUBMIT REVIEW'}
+                      </button>
+                      <div className={styles.authTrust}>
+                        <ShieldCheck size={28} className={styles.trustIcon} strokeWidth={1.5} />
+                        <div className={styles.trustText}>
+                          <span>Your review is 100% authentic</span>
+                          <span>and helps our community.</span>
+                        </div>
+                      </div>
+                    </div>
+
                     {currentUser?.email === 'aviroopghosh283@gmail.com' && (
                       <button 
                         type="button" 
@@ -871,6 +943,48 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
                       </button>
                     )}
                   </form>
+                  
+                  <div className={styles.reviewBadgesRow}>
+                    <div className={styles.badgeItem}>
+                      <div className={styles.badgeIconWrapper}>
+                        <Award size={20} className={styles.badgeIcon} />
+                      </div>
+                      <div className={styles.badgeTextGroup}>
+                        <span className={styles.badgeTitle}>Real Reviews</span>
+                        <span className={styles.badgeSub}>From Real Athletes</span>
+                      </div>
+                    </div>
+                    <div className={styles.badgeDivider}></div>
+                    <div className={styles.badgeItem}>
+                      <div className={styles.badgeIconWrapper}>
+                        <Gem size={20} className={styles.badgeIcon} />
+                      </div>
+                      <div className={styles.badgeTextGroup}>
+                        <span className={styles.badgeTitle}>Premium Quality</span>
+                        <span className={styles.badgeSub}>Crafted for Performance</span>
+                      </div>
+                    </div>
+                    <div className={styles.badgeDivider}></div>
+                    <div className={styles.badgeItem}>
+                      <div className={styles.badgeIconWrapper}>
+                        <Users size={20} className={styles.badgeIcon} />
+                      </div>
+                      <div className={styles.badgeTextGroup}>
+                        <span className={styles.badgeTitle}>Better Together</span>
+                        <span className={styles.badgeSub}>Stronger Community</span>
+                      </div>
+                    </div>
+                    <div className={styles.badgeDivider}></div>
+                    <div className={styles.badgeItem}>
+                      <div className={styles.badgeIconWrapper}>
+                        <Heart size={20} className={styles.badgeIcon} />
+                      </div>
+                      <div className={styles.badgeTextGroup}>
+                        <span className={styles.badgeTitle}>Trusted by Athletes</span>
+                        <span className={styles.badgeSub}>Loved Across India</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
               </div>
