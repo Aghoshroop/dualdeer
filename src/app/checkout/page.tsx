@@ -11,6 +11,7 @@ import styles from './Checkout.module.css';
 import { useCurrency } from '@/context/CurrencyContext';
 import * as metaPixel from '@/lib/metaPixel';
 import { useAuthToast } from '@/context/AuthToastContext';
+import { calculateBundleSavings } from '@/lib/bundleLogic';
 
 export default function CheckoutPage() {
   return (
