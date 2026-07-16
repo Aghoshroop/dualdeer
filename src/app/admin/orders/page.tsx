@@ -56,7 +56,7 @@ export default function AdminOrdersPage() {
   };
 
   const getFilteredOrders = () => {
-    let result = orders.filter(o => o.status !== 'payment_pending' && o.status !== 'draft');
+    let result = orders.filter(o => o.status !== 'payment_pending');
     switch (activeFilter) {
       case 'price_high': result.sort((a, b) => b.total - a.total); break;
       case 'price_low': result.sort((a, b) => a.total - b.total); break;
