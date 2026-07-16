@@ -11,7 +11,7 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [mutatingId, setMutatingId] = useState<string | null>(null);
   const [trackingEditId, setTrackingEditId] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<'recent' | 'price_high' | 'price_low' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned'>('recent');
+  const [activeFilter, setActiveFilter] = useState<'recent' | 'price_high' | 'price_low' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned'>('recent');
   const { formatPrice } = useCurrency();
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function AdminOrdersPage() {
     setLoading(false);
   };
 
-  const handleStatusChange = async (orderId: string, newStatus: 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned') => {
+  const handleStatusChange = async (orderId: string, newStatus: 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned') => {
     setMutatingId(orderId);
     try {
       await updateOrder(orderId, { status: newStatus });
@@ -56,10 +56,11 @@ export default function AdminOrdersPage() {
   };
 
   const getFilteredOrders = () => {
-    let result = [...orders];
+    let result = orders.filter(o => o.status !== 'payment_pending' && o.status !== 'draft');
     switch (activeFilter) {
       case 'price_high': result.sort((a, b) => b.total - a.total); break;
       case 'price_low': result.sort((a, b) => a.total - b.total); break;
+      case 'paid':
       case 'processing':
       case 'shipped':
       case 'delivered': 
@@ -79,6 +80,7 @@ export default function AdminOrdersPage() {
 
   const StatusIcon = ({ status }: { status: string }) => {
     if (status === 'delivered') return <CheckCircle size={14} color="#00ffcc" />;
+    if (status === 'paid') return <CheckCircle size={14} color="#10b981" />;
     if (status === 'shipped') return <Send size={14} color="#3399ff" />;
     if (status === 'cancellation_requested') return <RefreshCw size={14} color="#f59e0b" />;
     if (status === 'return_requested') return <RefreshCw size={14} color="#ec4899" />;
@@ -110,7 +112,8 @@ export default function AdminOrdersPage() {
           <button onClick={() => setActiveFilter('price_high')} className={`${styles.filterBtn} ${activeFilter === 'price_high' ? styles.activeF : ''}`}>Highest Price</button>
           <button onClick={() => setActiveFilter('price_low')} className={`${styles.filterBtn} ${activeFilter === 'price_low' ? styles.activeF : ''}`}>Lowest Price</button>
           <div className={styles.filterDivider}></div>
-          <button onClick={() => setActiveFilter('processing')} className={`${styles.filterBtn} ${activeFilter === 'processing' ? styles.activeF : ''}`}>Pending Actions</button>
+          <button onClick={() => setActiveFilter('paid')} className={`${styles.filterBtn} ${activeFilter === 'paid' ? styles.activeF : ''}`}>Paid</button>
+          <button onClick={() => setActiveFilter('processing')} className={`${styles.filterBtn} ${activeFilter === 'processing' ? styles.activeF : ''}`}>Processing</button>
           <button onClick={() => setActiveFilter('shipped')} className={`${styles.filterBtn} ${activeFilter === 'shipped' ? styles.activeF : ''}`}>Shipped</button>
           <button onClick={() => setActiveFilter('delivered')} className={`${styles.filterBtn} ${activeFilter === 'delivered' ? styles.activeF : ''}`}>Delivered</button>
           <button onClick={() => setActiveFilter('return_requested')} className={`${styles.filterBtn} ${activeFilter === 'return_requested' ? styles.activeF : ''}`} style={{ color: activeFilter === 'return_requested' ? '#ec4899' : 'inherit' }}>Return Requests</button>
@@ -176,6 +179,11 @@ export default function AdminOrdersPage() {
                         Stripe Invoice: {order.stripeInvoiceId} | Status: {order.stripeStatus || 'pending'}
                       </div>
                     )}
+                    {order.razorpay?.status === 'paid' && (
+                      <div style={{ fontSize: '0.75rem', background: '#ecfdf5', color: '#059669', padding: '4px 8px', borderRadius: '4px', marginBottom: '0.5rem', display: 'inline-block', fontWeight: 600 }}>
+                        PAID ONLINE (Razorpay)
+                      </div>
+                    )}
                     {(order.appliedCoupon || order.discountAmount) && (
                       <div style={{ fontSize: '0.8rem', color: '#ffcc00', marginBottom: '0.5rem', fontWeight: 600, display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                         {order.appliedCoupon && <span style={{ background: 'rgba(255, 204, 0, 0.2)', padding: '2px 6px', borderRadius: '4px' }}>CODE: {order.appliedCoupon}</span>}
@@ -221,6 +229,7 @@ export default function AdminOrdersPage() {
                         style={{ marginBottom: '8px' }}
                       >
                         <option value="payment_pending">Payment Pending</option>
+                        <option value="paid">Paid</option>
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>

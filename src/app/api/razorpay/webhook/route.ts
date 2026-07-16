@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     }
 
     // Idempotency check: if order is already processed and this is a payment event, ignore
-    if (order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered') {
+    if (order.status === 'paid' || order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered') {
        if (eventType === 'payment.captured' || eventType === 'payment_link.paid' || eventType === 'payment.authorized' || eventType === 'qr_code.credited') {
           console.log('Razorpay Webhook: Order already processed, ignoring duplicate event.', orderId);
           return NextResponse.json({ received: true });
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         console.log(`Razorpay Payment confirmed for order: ${orderId}`);
         
         await updateOrder(orderId, {
-           status: 'processing',
+           status: 'paid',
            'razorpay.status': 'paid',
            'razorpay.paymentId': eventType === 'payment_link.paid' ? paymentData.payment_id : paymentData.id,
            'razorpay.paidAt': Date.now(),

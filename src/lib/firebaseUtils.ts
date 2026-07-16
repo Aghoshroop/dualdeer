@@ -219,7 +219,7 @@ export interface Order {
   total: number;
   discountAmount?: number;
   appliedCoupon?: string;
-  status: 'payment_pending' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned';
+  status: 'payment_pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancellation_requested' | 'cancelled' | 'return_requested' | 'return_approved' | 'return_picked_up' | 'returned';
   tracking?: TrackingInfo;
   affiliateId?: string;
   affiliateCommission?: number;

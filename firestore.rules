@@ -29,7 +29,7 @@ service cloud.firestore {
         (
           (
             request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'cancellationReason']) &&
-            resource.data.status == 'processing' &&
+            (resource.data.status == 'processing' || resource.data.status == 'paid') &&
             request.resource.data.status == 'cancellation_requested'
           ) ||
           (
@@ -46,7 +46,7 @@ service cloud.firestore {
         // Allow Webhooks (Server using Client SDK without auth) to update order status
         // Secure because Firestore Document IDs are unguessable 20-character random strings.
         request.resource.data.diff(resource.data).affectedKeys().hasAny(['razorpay', 'status', 'stripeStatus']) &&
-        (resource.data.status == 'payment_pending' || resource.data.status == 'processing')
+        (resource.data.status == 'payment_pending' || resource.data.status == 'processing' || resource.data.status == 'paid')
       );
 
       allow delete: if isAdmin() || (

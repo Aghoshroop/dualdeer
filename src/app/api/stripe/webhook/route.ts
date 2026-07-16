@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       console.log(`Payment confirmed for order: ${orderId}`);
       try {
         await updateOrder(orderId, {
-          status: 'processing',
+          status: 'paid',
           stripeStatus: 'paid'
         });
         

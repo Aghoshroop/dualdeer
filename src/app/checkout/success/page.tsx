@@ -83,12 +83,11 @@ function CheckoutSuccessContent() {
 
   const getStepClass = (stepName: 'validated' | 'processing' | 'shipped' | 'delivered') => {
     const currentStatus = order?.status || 'processing';
-
     if (stepName === 'validated') return `${styles.step} ${styles.completedStep}`;
-
+    
     if (stepName === 'processing') {
-      if (currentStatus === 'processing') return `${styles.step} ${styles.activeStep}`;
-      if (currentStatus === 'shipped' || currentStatus === 'delivered') return `${styles.step} ${styles.completedStep}`;
+      if (currentStatus === 'processing' || currentStatus === 'paid') return `${styles.step} ${styles.activeStep}`;
+      if (['shipped', 'delivered'].includes(currentStatus)) return `${styles.step} ${styles.completedStep}`;
     }
 
     if (stepName === 'shipped') {
