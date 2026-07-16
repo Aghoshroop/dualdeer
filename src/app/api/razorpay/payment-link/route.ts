@@ -40,7 +40,7 @@ export async function POST(req: Request) {
         order_id: orderId,
         ...notes
       },
-      callback_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/checkout/success?orderId=${orderId}`,
+      callback_url: `${process.env.NEXT_PUBLIC_BASE_URL || `${req.headers.get('x-forwarded-proto') || 'http'}://${req.headers.get('host') || 'localhost:3000'}`}/checkout/success?orderId=${orderId}`,
       callback_method: 'get'
     };
 
