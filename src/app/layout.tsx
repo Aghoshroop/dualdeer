@@ -17,6 +17,7 @@ import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import MetaPixelTracker from "@/components/analytics/MetaPixelTracker";
 import { Suspense } from "react";
 import { AuthToastProvider } from "@/context/AuthToastContext";
+import MaintenanceWrapper from "@/components/layout/MaintenanceWrapper";
 
 export const metadata: Metadata = {
   title: "DualDeer SpeedSuits India | Premium Compression & Gym Wear",
@@ -215,25 +216,27 @@ export default function RootLayout({
         </Suspense>
         <ThemeProvider defaultTheme="light" attribute="data-theme">
         <CustomCursor />
-        <CurrencyProvider>
-          <CartProvider>
-            <SplashScreen />
-            <HideOnAdmin>
-              <Navbar />
-              <NewsletterModal />
-            </HideOnAdmin>
-            <AuthToastProvider>
-              <SmoothScrollProvider>
-                {children}
-              </SmoothScrollProvider>
-            </AuthToastProvider>
-            <HideOnAdmin>
-              <SupportAgent />
-              <Footer />
-              <BottomNav />
-            </HideOnAdmin>
-          </CartProvider>
-        </CurrencyProvider>
+        <MaintenanceWrapper>
+          <CurrencyProvider>
+            <CartProvider>
+              <SplashScreen />
+              <HideOnAdmin>
+                <Navbar />
+                <NewsletterModal />
+              </HideOnAdmin>
+              <AuthToastProvider>
+                <SmoothScrollProvider>
+                  {children}
+                </SmoothScrollProvider>
+              </AuthToastProvider>
+              <HideOnAdmin>
+                <SupportAgent />
+                <Footer />
+                <BottomNav />
+              </HideOnAdmin>
+            </CartProvider>
+          </CurrencyProvider>
+        </MaintenanceWrapper>
         </ThemeProvider>
         <Analytics />
       </body>

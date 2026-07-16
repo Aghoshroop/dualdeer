@@ -11,6 +11,7 @@ export default function AdminSettingsPage() {
     supportEmail: 'support@dualdeer.com',
     shippingFee: 0,
     taxRate: 8,
+    maintenanceMode: false,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -113,6 +114,32 @@ export default function AdminSettingsPage() {
                 onChange={(e) => setSettings({...settings, shippingFee: Number(e.target.value)})}
                 min="0"
               />
+            </div>
+
+            <div className={styles.formGroup} style={{ marginBottom: '0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '4px', color: '#ef4444', fontWeight: 600 }}>VIP Maintenance Mode</label>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Blocks all users from accessing the site. Only admins can enter.</span>
+              </div>
+              <label style={{ position: 'relative', display: 'inline-block', width: '50px', height: '24px' }}>
+                <input 
+                  type="checkbox" 
+                  checked={settings.maintenanceMode || false} 
+                  onChange={(e) => setSettings({...settings, maintenanceMode: e.target.checked})}
+                  style={{ opacity: 0, width: 0, height: 0 }}
+                />
+                <span style={{
+                  position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
+                  backgroundColor: settings.maintenanceMode ? '#ef4444' : '#333',
+                  transition: '.4s', borderRadius: '34px'
+                }}>
+                  <span style={{
+                    position: 'absolute', content: '""', height: '16px', width: '16px', left: '4px', bottom: '4px',
+                    backgroundColor: 'white', transition: '.4s', borderRadius: '50%',
+                    transform: settings.maintenanceMode ? 'translateX(26px)' : 'translateX(0)'
+                  }} />
+                </span>
+              </label>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
