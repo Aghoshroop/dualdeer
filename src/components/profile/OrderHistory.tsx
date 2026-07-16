@@ -23,8 +23,9 @@ export default function OrderHistory({ user }: { user: any }) {
     setLoading(true);
     const q = query(collection(db, 'orders'), where('userId', '==', user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const userOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
-      // Sort newest first
+      const userOrders = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Order))
+        .filter(order => order.status !== 'draft');
       const sorted = userOrders.sort((a, b) => {
         const timeA = a.createdAt && (a.createdAt as any).toMillis ? (a.createdAt as any).toMillis() : typeof a.createdAt === 'number' ? a.createdAt : 0;
         const timeB = b.createdAt && (b.createdAt as any).toMillis ? (b.createdAt as any).toMillis() : typeof b.createdAt === 'number' ? b.createdAt : 0;
@@ -161,7 +162,21 @@ export default function OrderHistory({ user }: { user: any }) {
                   </div>
                 </div>
                 <div className={styles.amzHeaderRight}>
-                  <span className={styles.amzHeaderLabel}>Order # {order.id?.substring(0, 12).toUpperCase()}</span>
+                  <span className={styles.amzHeaderLabel}>
+                    Order # {order.id?.substring(0, 12).toUpperCase()}
+                    <span style={{ 
+                      marginLeft: '10px', 
+                      padding: '2px 8px', 
+                      borderRadius: '4px', 
+                      background: order.status === 'payment_pending' ? 'rgba(245, 158, 11, 0.2)' : order.status === 'paid' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.1)', 
+                      color: order.status === 'payment_pending' ? '#f59e0b' : order.status === 'paid' ? '#10b981' : 'var(--color-text-muted)', 
+                      fontSize: '0.75rem', 
+                      fontWeight: 600,
+                      textTransform: 'uppercase'
+                    }}>
+                      {order.status.replace('_', ' ')}
+                    </span>
+                  </span>
                   <span className={styles.amzOrderDetailsLink} onClick={() => setSelectedOrder(order)}>
                     View order details
                   </span>
