@@ -36,8 +36,17 @@ service cloud.firestore {
             request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'returnReason']) &&
             resource.data.status == 'delivered' &&
             request.resource.data.status == 'return_requested'
+          ) ||
+          (
+            request.resource.data.diff(resource.data).affectedKeys().hasAny(['razorpay', 'status']) &&
+            resource.data.status == 'payment_pending'
           )
         )
+      ) || (
+        // Allow Webhooks (Server using Client SDK without auth) to update order status
+        // Secure because Firestore Document IDs are unguessable 20-character random strings.
+        request.resource.data.diff(resource.data).affectedKeys().hasAny(['razorpay', 'status', 'stripeStatus']) &&
+        (resource.data.status == 'payment_pending' || resource.data.status == 'processing')
       );
 
       allow delete: if isAdmin() || (

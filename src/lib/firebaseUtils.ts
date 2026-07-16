@@ -233,6 +233,21 @@ export interface Order {
   stripeStatus?: string;
   shiprocketSyncStatus?: 'pending' | 'synced' | 'failed';
   shiprocketOrderId?: string;
+  razorpay?: {
+    orderId?: string;
+    paymentId?: string;
+    paymentLinkId?: string;
+    qrId?: string;
+    status?: string;
+    amount?: number;
+    currency?: string;
+    method?: string;
+    webhookEvent?: string;
+    signature?: string;
+    createdAt?: any;
+    paidAt?: any;
+    expiresAt?: any;
+  };
   createdAt?: any;
   updatedAt?: any;
 }
@@ -437,7 +452,7 @@ export const createOrder = async (orderData: Omit<Order, 'id'>) => {
   return addDocument('orders', orderData);
 };
 
-export const updateOrder = async (id: string, data: Partial<Order>) => {
+export const updateOrder = async (id: string, data: Partial<Order> | Record<string, any>) => {
   return updateDocument('orders', id, data);
 };
 
@@ -454,6 +469,81 @@ export const getOrder = async (id: string): Promise<Order | null> => {
     console.error("Error fetching single order", e);
   }
   return null;
+};
+
+// ========================
+// Inventory Management
+// ========================
+export const reserveInventory = async (items: OrderItem[]) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      // First, read all product documents to ensure we have enough stock
+      const productRefs = items.map(item => doc(db, 'products', item.productId));
+      const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
+      
+      const updates = [];
+      
+      for (let i = 0; i < productDocs.length; i++) {
+        const pDoc = productDocs[i];
+        if (!pDoc.exists()) {
+          throw new Error(`Product ${items[i].productId} does not exist`);
+        }
+        
+        const data = pDoc.data();
+        const requestedQuantity = items[i].quantity;
+        const currentStock = data.stock || 0;
+        
+        if (currentStock < requestedQuantity) {
+          throw new Error(`Insufficient stock for ${data.name}`);
+        }
+        
+        updates.push({
+          ref: pDoc.ref,
+          newStock: currentStock - requestedQuantity
+        });
+      }
+      
+      // If we got here, all products have enough stock. Perform the updates.
+      for (const update of updates) {
+        transaction.update(update.ref, { stock: update.newStock });
+      }
+    });
+    return true;
+  } catch (e) {
+    console.error("Error reserving inventory:", e);
+    throw e;
+  }
+};
+
+export const releaseInventory = async (items: OrderItem[]) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      const productRefs = items.map(item => doc(db, 'products', item.productId));
+      const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
+      
+      const updates = [];
+      
+      for (let i = 0; i < productDocs.length; i++) {
+        const pDoc = productDocs[i];
+        if (pDoc.exists()) {
+          const data = pDoc.data();
+          const quantityToRestore = items[i].quantity;
+          updates.push({
+            ref: pDoc.ref,
+            newStock: (data.stock || 0) + quantityToRestore
+          });
+        }
+      }
+      
+      for (const update of updates) {
+        transaction.update(update.ref, { stock: update.newStock });
+      }
+    });
+    return true;
+  } catch (e) {
+    console.error("Error releasing inventory:", e);
+    return false;
+  }
 };
 
 // ========================

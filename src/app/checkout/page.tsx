@@ -2,16 +2,19 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { createOrder, getProduct, validateCoupon, updateCoupon, Coupon } from '@/lib/firebaseUtils';
+import { createOrder, getProduct, validateCoupon, updateCoupon, Coupon, updateOrder } from '@/lib/firebaseUtils';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import Link from 'next/link';
-import { Lock, ChevronLeft, CreditCard, Wallet, Banknote, ShieldAlert, Globe } from 'lucide-react';
+import { Lock, ChevronLeft, CreditCard, Wallet, Banknote, ShieldAlert, Globe, QrCode } from 'lucide-react';
 import styles from './Checkout.module.css';
 import { useCurrency } from '@/context/CurrencyContext';
 import * as metaPixel from '@/lib/metaPixel';
 import { useAuthToast } from '@/context/AuthToastContext';
 import { calculateBundleSavings } from '@/lib/bundleLogic';
+import { reserveInventory } from '@/lib/firebaseUtils';
 
 export default function CheckoutPage() {
   return (
@@ -28,13 +31,53 @@ function CheckoutEngine() {
   const { currency, formatPrice, conversionRate, countryCode, renderPrice } = useCurrency();
   const { showAuthToast } = useAuthToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [step, setStep] = useState<'shipping' | 'payment' | 'upi-verification'>('shipping');
-  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi' | 'international_card'>(currency === 'USD' ? 'international_card' : 'cod');
-  const [utrNumber, setUtrNumber] = useState('');
-  const [upiTr] = useState(() => `DD${Math.floor(Math.random() * 10000000)}`);
+  const [step, setStep] = useState<'shipping' | 'payment' | 'qr-payment'>('shipping');
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'razorpay_qr' | 'razorpay_link'>(currency === 'USD' ? 'razorpay_link' : 'razorpay_qr');
   const [currentUser, setCurrentUser] = useState<any>(null);
-
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [qrExpiresAt, setQrExpiresAt] = useState<number | null>(null);
+  const [qrTimeLeft, setQrTimeLeft] = useState('15:00');
+  const [createdOrderId, setCreatedOrderId] = useState('');
+  
   const [authLoading, setAuthLoading] = useState(true);
+
+  // Timer Effect
+  useEffect(() => {
+     if (step === 'qr-payment' && qrExpiresAt) {
+       const interval = setInterval(() => {
+         const now = Date.now();
+         if (now > qrExpiresAt) {
+            setQrTimeLeft('00:00');
+            clearInterval(interval);
+         } else {
+            const totalSeconds = Math.floor((qrExpiresAt - now) / 1000);
+            const mins = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const secs = (totalSeconds % 60).toString().padStart(2, '0');
+            setQrTimeLeft(`${mins}:${secs}`);
+         }
+       }, 1000);
+       return () => clearInterval(interval);
+     }
+  }, [step, qrExpiresAt]);
+
+  // Firestore Listener Effect
+  useEffect(() => {
+     if (step === 'qr-payment' && createdOrderId) {
+        const unsubscribe = onSnapshot(doc(db, 'orders', createdOrderId), (docSnap) => {
+           if (docSnap.exists()) {
+              const data = docSnap.data();
+              if (data.status === 'processing' || data.razorpay?.status === 'paid') {
+                 // Payment Successful, redirect
+                 if (!buyNowId && clearCart) {
+                    clearCart();
+                 }
+                 router.push(`/checkout/success?orderId=${createdOrderId}`);
+              }
+           }
+        });
+        return () => unsubscribe();
+     }
+  }, [step, createdOrderId]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -189,9 +232,8 @@ function CheckoutEngine() {
         affiliateId: appliedCoupon.affiliateId,
         affiliateCommission: discountAmountCapped 
       } : {}),
-      status: (paymentMethod === 'international_card' ? 'payment_pending' : 'processing') as any,
+      status: 'payment_pending' as any,
       paymentMethod: paymentMethod,
-      utrNumber: paymentMethod === 'upi' ? utrNumber : '',
       currency: currency,
       exchangeRate: currency === 'USD' ? conversionRate : 1,
       shiprocketSyncStatus: 'pending' as const
@@ -199,49 +241,88 @@ function CheckoutEngine() {
 
     try {
       const orderId = await createOrder(orderPayload);
+      setCreatedOrderId(orderId);
       
-      // Async Shiprocket Sync
+      // Reserve inventory right after creating the order
       try {
-        await fetch('/api/shiprocket/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId, orderData: orderPayload })
-        });
-      } catch (syncErr) {
-        console.error("Shiprocket Background Sync Failed:", syncErr);
+        await reserveInventory(orderPayload.items);
+      } catch (invErr: any) {
+         console.error('Failed to reserve inventory:', invErr);
+         alert(invErr.message || 'Sorry, some items are out of stock.');
+         setIsSubmitting(false);
+         return;
       }
-
-      // Async Email Notification
-      try {
-        await fetch('/api/send-order-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId, orderData: orderPayload })
-        });
-      } catch (emailErr) {
-        console.error("Email Notification Failed:", emailErr);
+      
+      if (paymentMethod === 'razorpay_link') {
+         // Create Payment Link
+         const res = await fetch('/api/razorpay/payment-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+               orderId,
+               amount: total,
+               customer: formData
+            })
+         });
+         const data = await res.json();
+         if (data.shortUrl) {
+            window.location.href = data.shortUrl; // Redirect to Razorpay
+         } else {
+            alert('Failed to generate payment link');
+            setIsSubmitting(false);
+         }
+         return; // Wait for redirect
       }
-
-      if (appliedCoupon && appliedCoupon.id) {
-        try {
-          if (appliedCoupon.usageLimitType === 'single_use') {
-            await updateCoupon(appliedCoupon.id, { active: false });
-          } else if (appliedCoupon.usageLimitType === 'once_per_user' && currentUser?.uid) {
-            const currentUsedBy = appliedCoupon.usedBy || [];
-            await updateCoupon(appliedCoupon.id, { usedBy: [...currentUsedBy, currentUser.uid] });
+      
+      if (paymentMethod === 'razorpay_qr') {
+         // Create QR Code
+         const res = await fetch('/api/razorpay/qr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+               orderId,
+               amount: total,
+               customer: formData
+            })
+         });
+         const data = await res.json();
+         if (data.imageUrl) {
+            setQrCodeUrl(data.imageUrl);
+            setQrExpiresAt(Date.now() + 15 * 60 * 1000);
+            setStep('qr-payment');
+         } else {
+            alert('Failed to generate QR code');
+         }
+         setIsSubmitting(false);
+         return; // Wait for user to scan
+      }
+      
+      // COD Logic
+      if (paymentMethod === 'cod') {
+          // Trigger order emails, sync
+          await updateOrder(orderId, { status: 'processing' });
+          fetch('/api/shiprocket/create-order', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ orderId, orderData: orderPayload })
+          }).catch(console.error);
+          
+          fetch('/api/send-order-email', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ orderId, orderData: orderPayload })
+          }).catch(console.error);
+          
+          if (appliedCoupon && appliedCoupon.id) {
+             if (appliedCoupon.usageLimitType === 'single_use') await updateCoupon(appliedCoupon.id, { active: false });
+             else if (appliedCoupon.usageLimitType === 'once_per_user' && currentUser?.uid) {
+                await updateCoupon(appliedCoupon.id, { usedBy: [...(appliedCoupon.usedBy || []), currentUser.uid] });
+             }
           }
-        } catch (couponErr) {
-          console.warn('Coupon invalidation failed manually - verify security rules applied:', couponErr);
-        }
+          
+          if (!buyNowId && clearCart) clearCart();
+          router.push(`/checkout/success?orderId=${orderId}`);
       }
-
-      // Clear the global bag securely ONLY if we are processing the cart (not an isolated Buy Now action)
-      if (!buyNowId && clearCart) {
-        clearCart();
-      }
-
-      // Route specifically to the Success gateway passing the Tracking ID via query payload
-      router.push(`/checkout/success?orderId=${orderId}`);
 
     } catch (err) {
       console.error("Payment Submission Failed: ", err);
@@ -348,106 +429,110 @@ function CheckoutEngine() {
                 <h2>Secure Payment Portal</h2>
               </div>
               <div className={styles.paymentMethods}>
-                {currency === 'USD' ? (
-                  <div 
-                     className={`${styles.paymentOption} ${paymentMethod === 'international_card' ? styles.paymentOptionActive : ''}`}
-                     onClick={() => setPaymentMethod('international_card')}
-                  >
-                     <div className={styles.payIcon}><Globe size={24} /></div>
-                     <div className={styles.payInfo}>
-                       <h4>International Payment (Card)</h4>
-                       <span>You will receive a secure Stripe payment link via email after confirming your order.</span>
+                <div 
+                   className={`${styles.paymentOption} ${paymentMethod === 'razorpay_qr' ? styles.paymentOptionActive : ''}`}
+                   onClick={() => setPaymentMethod('razorpay_qr')}
+                >
+                   <div className={styles.payIcon}><QrCode size={24} /></div>
+                   <div className={styles.payInfo}>
+                     <h4>Pay via QR Code (UPI)</h4>
+                     <span>Scan and pay securely using any UPI app.</span>
+                   </div>
+                   {paymentMethod === 'razorpay_qr' && (
+                     <div className={styles.activeCheck}>
+                       <ShieldAlert size={16} color="#48bb78" /> Selected
                      </div>
-                     {paymentMethod === 'international_card' && (
-                       <div className={styles.activeCheck}>
-                         <ShieldAlert size={16} color="#48bb78" /> Selected
-                       </div>
-                     )}
-                  </div>
-                ) : (
-                  <>
-                  <div 
-                     className={`${styles.paymentOptionDisabled}`}
-                     style={{ opacity: 0.7, cursor: 'not-allowed', position: 'relative' }}
-                  >
-                     <div className={styles.payIcon}><Wallet size={24} /></div>
-                     <div className={styles.payInfo}>
-                       <h4>Pre Online Payment (UPI)</h4>
-                       <span>Temporarily disabled for maintenance. Please use COD.</span>
-                     </div>
-                     <div className={styles.offlineTag}>
-                       MAINTENANCE
-                     </div>
-                  </div>
+                   )}
+                </div>
 
-                  <div 
-                     className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
-                     onClick={() => setPaymentMethod('cod')}
-                  >
-                     <div className={styles.payIcon}><Banknote size={24} /></div>
-                     <div className={styles.payInfo}>
-                       <h4>Cash on Delivery (COD)</h4>
-                       <span>Pay at your doorstep with Cash or UPI</span>
+                <div 
+                   className={`${styles.paymentOption} ${paymentMethod === 'razorpay_link' ? styles.paymentOptionActive : ''}`}
+                   onClick={() => setPaymentMethod('razorpay_link')}
+                >
+                   <div className={styles.payIcon}><Globe size={24} /></div>
+                   <div className={styles.payInfo}>
+                     <h4>Pay via Payment Link</h4>
+                     <span>You will be redirected to a secure payment gateway.</span>
+                   </div>
+                   {paymentMethod === 'razorpay_link' && (
+                     <div className={styles.activeCheck}>
+                       <ShieldAlert size={16} color="#48bb78" /> Selected
                      </div>
-                     {paymentMethod === 'cod' && (
-                       <div className={styles.activeCheck}>
-                         <ShieldAlert size={16} color="#48bb78" /> Selected
-                       </div>
-                     )}
-                  </div>
-                  </>
-                )}
+                   )}
+                </div>
+
+                <div 
+                   className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
+                   onClick={() => setPaymentMethod('cod')}
+                >
+                   <div className={styles.payIcon}><Banknote size={24} /></div>
+                   <div className={styles.payInfo}>
+                     <h4>Cash on Delivery (COD)</h4>
+                     <span>Pay at your doorstep with Cash or UPI</span>
+                   </div>
+                   {paymentMethod === 'cod' && (
+                     <div className={styles.activeCheck}>
+                       <ShieldAlert size={16} color="#48bb78" /> Selected
+                     </div>
+                   )}
+                </div>
               </div>
             </>
           ) : (
             <>
               <div className={styles.paymentHeader}>
                 <button type="button" onClick={() => setStep('payment')} className={styles.backToShippingBtn}>
-                  <ChevronLeft size={16} /> Returns to Payment Selection
+                  <ChevronLeft size={16} /> Change Payment Method
                 </button>
-                <h2>Verify UPI Payment</h2>
+                <h2>Scan QR to Pay</h2>
               </div>
               <div style={{ padding: '1.5rem', background: 'rgba(var(--foreground-rgb), 0.02)', borderRadius: '12px', border: '1px solid var(--color-border)', textAlign: 'center' }}>
                 <p style={{ marginBottom: '15px', fontSize: '1rem', color: 'var(--color-text)' }}>
-                  Please transfer exactly <strong style={{color: 'var(--color-primary)', fontSize: '1.2rem'}}>{renderPrice(total)}</strong> to proceed.
+                  Scan this code with any UPI app to pay <strong style={{color: 'var(--color-primary)', fontSize: '1.2rem'}}>{renderPrice(total)}</strong>.
                 </p>
                 
-                <div style={{ background: 'var(--color-foreground)', padding: '1rem', borderRadius: '12px', display: 'inline-block', marginBottom: '1.5rem' }}>
-                   <img 
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980105971@YBL&pn=DualDeer&am=${total.toFixed(2)}&tr=${upiTr}&mc=0000&cu=INR`} 
-                      alt="UPI QR Code" 
-                      style={{ width: '200px', height: '200px' }}
-                   />
+                <div style={{ background: 'var(--color-foreground)', padding: '1rem', borderRadius: '12px', display: 'inline-block', marginBottom: '1.5rem', position: 'relative' }}>
+                   {qrTimeLeft === '00:00' ? (
+                     <div style={{ width: '200px', height: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', borderRadius: '8px' }}>
+                        <span style={{ color: 'red', fontWeight: 'bold' }}>QR Expired</span>
+                        <button onClick={() => setStep('payment')} style={{ marginTop: '10px', padding: '5px 10px', cursor: 'pointer' }}>Go Back</button>
+                     </div>
+                   ) : (
+                     <div style={{ 
+                        width: '200px', 
+                        height: '200px', 
+                        overflow: 'hidden', 
+                        borderRadius: '8px',
+                        background: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                     }}>
+                       <img 
+                          src={qrCodeUrl} 
+                          alt="Razorpay UPI QR Code" 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%',
+                            transform: 'scale(1.65)', // Crops the Razorpay borders perfectly!
+                            transformOrigin: 'center center',
+                            maxWidth: 'none'
+                          }}
+                       />
+                     </div>
+                   )}
                 </div>
                 
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <p style={{ fontSize: '0.9rem', color: '#888', marginBottom: '8px' }}>Or pay using UPI ID directly:</p>
-                  <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: 'var(--color-primary)', letterSpacing: '1px' }}>
-                    7980105971@YBL
+                  <p style={{ fontSize: '0.9rem', color: '#888', marginBottom: '8px' }}>Expires in:</p>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: qrTimeLeft === '00:00' ? 'red' : 'var(--color-primary)', letterSpacing: '1px' }}>
+                    {qrTimeLeft}
                   </div>
                 </div>
 
-                <a 
-                   href={`upi://pay?pa=7980105971@YBL&pn=DualDeer&am=${total.toFixed(2)}&tr=${upiTr}&mc=0000&cu=INR`}
-                   className={styles.submitBtn} 
-                   style={{ marginBottom: '2rem', display: 'flex', textDecoration: 'none', justifyContent: 'center' }}
-                >
-                   Tap to Pay with UPI App
-                </a>
-
-                <div className={styles.formGroup} style={{ textAlign: 'left' }}>
-                  <label>12-Digit Transaction ID (UTR)</label>
-                  <input 
-                    type="text" 
-                    className={styles.input} 
-                    required
-                    placeholder="e.g. 234567890123" 
-                    value={utrNumber} 
-                    onChange={e => setUtrNumber(e.target.value)} 
-                  />
-                  <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '8px' }}>
-                    * Enter the UTR number from your payment app after successful transfer.
-                  </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#888', fontSize: '0.85rem' }}>
+                   <div className="spinner" style={{ width: '16px', height: '16px', border: '2px solid rgba(0,0,0,0.1)', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                   Awaiting Payment Confirmation...
                 </div>
               </div>
             </>
@@ -537,15 +622,15 @@ function CheckoutEngine() {
             </button>
           ) : step === 'payment' ? (
             <button 
-              onClick={() => paymentMethod === 'upi' ? setStep('upi-verification') : handleSubmitOrder()} 
+              onClick={() => handleSubmitOrder()} 
               disabled={isSubmitting} 
               className={styles.submitBtn}
             >
-              {paymentMethod === 'upi' ? <>Pay {renderPrice(total)} Now</> : paymentMethod === 'international_card' ? <><Globe size={16} style={{marginRight: '8px'}} /> Request Payment Link</> : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
+              {isSubmitting ? 'Processing...' : paymentMethod === 'razorpay_qr' ? <><QrCode size={16} style={{marginRight: '8px'}} /> Generate QR Code</> : paymentMethod === 'razorpay_link' ? <><Globe size={16} style={{marginRight: '8px'}} /> Request Payment Link</> : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
             </button>
           ) : (
-            <button onClick={handleSubmitOrder} disabled={isSubmitting || !utrNumber || utrNumber.length < 5} className={styles.submitBtn}>
-              {isSubmitting ? 'Processing...' : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Payment & Order</>}
+            <button disabled className={styles.submitBtn} style={{ opacity: 0.7, cursor: 'not-allowed' }}>
+              <Lock size={16} style={{marginRight: '8px'}} /> Waiting for scan...
             </button>
           )}
         </aside>
