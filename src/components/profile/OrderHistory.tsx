@@ -24,8 +24,7 @@ export default function OrderHistory({ user }: { user: any }) {
     const q = query(collection(db, 'orders'), where('userId', '==', user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const userOrders = snapshot.docs
-        .map(doc => ({ id: doc.id, ...doc.data() } as Order))
-        .filter(order => order.status !== 'draft');
+        .map(doc => ({ id: doc.id, ...doc.data() } as Order));
       const sorted = userOrders.sort((a, b) => {
         const timeA = a.createdAt && (a.createdAt as any).toMillis ? (a.createdAt as any).toMillis() : typeof a.createdAt === 'number' ? a.createdAt : 0;
         const timeB = b.createdAt && (b.createdAt as any).toMillis ? (b.createdAt as any).toMillis() : typeof b.createdAt === 'number' ? b.createdAt : 0;
