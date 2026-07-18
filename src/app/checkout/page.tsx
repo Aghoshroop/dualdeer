@@ -38,7 +38,7 @@ function CheckoutEngine() {
   const [qrExpiresAt, setQrExpiresAt] = useState<number | null>(null);
   const [qrTimeLeft, setQrTimeLeft] = useState('15:00');
   const [createdOrderId, setCreatedOrderId] = useState('');
-  
+  const [showCodModal, setShowCodModal] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
   // Timer Effect
@@ -169,6 +169,12 @@ function CheckoutEngine() {
   const tax = taxableAmount * taxRate;
   const shipping = subtotal > 0 ? (isIndia ? 0 : 20 * conversionRate) : 0;
   const total = taxableAmount + tax + shipping;
+
+  useEffect(() => {
+    if (total < 1500 && paymentMethod === 'cod') {
+      setPaymentMethod(currency === 'USD' ? 'razorpay_link' : 'razorpay_qr');
+    }
+  }, [total, paymentMethod, currency]);
 
   const [checkoutInitiated, setCheckoutInitiated] = useState(false);
 
@@ -371,6 +377,69 @@ function CheckoutEngine() {
     );
   }
 
+  const paymentMethodsBlock = (
+    <div className={styles.paymentMethods}>
+      <div 
+         className={`${styles.paymentOption} ${paymentMethod === 'razorpay_qr' ? styles.paymentOptionActive : ''}`}
+         onClick={() => setPaymentMethod('razorpay_qr')}
+      >
+         <div className={styles.payIcon}><QrCode size={20} /></div>
+         <div className={styles.payInfo}>
+           <h4 style={{ fontSize: '0.85rem' }}>Pay via QR Code (UPI)</h4>
+         </div>
+         {paymentMethod === 'razorpay_qr' && (
+           <div className={styles.activeCheck}>
+             <ShieldAlert size={14} color="#48bb78" />
+           </div>
+         )}
+      </div>
+
+      <div 
+         className={`${styles.paymentOption} ${paymentMethod === 'razorpay_link' ? styles.paymentOptionActive : ''}`}
+         onClick={() => setPaymentMethod('razorpay_link')}
+      >
+         <div className={styles.payIcon}><Globe size={20} /></div>
+         <div className={styles.payInfo}>
+           <h4 style={{ fontSize: '0.85rem' }}>Pay via Payment Link</h4>
+         </div>
+         {paymentMethod === 'razorpay_link' && (
+           <div className={styles.activeCheck}>
+             <ShieldAlert size={14} color="#48bb78" />
+           </div>
+         )}
+      </div>
+
+      {total >= 1500 ? (
+        <div 
+           className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
+           onClick={() => setPaymentMethod('cod')}
+        >
+           <div className={styles.payIcon}><Banknote size={20} /></div>
+           <div className={styles.payInfo}>
+             <h4 style={{ fontSize: '0.85rem' }}>Cash on Delivery (COD)</h4>
+           </div>
+           {paymentMethod === 'cod' && (
+             <div className={styles.activeCheck}>
+               <ShieldAlert size={14} color="#48bb78" />
+             </div>
+           )}
+        </div>
+      ) : (
+        <div 
+           className={`${styles.paymentOption}`}
+           style={{ opacity: 0.5, cursor: 'not-allowed' }}
+           onClick={() => setShowCodModal(true)}
+        >
+           <div className={styles.payIcon}><Banknote size={20} /></div>
+           <div className={styles.payInfo}>
+             <h4 style={{ fontSize: '0.85rem' }}>Cash on Delivery</h4>
+             <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem' }}>Min order {renderPrice(1500)}</span>
+           </div>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className={styles.page}>
       <button 
@@ -381,7 +450,9 @@ function CheckoutEngine() {
         <ChevronLeft size={20} /> Back to Arsenal
       </button>
 
-      <h1 className={styles.title}>Secure Checkout</h1>
+      <div className={styles.headerContainer}>
+        <h1 className={styles.title}><Lock size={24} style={{ marginRight: '10px', verticalAlign: 'text-bottom' }}/> Secure Checkout</h1>
+      </div>
       
       <div className={styles.container}>
         
@@ -389,105 +460,81 @@ function CheckoutEngine() {
         <section className={styles.formSection}>
           {step === 'shipping' ? (
             <>
-              <h2>Delivery Coordinates</h2>
               <form id="checkout-form" onSubmit={handleProceedToPayment} className={styles.formGrid}>
-                <div className={styles.formGroup}>
-                  <label>Full Name</label>
-                  <input type="text" className={styles.input} required placeholder="John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                
+                <div style={{ gridColumn: '1 / -1', marginTop: '0.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 500, margin: 0 }}>Contact Information</h3>
                 </div>
-            <div className={styles.formGroup}>
-              <label>Contact Email</label>
-              <input type="email" className={styles.input} required placeholder="john@example.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-            </div>
-            
-            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-              <label>Shipping Address</label>
-              <input type="text" className={styles.input} required placeholder="123 Luxury Ave, Apt 4B" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
-            </div>
-            
-            <div className={styles.formGroup}>
-              <label>City</label>
-              <input type="text" className={styles.input} required placeholder="New York" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} />
-            </div>
-            <div className={styles.formGroup}>
-              <label>Zip / Postal Code</label>
-              <input type="text" className={styles.input} required placeholder="10001" value={formData.zip} onChange={e => setFormData({...formData, zip: e.target.value})} />
-            </div>
+                
+                <div className={styles.formGroup}>
+                  <label>Email Address</label>
+                  <input type="email" className={styles.input} required placeholder=" " value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Phone Number</label>
+                  <input type="tel" className={styles.input} required placeholder=" " value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                </div>
 
-            <div className={styles.formGroup}>
-              <label>Country</label>
-              <input type="text" className={styles.input} required placeholder="United States" value={formData.country} onChange={e => setFormData({...formData, country: e.target.value})} />
-            </div>
+                <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 500, margin: 0 }}>Shipping Address</h3>
+                </div>
 
-            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-              <label>Phone Number</label>
-              <input type="tel" className={styles.input} required placeholder="+1 (555) 000-0000" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-            </div>
-          </form>
+                <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                  <label>Full Name</label>
+                  <input type="text" className={styles.input} required placeholder=" " value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                </div>
+                
+                <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                  <label>Street Address</label>
+                  <input type="text" className={styles.input} required placeholder=" " value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <label>City</label>
+                  <input type="text" className={styles.input} required placeholder=" " value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Zip / Postal Code</label>
+                  <input type="text" className={styles.input} required placeholder=" " value={formData.zip} onChange={e => setFormData({...formData, zip: e.target.value})} />
+                </div>
+
+                <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                  <label>Country</label>
+                  <input type="text" className={styles.input} required placeholder=" " value={formData.country} onChange={e => setFormData({...formData, country: e.target.value})} />
+                </div>
+              </form>
+              <button form="checkout-form" type="submit" className={styles.submitBtn} style={{ marginTop: '2rem' }}>
+                Proceed to Payment
+              </button>
             </>
           ) : step === 'payment' ? (
             <>
               <div className={styles.paymentHeader}>
-                <button type="button" onClick={() => setStep('shipping')} className={styles.backToShippingBtn}>
-                  <ChevronLeft size={16} /> Returns to Shipping
-                </button>
-                <h2>Secure Payment Portal</h2>
+                <h2>Payment</h2>
               </div>
-              <div className={styles.paymentMethods}>
-                <div 
-                   className={`${styles.paymentOption} ${paymentMethod === 'razorpay_qr' ? styles.paymentOptionActive : ''}`}
-                   onClick={() => setPaymentMethod('razorpay_qr')}
-                >
-                   <div className={styles.payIcon}><QrCode size={24} /></div>
-                   <div className={styles.payInfo}>
-                     <h4>Pay via QR Code (UPI)</h4>
-                     <span>Scan and pay securely using any UPI app.</span>
-                   </div>
-                   {paymentMethod === 'razorpay_qr' && (
-                     <div className={styles.activeCheck}>
-                       <ShieldAlert size={16} color="#48bb78" /> Selected
-                     </div>
-                   )}
+              <div className={styles.confirmedBox}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>Deliver to:</p>
+                    <p style={{ fontSize: '0.95rem', fontWeight: 500, margin: '4px 0 0 0' }}>{formData.name}</p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text)', margin: '2px 0 0 0', lineHeight: 1.4 }}>
+                      {formData.address}, {formData.city}, {formData.zip}
+                    </p>
+                  </div>
+                  <button type="button" onClick={() => setStep('shipping')} style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 500 }}>
+                    Change
+                  </button>
                 </div>
-
-                <div 
-                   className={`${styles.paymentOption} ${paymentMethod === 'razorpay_link' ? styles.paymentOptionActive : ''}`}
-                   onClick={() => setPaymentMethod('razorpay_link')}
-                >
-                   <div className={styles.payIcon}><Globe size={24} /></div>
-                   <div className={styles.payInfo}>
-                     <h4>Pay via Payment Link</h4>
-                     <span>You will be redirected to a secure payment gateway.</span>
-                   </div>
-                   {paymentMethod === 'razorpay_link' && (
-                     <div className={styles.activeCheck}>
-                       <ShieldAlert size={16} color="#48bb78" /> Selected
-                     </div>
-                   )}
-                </div>
-
-                <div 
-                   className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
-                   onClick={() => setPaymentMethod('cod')}
-                >
-                   <div className={styles.payIcon}><Banknote size={24} /></div>
-                   <div className={styles.payInfo}>
-                     <h4>Cash on Delivery (COD)</h4>
-                     <span>Pay at your doorstep with Cash or UPI</span>
-                   </div>
-                   {paymentMethod === 'cod' && (
-                     <div className={styles.activeCheck}>
-                       <ShieldAlert size={16} color="#48bb78" /> Selected
-                     </div>
-                   )}
-                </div>
+              </div>
+              <div className={styles.desktopPaymentWrapper}>
+                {paymentMethodsBlock}
               </div>
             </>
-          ) : (
+          ) : step === 'qr-payment' ? (
             <>
               <div className={styles.paymentHeader}>
-                <button type="button" onClick={() => setStep('payment')} className={styles.backToShippingBtn}>
-                  <ChevronLeft size={16} /> Change Payment Method
+                <button type="button" onClick={() => setStep('shipping')} className={styles.backToShippingBtn}>
+                  <ChevronLeft size={16} /> Cancel Payment
                 </button>
                 <h2>Scan QR to Pay</h2>
               </div>
@@ -500,7 +547,7 @@ function CheckoutEngine() {
                    {qrTimeLeft === '00:00' ? (
                      <div style={{ width: '200px', height: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', borderRadius: '8px' }}>
                         <span style={{ color: 'red', fontWeight: 'bold' }}>QR Expired</span>
-                        <button onClick={() => setStep('payment')} style={{ marginTop: '10px', padding: '5px 10px', cursor: 'pointer' }}>Go Back</button>
+                        <button onClick={() => setStep('shipping')} style={{ marginTop: '10px', padding: '5px 10px', cursor: 'pointer' }}>Go Back</button>
                      </div>
                    ) : (
                      <div style={{ 
@@ -541,20 +588,24 @@ function CheckoutEngine() {
                 </div>
               </div>
             </>
-          )}
+          ) : null}
         </section>
 
         {/* Right Summary Wrapper */}
-        <aside className={styles.summarySection}>
-          <h2>Order Manifest {buyNowId && <span style={{ fontSize: '0.8rem', opacity: 0.5, marginLeft: '1rem' }}>(Direct Checkout)</span>}</h2>
+        <aside className={`${styles.summarySection} ${step === 'shipping' ? styles.hideOnMobile : ''}`}>
+          <div className={step === 'shipping' ? styles.hideOnMobile : ''}>
+            <h2>Order Manifest {buyNowId && <span style={{ fontSize: '0.8rem', opacity: 0.5, marginLeft: '1rem' }}>(Direct Checkout)</span>}</h2>
           
           <div className={styles.cartItems}>
             {activeItems.map((item: any, idx: number) => (
               <div key={`${item.id}-${item.size}-${idx}`} className={styles.item}>
-                <img src={item.image} alt={item.name} className={styles.itemImage} />
+                <div className={styles.itemImageWrapper}>
+                  <img src={item.image} alt={item.name} className={styles.itemImage} />
+                  <div className={styles.itemQuantityBadge}>{item.quantity}</div>
+                </div>
                 <div className={styles.itemInfo}>
                   <span className={styles.itemName}>{item.name}</span>
-                  <span className={styles.itemMeta}>Size: {item.size} | Qty: {item.quantity}</span>
+                  <span className={styles.itemMeta}>{item.size}</span>
                 </div>
                 <span className={styles.itemPrice}>{renderPrice(item.price * item.quantity)}</span>
               </div>
@@ -584,7 +635,7 @@ function CheckoutEngine() {
             {couponError && <p className={styles.couponError}>{couponError}</p>}
           </div>
 
-          <div className={styles.totals}>
+           <div className={styles.totals}>
              <div className={styles.summaryRow}>
                <span>Subtotal</span>
                <span>{renderPrice(subtotal)}</span>
@@ -619,13 +670,16 @@ function CheckoutEngine() {
                <span>Total</span>
                <span>{renderPrice(total)}</span>
              </div>
+            </div>
           </div>
 
-          {step === 'shipping' ? (
-            <button form="checkout-form" type="submit" className={styles.submitBtn}>
-              Proceed to Payment
-            </button>
-          ) : step === 'payment' ? (
+           {step === 'payment' && (
+             <div className={styles.mobilePaymentWrapper}>
+                {paymentMethodsBlock}
+             </div>
+           )}
+
+           {step === 'payment' ? (
             <button 
               onClick={() => handleSubmitOrder()} 
               disabled={isSubmitting} 
@@ -633,14 +687,83 @@ function CheckoutEngine() {
             >
               {isSubmitting ? 'Processing...' : paymentMethod === 'razorpay_qr' ? <><QrCode size={16} style={{marginRight: '8px'}} /> Generate QR Code</> : paymentMethod === 'razorpay_link' ? <><Globe size={16} style={{marginRight: '8px'}} /> Request Payment Link</> : <><Lock size={16} style={{marginRight: '8px'}} /> Confirm Order</>}
             </button>
-          ) : (
+          ) : step === 'qr-payment' ? (
             <button disabled className={styles.submitBtn} style={{ opacity: 0.7, cursor: 'not-allowed' }}>
               <Lock size={16} style={{marginRight: '8px'}} /> Waiting for scan...
             </button>
-          )}
+          ) : null}
+
+          <div className={`${styles.trustBadges} ${step === 'shipping' ? styles.hideOnMobile : ''}`}>
+            <div className={styles.trustBadgeItem}>
+              <ShieldAlert size={14} /> 256-bit SSL
+            </div>
+            <div className={styles.trustBadgeItem}>
+              <Lock size={14} /> Secure Checkout
+            </div>
+          </div>
         </aside>
 
       </div>
+
+      {/* COD Upsell Modal */}
+      {showCodModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'var(--color-surface)', 
+            color: 'var(--color-text)',
+            padding: '2.5rem', 
+            borderRadius: '16px', 
+            maxWidth: '450px',
+            textAlign: 'center',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+            position: 'relative',
+            border: '1px solid var(--color-border)'
+          }}>
+            <button 
+               onClick={() => setShowCodModal(false)}
+               style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--color-text-muted)' }}
+            >
+              ✕
+            </button>
+            <Banknote size={48} style={{ color: '#2563eb', margin: '0 auto 1.5rem auto' }} />
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 600, marginBottom: '1rem' }}>
+              Unlock Cash on Delivery!
+            </h2>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', lineHeight: 1.5, marginBottom: '2rem' }}>
+              You're only <strong style={{ color: '#2563eb', fontSize: '1.1rem' }}>{renderPrice(1500 - total)}</strong> away from unlocking our Cash on Delivery option! Treat yourself to something extra and pay right at your doorstep.
+            </p>
+            <button 
+              onClick={() => {
+                setShowCodModal(false);
+                router.push('/shop');
+              }}
+              style={{
+                width: '100%', padding: '1rem', background: '#2563eb', color: '#fff',
+                border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 600,
+                cursor: 'pointer', marginBottom: '1rem', transition: 'background 0.2s'
+              }}
+            >
+              Add More Products
+            </button>
+            <button 
+              onClick={() => setShowCodModal(false)}
+              style={{
+                width: '100%', padding: '1rem', background: 'transparent', color: 'var(--color-text)',
+                border: '1px solid var(--color-border)', borderRadius: '8px', fontSize: '1rem', fontWeight: 600,
+                cursor: 'pointer', transition: 'background 0.2s'
+              }}
+            >
+              No thanks, I'll pay online
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

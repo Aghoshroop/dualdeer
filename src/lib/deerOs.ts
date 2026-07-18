@@ -84,6 +84,11 @@ export class IntentEngine {
   static detect(message: string): Intent {
     const raw = message.toLowerCase();
     
+    // Abstract concepts that map to product search
+    if (raw.match(/\b(fast|cool|summer|winter|heavy|light|aerodynamic|breathable|sweat|warm|cold|stealth|ninja)\b/)) {
+        return "product_search";
+    }
+
     if (raw.match(/\b(buy|shop|looking for|recommend|price|cost|gear|shirt|tshirt|suit|speedsuit|pants|shorts)\b/)) {
         return "product_search";
     }
@@ -113,24 +118,24 @@ export class IntentEngine {
 // -------------------------------------------------------------
 export const SITE_KNOWLEDGE = [
   {
-    keywords: ["shipping", "delivery", "track", "arrive", "ship", "deliver"],
-    answer: "We offer complimentary express shipping on all orders across India. Your performance gear is processed immediately for fast delivery."
+    keywords: ["shipping", "delivery", "track", "arrive", "ship", "deliver", "how long"],
+    answer: "We offer complimentary express shipping on all orders across India. Your performance gear is processed immediately and typically arrives within 2-4 business days."
   },
   {
-    keywords: ["return", "refund", "exchange", "back"],
-    answer: "We offer hassle-free complimentary returns and exchanges. If your gear doesn't fit perfectly, we've got you covered."
+    keywords: ["return", "refund", "exchange", "back", "didn't fit"],
+    answer: "We offer hassle-free complimentary returns and exchanges within 14 days. If your gear doesn't fit perfectly, we've got you covered."
   },
   {
     keywords: ["what is dualdeer", "about dualdeer", "brand", "who are you guys", "story", "dual deer"],
-    answer: "DualDeer is a premium luxury athleisure and high-performance activewear brand. We engineer gear for elite training, gym, and street-ready aesthetics."
+    answer: "DualDeer is India's premier luxury athleisure and high-performance activewear brand. We engineer gear for elite training, marathon running, gym, and street-ready aesthetics."
   },
   {
-    keywords: ["speedsuit", "speed suit", "what is a speedsuit"],
-    answer: "The SpeedSuit is our signature high-performance compression wear. It's engineered for aerodynamics, muscle support, and ultimate comfort during intense training."
+    keywords: ["speedsuit", "speed suit", "what is a speedsuit", "running suit", "sprint"],
+    answer: "The SpeedSuit is our signature high-performance compression wear. It's engineered for aerodynamics, reducing drag by 14%, muscle support, and ultimate comfort during intense training or races."
   },
   {
     keywords: ["contact", "support", "help", "email", "talk to human", "customer service"],
-    answer: "You can reach our support team right here in this chat, or email us. We're always monitoring and ready to assist you."
+    answer: "You can reach our support team right here in this chat, or email us at support@dualdeer.com. We're always monitoring and ready to assist you."
   },
   {
     keywords: ["men", "mens", "male", "guy", "boy"],
@@ -141,24 +146,24 @@ export const SITE_KNOWLEDGE = [
     answer: "Our Women's collection features luxury activewear and performance gear designed for perfection. Type 'show me womens gear' to explore."
   },
   {
-    keywords: ["size", "sizing", "fit", "chart", "measure"],
-    answer: "Our gear is designed with an athletic, tailored fit. If you prefer a looser fit, we recommend sizing up. All our SpeedSuits offer high-stretch compression."
+    keywords: ["size", "sizing", "fit", "chart", "measure", "too big", "too small"],
+    answer: "Our gear is designed with an athletic, tailored fit. If you prefer a looser fit, we recommend sizing up. All our SpeedSuits offer high-stretch compression (they will feel tight at first, which is intended)."
   },
   {
-    keywords: ["material", "fabric", "quality", "made of", "wash", "care"],
-    answer: "We use premium, moisture-wicking, high-stretch fabrics designed for both luxury feel and elite performance. Wash them cold to maintain the premium texture."
+    keywords: ["material", "fabric", "quality", "made of", "wash", "care", "washing"],
+    answer: "We use proprietary premium, moisture-wicking, high-stretch fabrics (Nylon-Elastane blends) designed for luxury feel and elite performance. Always machine wash cold inside out, and hang dry."
   },
   {
-    keywords: ["where", "location", "based", "india", "country"],
-    answer: "DualDeer provides premium SpeedSuits and activewear across India, delivering luxury performance gear right to your doorstep."
+    keywords: ["where", "location", "based", "india", "country", "store", "offline"],
+    answer: "DualDeer provides premium SpeedSuits and activewear exclusively online across India. We deliver luxury performance gear directly from our warehouse to your doorstep."
   },
   {
     keywords: ["discount", "coupon", "sale", "promo", "code", "offer"],
-    answer: "We occasionally run exclusive drops and promotions. Keep an eye on our homepage or sign up for our newsletter to get early access to our luxury sales!"
+    answer: "We occasionally run exclusive drops and promotions. Keep an eye on our homepage or sign up for our newsletter to get early access to our luxury sales and 10% off!"
   },
   {
     keywords: ["payment", "pay", "cod", "cash on delivery", "card", "upi"],
-    answer: "We accept all major secure payment methods including UPI, Credit/Debit cards, and Net Banking to ensure a smooth checkout experience."
+    answer: "We accept all major secure payment methods including UPI, Credit/Debit cards, Net Banking, and Wallet apps. Cash on Delivery is available for eligible pin codes."
   },
   {
     keywords: ["owner", "founder", "ceo", "who made", "creator"],
@@ -174,19 +179,39 @@ export const SITE_KNOWLEDGE = [
   },
   {
     keywords: ["compression", "tight", "muscle support", "aerodynamic"],
-    answer: "Our compression wear (including the signature SpeedSuit) is engineered for muscle support, improved blood flow, aerodynamics, and sweat wicking. It's built for high-intensity training."
+    answer: "Our compression wear (including the signature SpeedSuit) is engineered for muscle support, improved blood flow, aerodynamics, and sweat wicking. It's built for high-intensity training and recovery."
   },
   {
     keywords: ["newsletter", "subscribe", "10%", "discount", "welcome"],
-    answer: "You can sign up for our newsletter to receive 10% off your first order and get early access to our exclusive luxury drops!"
+    answer: "You can sign up for our newsletter at the bottom of the page to receive 10% off your first order and get early access to our exclusive luxury drops!"
   },
   {
     keywords: ["who are you", "what are you", "ai", "bot"],
-    answer: "I'm Deer, your DualDeer Concierge AI. I'm engineered to know everything about our luxury activewear, help you find the perfect fit, and assist with any questions you have."
+    answer: "I'm Deer, your DualDeer Concierge AI. I'm a highly advanced, locally trained system engineered to know everything about our luxury activewear, help you find the perfect fit, and assist with any questions."
   },
   {
     keywords: ["how to navigate", "menu", "find things", "where is"],
     answer: "You can explore our collections via the top navigation bar (or the bottom dock on mobile). The User icon takes you to your account, and the Bag icon opens your cart."
+  },
+  {
+    keywords: ["sweat", "breathable", "hot", "summer", "heat"],
+    answer: "All our activewear features advanced moisture-wicking technology. For intense heat, I highly recommend our Logic Vests and SpeedSuits—they pull sweat away from the skin and dry instantly."
+  },
+  {
+    keywords: ["cold", "winter", "warm", "heavy", "layer"],
+    answer: "For colder climates, our heavy-weight tracksuits and thermal compression layers provide incredible insulation without sacrificing mobility."
+  },
+  {
+    keywords: ["warranty", "guarantee", "broken", "tear"],
+    answer: "We stand by our quality. If your gear arrives with a manufacturing defect, let us know within 7 days and we will replace it immediately, no questions asked."
+  },
+  {
+    keywords: ["gift", "card", "present"],
+    answer: "DualDeer gear makes the perfect gift for high performers. While we don't have digital gift cards yet, you can order directly to their address!"
+  },
+  {
+    keywords: ["color", "fade", "black", "white"],
+    answer: "Our fabrics are treated to retain their deep colors, especially our Stealth Blacks. Follow the care instructions (wash cold, no bleach) and they will never fade."
   }
 ];
 
@@ -333,26 +358,43 @@ export interface ScoredProduct extends Product {
 export class ProductEngine {
   static getTopMatches(query: string, products: Product[], userPrefs: string[] = []): ScoredProduct[] {
      const q = query.toLowerCase();
+     
+     // 1. Abstract Reasoning / Intent Mapping
+     let mappedQuery = q;
+     if (q.includes("fast") || q.includes("aerodynamic") || q.includes("speed")) mappedQuery += " speedsuit";
+     if (q.includes("cool") || q.includes("summer") || q.includes("sweat") || q.includes("breathable")) mappedQuery += " shirt shorts vest";
+     if (q.includes("winter") || q.includes("warm") || q.includes("heavy") || q.includes("cold")) mappedQuery += " hoodie jacket tracksuit";
+     if (q.includes("stealth") || q.includes("ninja") || q.includes("dark")) mappedQuery += " black";
+     if (q.includes("gym") || q.includes("train") || q.includes("lift")) mappedQuery += " shirt short compression";
+     
+     // 2. Scoring Logic
      const results = products.map(p => {
          let score = 0;
 
-         if (q.includes(p.category.toLowerCase())) score += 4;
-         if (p.colors?.some(c => q.includes(c.toLowerCase()))) score += 2;
+         // Category match (boosted)
+         if (mappedQuery.includes(p.category.toLowerCase())) score += 8;
          
-         const words = q.split(' ');
+         // Color match
+         if (p.colors?.some(c => mappedQuery.includes(c.toLowerCase()))) score += 4;
+         
+         // Name matching
+         const words = mappedQuery.split(' ');
          const nameLower = p.name.toLowerCase();
-         if (words.some(w => w.length > 3 && nameLower.includes(w))) score += 8;
+         if (words.some(w => w.length > 3 && nameLower.includes(w))) score += 10;
          
+         // User preferences (long-term memory)
          userPrefs.forEach(pref => {
-            if (`${p.description} ${p.category}`.toLowerCase().includes(pref)) score += 2;
+            if (`${p.description} ${p.category}`.toLowerCase().includes(pref)) score += 3;
          });
          
+         // Quality heuristic
          score += (p.rating || 0) * 0.5;
          
          return { ...p, score };
      });
      
-     return results.filter(r => r.score > 1).sort((a,b) => b.score - a.score).slice(0,3);
+     // 3. Return top matches above a threshold
+     return results.filter(r => r.score > 2).sort((a,b) => b.score - a.score).slice(0,3);
   }
 }
 
@@ -396,11 +438,19 @@ export class ResponseEngine {
   }
 
   static constructProductResponse(products: ScoredProduct[]): string {
-     if (products.length === 0) return "I couldn't find an exact match for that right now.";
+     if (products.length === 0) return "I couldn't find an exact match for that right now in our current lineup.";
      
-     let res = "Here are my top hardware picks for you:\n";
+     const intros = [
+       "Here is the premium gear I selected for you based on those specs:",
+       "I scanned our entire vault. This is exactly what you need:",
+       "These are our top-tier performance pieces matching your request:",
+       "I found exactly what you're looking for. Check these out:"
+     ];
+     
+     let res = intros[Math.floor(Math.random() * intros.length)] + "\n";
+     
      products.forEach(p => {
-        res += `\n- ${p.name} (₹${p.price})`;
+        res += `\n- **${p.name}** (₹${p.price})`;
      });
      return res;
   }

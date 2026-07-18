@@ -641,7 +641,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      <LiveTrafficBadge />
+      {pathname !== '/checkout' && <LiveTrafficBadge />}
     </>
   );
 }

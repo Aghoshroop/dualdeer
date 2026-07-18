@@ -272,15 +272,18 @@ export default function SupportAgent() {
               {/* HEADER */}
               <div className={styles.header}>
                 <div className={styles.headerInfo}>
-                  <div className={styles.avatarWrapper}>
-                     <div className={styles.avatar}><Sparkles size={16} /></div>
-                     <div className={styles.onlineDot}></div>
-                  </div>
-                  <div>
-                    <h3 className={styles.headerTitle}>Deer AI Concierge</h3>
-                    <span className={styles.status}>Always Active</span>
+                <div className={styles.avatar}>
+                  <Sparkles size={20} />
+                  <div className={styles.onlineDot} />
+                </div>
+                <div>
+                  <h3 className={styles.headerTitle}>DualDeer Concierge</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                     <span className={styles.status}>Intelligence Active</span>
+                     <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Powered by AI</span>
                   </div>
                 </div>
+              </div>
                 <div className={styles.headerActions}>
                    <button className={styles.clearBtn} onClick={clearChat} title="Reset Chat">
                       Reset
