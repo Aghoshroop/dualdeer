@@ -648,19 +648,19 @@
 }
 
 @media (max-width: 768px) {
-  .card { height: 480px; }
-  .imageSection { height: 280px; }
+  .card { height: var(--mobile-premium-card-height, 480px); }
+  .imageSection { height: var(--mobile-premium-image-height, 280px); }
   .detailsSection { 
     padding: 30px 16px 16px; 
     mask-size: 100% 36px, 100% calc(100% - 35px);
     -webkit-mask-size: 100% 36px, 100% calc(100% - 35px);
   }
   .detailsWrapper { margin-top: -30px; }
-  .title { font-size: 1.15rem; }
+  .title { font-size: var(--mobile-premium-title-size, 1.15rem); }
   .subtitle { font-size: 0.65rem; }
-  .priceValue { font-size: 1.3rem; }
-  .feature span { font-size: 0.65rem; }
-  .feature svg { width: 14px; height: 14px; }
+  .priceValue { font-size: var(--mobile-premium-price-size, 1.3rem); }
+  .feature span { font-size: var(--mobile-premium-feature-size, 0.65rem); }
+  .feature svg { width: var(--mobile-premium-feature-icon, 14px); height: var(--mobile-premium-feature-icon, 14px); }
   .sidebar { top: 90px; }
   .pageNumber { font-size: 1rem; }
 }
@@ -668,7 +668,7 @@
 @media (max-width: 480px) {
   /* COMPLETE MOBILE REBUILD - FIXED LAYOUT ARCHITECTURE */
   .card {
-    height: 315px;
+    height: var(--mobile-premium-card-height, 315px);
     border-radius: 12px;
     background: #ffffff;
     border: 1px solid rgba(224, 203, 142, 0.25);
@@ -681,7 +681,7 @@
 
   /* IMAGE AREA */
   .imageSection {
-    height: 175px;
+    height: var(--mobile-premium-image-height, 175px);
     width: 100%;
     position: relative;
     flex-shrink: 0;
@@ -780,7 +780,7 @@
     margin-top: 4px;
   }
   .title { 
-    font-size: 1rem; 
+    font-size: var(--mobile-premium-title-size, 1rem); 
     white-space: normal;
     line-height: 1.2;
     max-height: 2.4em;
@@ -806,8 +806,8 @@
   }
   .thirdFeatureWrap { display: none; }
   .feature { gap: 4px; }
-  .feature span { font-size: 0.65rem; white-space: nowrap; color: #5c5a66; }
-  .feature svg { width: 12px; height: 12px; flex-shrink: 0; stroke: #a382ec; }
+  .feature span { font-size: var(--mobile-premium-feature-size, 0.65rem); white-space: nowrap; color: #5c5a66; }
+  .feature svg { width: var(--mobile-premium-feature-icon, 12px); height: var(--mobile-premium-feature-icon, 12px); flex-shrink: 0; stroke: #a382ec; }
 
   /* FOOTER AREA */
   .footerRow { 
@@ -821,13 +821,13 @@
   }
   .priceArea { align-items: flex-start; gap: 0; flex: 1; min-width: 0; }
   .priceLabel { display: block; font-size: 9px; opacity: 0.6; font-weight: 500; color: #a984f3; letter-spacing: 1px; margin-bottom: 0; }
-  .priceValue { font-size: 22px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin: 0; margin-bottom: 2px; }
+  .priceValue { font-size: var(--mobile-premium-price-size, 22px); font-weight: 800; letter-spacing: -1px; line-height: 1; margin: 0; margin-bottom: 2px; }
   .taxLabel { display: none; }
   
   .viewDetailsBtn { 
     padding: 1px;
-    width: 54px;
-    height: 24px;
+    width: var(--mobile-premium-btn-w, 54px);
+    height: var(--mobile-premium-btn-h, 24px);
     flex-shrink: 0;
     clip-path: none;
     border-radius: 12px;
@@ -840,7 +840,7 @@
   .viewDetailsBtn::before, .viewDetailsBtn::after { display: none; }
   .btnInner { 
     padding: 0 4px;
-    height: 22px;
+    height: var(--mobile-premium-btn-inner-h, 22px);
     width: 100%;
     justify-content: center;
     gap: 3px;
@@ -851,17 +851,15 @@
   .btnInner span { font-size: 0; }
   .btnInner span::after {
     content: "View";
-    font-size: 0.5rem;
+    font-size: var(--mobile-premium-btn-text, 0.5rem);
     font-weight: 700;
     letter-spacing: 0.5px;
     color: #f5d799;
   }
-  .btnInner svg { width: 9px; height: 9px; display: block; stroke: #d4af37; margin-left: 1px; }
+  .btnInner svg { width: var(--mobile-premium-btn-icon, 9px); height: var(--mobile-premium-btn-icon, 9px); display: block; stroke: #d4af37; margin-left: 1px; }
 }
 
 @media (max-width: 360px) {
-  .card { height: 320px; }
-  .imageSection { height: 200px; }
   .detailsSection { padding: 16px 8px 10px; }
   .title { font-size: 0.85rem; }
   .priceValue { font-size: 1rem; }

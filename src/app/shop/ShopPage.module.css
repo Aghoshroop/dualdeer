@@ -1184,6 +1184,31 @@
   .galleryGrid.grid-1 {
     grid-template-columns: 1fr;
     gap: 16px !important;
+    --mobile-card-height: 380px;
+    --mobile-image-height: 240px;
+    --mobile-premium-card-height: 520px;
+    --mobile-premium-image-height: 380px;
+
+    /* Scale up Premium text/buttons for massive card */
+    --mobile-premium-title-size: 1.8rem;
+    --mobile-premium-feature-size: 0.95rem;
+    --mobile-premium-feature-icon: 16px;
+    --mobile-premium-price-size: 36px;
+    --mobile-premium-btn-w: 105px;
+    --mobile-premium-btn-h: 42px;
+    --mobile-premium-btn-inner-h: 40px;
+    --mobile-premium-btn-text: 0.95rem;
+    --mobile-premium-btn-icon: 14px;
+
+    /* Scale up standard text/buttons for larger card */
+    --mobile-card-title-size: 1.35rem;
+    --mobile-card-feature-size: 0.8rem;
+    --mobile-card-feature-icon: 14px;
+    --mobile-card-price-size: 28px;
+    --mobile-card-btn-w: 80px;
+    --mobile-card-btn-h: 34px;
+    --mobile-card-btn-text: 0.75rem;
+    --mobile-card-btn-icon: 12px;
   }
   
   .galleryGrid.grid-1 .galleryCard {

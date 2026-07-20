@@ -325,26 +325,27 @@
 }
 
 @media (max-width: 768px) {
-  .card { height: 480px; }
-  .imageSection { height: 340px; }
+  .card { height: var(--mobile-card-height, 480px); }
+  .imageSection { height: var(--mobile-image-height, 340px); }
   .detailsSection { 
     padding: 30px 16px 16px; 
     mask-size: 100% 24px, 100% calc(100% - 23px);
     -webkit-mask-size: 100% 24px, 100% calc(100% - 23px);
   }
   .detailsWrapper { margin-top: -20px; }
-  .title { font-size: 1.1rem; }
+  .title { font-size: var(--mobile-card-title-size, 1.1rem); }
   .rating { font-size: 0.9rem; }
-  .price { font-size: 1.15rem; }
-  .featureItem span { font-size: 0.75rem; }
-  .featureIcon { width: 14px; height: 14px; }
-  .actionButton { padding: 0 12px; height: 32px; font-size: 0.75rem; }
+  .price { font-size: var(--mobile-card-price-size, 1.15rem); }
+  .featureItem { font-size: var(--mobile-card-feature-size, 0.75rem); }
+  .featureItem span { font-size: var(--mobile-card-feature-size, 0.75rem); }
+  .featureIcon { width: var(--mobile-card-feature-icon, 14px); height: var(--mobile-card-feature-icon, 14px); }
+  .actionButton { padding: 0 12px; height: var(--mobile-card-btn-h, 32px); font-size: var(--mobile-card-btn-text, 0.75rem); }
 }
 
 @media (max-width: 480px) {
   /* COMPLETE MOBILE REBUILD - FIXED LAYOUT ARCHITECTURE */
   .card {
-    height: 315px;
+    height: var(--mobile-card-height, 315px);
     border-radius: 12px;
     background: #ffffff;
     box-shadow: 0 4px 12px rgba(163, 130, 236, 0.08);
@@ -356,7 +357,7 @@
 
   /* IMAGE AREA */
   .imageSection {
-    height: 175px;
+    height: var(--mobile-image-height, 175px);
     width: 100%;
     position: relative;
     flex-shrink: 0;
@@ -416,7 +417,7 @@
     margin-top: 4px; 
   }
   .title { 
-    font-size: 1rem; 
+    font-size: var(--mobile-card-title-size, 1rem); 
     white-space: normal;
     line-height: 1.2;
     max-height: 2.4em;
@@ -443,9 +444,9 @@
   }
   .thirdFeatureWrap { display: none; }
   .featureDivider { display: none; }
-  .featureItem { font-size: 0.65rem; white-space: nowrap; gap: 4px; }
-  .featureItem span { font-size: 0.65rem; color: #5c5a66; }
-  .featureIcon { width: 12px; height: 12px; flex-shrink: 0; }
+  .featureItem { font-size: var(--mobile-card-feature-size, 0.65rem); white-space: nowrap; gap: 4px; }
+  .featureItem span { font-size: var(--mobile-card-feature-size, 0.65rem); color: #5c5a66; }
+  .featureIcon { width: var(--mobile-card-feature-icon, 12px); height: var(--mobile-card-feature-icon, 12px); flex-shrink: 0; }
 
   /* FOOTER AREA */
   .bottomRow { 
@@ -459,12 +460,12 @@
   }
   .priceArea { align-items: flex-start; gap: 0; flex: 1; min-width: 0; }
   .mobilePriceLabel { display: block; font-size: 9px; opacity: 0.6; font-weight: 500; color: #a984f3; letter-spacing: 1px; margin-bottom: 0; }
-  .price { font-size: 22px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin: 0; margin-bottom: 2px; color: #2a1b3d; }
+  .price { font-size: var(--mobile-card-price-size, 22px); font-weight: 800; letter-spacing: -1px; line-height: 1; margin: 0; margin-bottom: 2px; color: #2a1b3d; }
   .mobileTaxLabel { display: none; }
   
   .actionButton { 
-    width: 54px;
-    height: 24px;
+    width: var(--mobile-card-btn-w, 54px);
+    height: var(--mobile-card-btn-h, 24px);
     border-radius: 12px;
     padding: 0 4px;
     justify-content: center;
@@ -477,14 +478,14 @@
   .actionButton span { font-size: 0; }
   .actionButton span::after {
     content: "View";
-    font-size: 0.5rem;
+    font-size: var(--mobile-card-btn-text, 0.5rem);
     font-weight: 700;
     letter-spacing: 0.5px;
   }
   .actionButton svg {
     display: block;
-    width: 9px;
-    height: 9px;
+    width: var(--mobile-card-btn-icon, 9px);
+    height: var(--mobile-card-btn-icon, 9px);
     stroke: #2a1b3d;
     margin-left: 1px;
   }
