@@ -2,6 +2,7 @@ import { getProductBySlug, getProduct, getReviews } from '@/lib/firebaseUtils';
 import { serializeProduct, serializeReview } from '@/lib/serialize';
 import { redirect, permanentRedirect } from 'next/navigation';
 import ProductClient from '@/components/product/ProductClient';
+import PremiumProductDetails from '@/components/product/PremiumProductDetails';
 import type { Metadata } from 'next';
 
 export const revalidate = 60; // SSG with ISR revalidation
@@ -258,7 +259,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <ProductClient initialProduct={serializeProduct(product)} initialReviews={safeReviews} />
+      {product.isPremium ? (
+        <PremiumProductDetails product={serializeProduct(product)} reviews={safeReviews} />
+      ) : (
+        <ProductClient initialProduct={serializeProduct(product)} initialReviews={safeReviews} />
+      )}
     </>
   );
 }

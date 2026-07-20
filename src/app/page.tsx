@@ -26,6 +26,8 @@ export default function Home() {
     "priceRange": "$$$",
     "address": {
       "@type": "PostalAddress",
+      "addressLocality": "Kolkata",
+      "addressRegion": "West Bengal",
       "addressCountry": "IN"
     }
   };
@@ -59,15 +61,15 @@ export default function Home() {
       {/* Brand Manifesto - Placed lower for pacing */}
       <div style={{ marginTop: '4rem', marginBottom: '2rem' }}>
         <BrandIntroBlock
-          h1="High-Performance SpeedSuits in India | DualDeer"
-          h2="Premium Activewear & Luxury Athleisure Brand"
+          h1="The Best Gym Wear in Kolkata | DualDeer Elite"
+          h2="Premium Activewear & The World's Best Fabrics"
           image="/speedsuitgang.jpeg"
           paragraphs={[
             <React.Fragment key="1">
-              Welcome to DualDeer, the definitive destination for <Link href="/shop" style={{ textDecoration: 'underline', color: 'var(--color-text)', textUnderlineOffset: '4px', fontWeight: 500 }}>premium activewear</Link> and high-end athleisure in India. Built upon a foundation of relentless innovation and an unwavering commitment to excellence, our brand is fundamentally redefining what it means to dress for performance, featuring our signature <Link href="/shop?category=speedsuit" style={{ textDecoration: 'underline', color: 'var(--color-text)', textUnderlineOffset: '4px', fontWeight: 500 }}>SpeedSuit collection</Link>. Our meticulously crafted gym apparel and streetwear don&apos;t just follow fleeting trends; they set rigorous new standards by seamlessly blending cutting-edge fabric technology with an avant-garde aesthetic that commands attention both inside and outside the gym.
+              Welcome to DualDeer, widely recognized as the definitive destination for the <Link href="/shop" style={{ textDecoration: 'underline', color: 'var(--color-text)', textUnderlineOffset: '4px', fontWeight: 500 }}>best activewear in Kolkata</Link>. Built upon a foundation of relentless innovation and an unwavering commitment to excellence, our brand is fundamentally redefining what it means to dress for performance. Featuring our exclusive <strong>Elite Collection</strong>, our meticulously crafted gym apparel and streetwear don't just follow fleeting trends; they set rigorous new standards by seamlessly blending the world's <strong>best fabrics</strong> with an avant-garde aesthetic that commands attention both inside and outside the gym.
             </React.Fragment>,
             <React.Fragment key="2">
-              Whether you are an elite athlete training for peak physical supremacy, or a modern professional seeking sophisticated and resilient comfort for your dynamic everyday life, our advanced collections bridge the critical gap between unmatched athletic performance and unparalleled luxury contemporary style. Every single garment at DualDeer is engineered with a strict purpose. We consistently integrate proprietary moisture-wicking materials and advanced four-way stretch fabrics that move instinctively and flawlessly in tandem with your body&apos;s natural biomechanics.
+              Whether you are an elite athlete training for peak physical supremacy, or a modern professional seeking the <Link href="/shop" style={{ textDecoration: 'underline', color: 'var(--color-text)', textUnderlineOffset: '4px', fontWeight: 500 }}>best gym wears</Link> for your dynamic everyday life, our advanced collections bridge the critical gap between unmatched athletic performance and unparalleled luxury contemporary style. Every single garment at DualDeer is engineered with a strict purpose. We consistently integrate proprietary moisture-wicking materials and advanced four-way stretch fabrics that move instinctively and flawlessly in tandem with your body's natural biomechanics.
             </React.Fragment>,
             <React.Fragment key="3">
               Our signature pieces feature seamless, chafe-free construction alongside intelligent, targeted compression zones intended for superior muscle stabilization and recovery. The aerodynamic, flattering silhouettes are built exclusively for the modern discerning individual. <Link href="/speedsuit" style={{ textDecoration: 'underline', color: 'var(--color-text)', textUnderlineOffset: '4px', fontWeight: 500 }}>Discover the best SpeedSuits in India</Link> and see how we continuously redefine the extreme boundaries of intense workout gear. By deploying state-of-the-art climate control technology directly into our exclusive weaves, our garments naturally and efficiently regulate your core body temperature during the most grueling conditions.

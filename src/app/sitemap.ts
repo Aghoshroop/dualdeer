@@ -66,6 +66,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     {
+      url: 'https://dualdeer.com/best-gym-wear-kolkata',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.90,
+    },
+    {
+      url: 'https://dualdeer.com/elite-activewear-kolkata',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.90,
+    },
+    {
       url: 'https://dualdeer.com/about',
       lastModified: new Date(),
       changeFrequency: 'monthly',

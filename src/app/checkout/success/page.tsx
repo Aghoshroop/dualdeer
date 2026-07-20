@@ -12,6 +12,7 @@ import { useCart } from '@/context/CartContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import * as metaPixel from '@/lib/metaPixel';
 import styles from './Success.module.css';
+import PremiumSuccess from '@/components/checkout/PremiumSuccess';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
@@ -245,11 +246,26 @@ function CheckoutSuccessContent() {
   );
 }
 
+function CheckoutSuccessRouter() {
+  const searchParams = useSearchParams();
+  const isPremium = searchParams.get('premium') === 'true';
+
+  if (isPremium) {
+    return <PremiumSuccess />;
+  }
+
+  return (
+    <div className={styles.page}>
+      <CheckoutSuccessContent />
+    </div>
+  );
+}
+
 export default function CheckoutSuccessPage() {
   return (
-    <main className={styles.page}>
+    <main style={{ width: '100vw', minHeight: '100vh' }}>
       <Suspense fallback={<div className={styles.container}>Loading Confirmation...</div>}>
-        <CheckoutSuccessContent />
+        <CheckoutSuccessRouter />
       </Suspense>
     </main>
   );

@@ -6,6 +6,8 @@ import { useEffect, useState, useRef } from "react";
 import { getProducts, Product } from "@/lib/firebaseUtils";
 import { ProductCardSkeleton } from "@/components/ui/Skeleton";
 import { useCurrency } from "@/context/CurrencyContext";
+import PremiumProductCard from '../product/PremiumProductCard';
+import ProductCard from '../product/ProductCard';
 
 interface RelatedProductsProps {
   category: string;
@@ -76,59 +78,21 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
               <ProductCardSkeleton key={`skeleton-${i}`} />
             ))
           ) : products.map((product, i) => (
-            <Link 
-              href={`/product/${product.slug || product.id}`} 
-              key={product.id} 
-              style={{ textDecoration: 'none' }}
-            >
-              <motion.div 
-                className={styles.card}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-              >
-                <div className={styles.imageBox}>
-                  <img 
-                    src={product.image}
-                    alt={product.name}
-                    className={styles.primaryImage}
-                  />
-                  <img 
-                    src={product.images && product.images.length > 1 ? product.images[1] : product.image}
-                    alt={`${product.name} alternate`}
-                    className={styles.hoverImage}
-                  />
-                </div>
-                <div className={styles.info} style={{ padding: '0 0.5rem 0.5rem' }}>
-                  <h3 className={styles.name}>{product.name}</h3>
-                  <div className={styles.priceRow}>
-                    {product.mrp && product.price > 0 && product.mrp > product.price && (
-                      <span className={styles.mrp}>{renderPrice(product.mrp)}</span>
-                    )}
-                    <span className={styles.price}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</span>
-                  </div>
-                  <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <div style={{ display: 'flex', gap: '1px' }}>
-                      {[1, 2, 3, 4, 5].map(star => (
-                        <span 
-                          key={star} 
-                          className={styles.star}
-                          style={{ 
-                            opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
-                            fontSize: '0.85rem'
-                          }}
-                        >
-                          ★
-                        </span>
-                      ))}
-                    </div>
-                    <span style={{ fontWeight: 800, marginLeft: '2px' }}>{(product.rating || 5.0).toFixed(1)}</span>
-                    <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>(Verified)</span>
-                  </div>
-                </div>
-              </motion.div>
-            </Link>
+            product.isPremium ? (
+              <PremiumProductCard 
+                key={product.id}
+                product={product}
+                i={i}
+                renderPrice={renderPrice}
+              />
+            ) : (
+            <ProductCard
+              key={product.id}
+              product={product}
+              i={i}
+              renderPrice={renderPrice}
+            />
+            )
           ))}
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import styles from "./CustomCursor.module.css";
 
 export default function CustomCursor() {
@@ -15,6 +15,7 @@ export default function CustomCursor() {
   
   const [cursorState, setCursorState] = useState<"default" | "pointer">("default");
   const [isVisible, setIsVisible] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     // Only show custom cursor on fine pointer devices (desktop/laptops)
@@ -55,9 +56,27 @@ export default function CustomCursor() {
     };
   }, [mouseX, mouseY]);
 
+  useEffect(() => {
+    // Check if we are on a premium page
+    if (typeof window !== 'undefined') {
+      const search = window.location.search;
+      if (pathname.startsWith('/product/') || search.includes('premium=true')) {
+        setIsPremium(true);
+      } else {
+        setIsPremium(false);
+      }
+    }
+  }, [pathname]);
+
   if (!isVisible) return null;
 
   const isPointer = cursorState === "pointer";
+
+  // Filter for premium pages: Solid white (if original is black) with a golden glow
+  // Standard pages: invert(1) grayscale(1)
+  const cursorFilter = isPremium 
+    ? 'invert(1) drop-shadow(0 0 6px rgba(212,175,55,0.8))' 
+    : 'invert(1) grayscale(1)';
 
   return (
     <>
@@ -68,64 +87,64 @@ export default function CustomCursor() {
         }
       `}} />
       <motion.div 
+        id="global-custom-cursor"
         className={styles.cursorWrapper}
         style={{ 
           x: cursorSpringX, 
           y: cursorSpringY,
-          mixBlendMode: 'difference' // Must be on the element with z-index/transform!
+          mixBlendMode: isPremium ? 'normal' : 'difference'
         }}
       >
-        {/* Default Target Cursor - Always spinning */}
-        <motion.img
-          src="/target.png"
-          alt="Cursor Target"
-          animate={{
-            opacity: isPointer ? 0 : 1,
-            scale: isPointer ? 1.2 : 1, // Expands slightly as it fades out
-            width: isPointer ? 56 : 40,
-            height: isPointer ? 56 : 40,
-            rotate: 360
-          }}
-          transition={{
-            opacity: { duration: 0.4, ease: "easeInOut" },
-            scale: { duration: 0.4, ease: "easeOut" },
-            width: { type: "spring", stiffness: 200, damping: 20 },
-            height: { type: "spring", stiffness: 200, damping: 20 },
-            rotate: { repeat: Infinity, duration: 15, ease: "linear" },
-          }}
-          style={{
-            position: 'absolute',
-            pointerEvents: 'none',
-            objectFit: 'contain',
-            filter: 'invert(1) grayscale(1)', 
-          }}
-        />
-
-        {/* Hover Hunting Cursor - 100% Static */}
-        <motion.img
-          src="/hunting.png"
-          alt="Cursor Hunting"
-          animate={{
-            opacity: isPointer ? 1 : 0,
-            scale: isPointer ? 1 : 0.8, // Gently zooms in as it appears
-            width: isPointer ? 56 : 40,
-            height: isPointer ? 56 : 40,
-            rotate: 0
-          }}
-          transition={{
-            opacity: { duration: 0.3, ease: "easeInOut" },
-            scale: { duration: 0.3, ease: "easeOut" },
-            width: { type: "spring", stiffness: 200, damping: 20 },
-            height: { type: "spring", stiffness: 200, damping: 20 },
-            rotate: { duration: 0 }
-          }}
-          style={{
-            position: 'absolute',
-            pointerEvents: 'none',
-            objectFit: 'contain',
-            filter: 'invert(1) grayscale(1)', 
-          }}
-        />
+        <AnimatePresence mode="wait">
+          {!isPointer ? (
+            <motion.img
+              key="target-cursor"
+              src="/target.png"
+              alt="Cursor Target"
+              initial={{ opacity: 0, scale: 1.2, x: "-50%", y: "-50%" }}
+              animate={{ opacity: 1, scale: 1, rotate: 360, x: "-50%", y: "-50%" }}
+              exit={{ opacity: 0, scale: 1.2, x: "-50%", y: "-50%" }}
+              transition={{
+                opacity: { duration: 0.2, ease: "easeInOut" },
+                scale: { duration: 0.2, ease: "easeOut" },
+                rotate: { repeat: Infinity, duration: 15, ease: "linear" }
+              }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                pointerEvents: 'none',
+                objectFit: 'contain',
+                width: 40,
+                height: 40,
+                filter: cursorFilter, 
+              }}
+            />
+          ) : (
+            <motion.img
+              key="hunting-cursor"
+              src="/hunting.png"
+              alt="Cursor Hunting"
+              initial={{ opacity: 0, scale: 0.8, x: "-50%", y: "-50%" }}
+              animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%" }}
+              exit={{ opacity: 0, scale: 0.8, x: "-50%", y: "-50%" }}
+              transition={{
+                opacity: { duration: 0.2, ease: "easeInOut" },
+                scale: { duration: 0.2, ease: "easeOut" }
+              }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                pointerEvents: 'none',
+                objectFit: 'contain',
+                width: 56,
+                height: 56,
+                filter: cursorFilter, 
+              }}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </>
   );

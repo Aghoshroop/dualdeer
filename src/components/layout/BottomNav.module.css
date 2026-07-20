@@ -82,3 +82,48 @@
     font-size: 0.5rem;
   }
 }
+
+/* --- HIDE ON NORMAL CHECKOUT --- */
+:global(body:not(.premium-theme)) .bottomNav[data-pathname^="/checkout"] {
+  display: none !important;
+}
+
+/* --- PREMIUM LUXURIOUS NAV THEME --- */
+:global(body.premium-theme) .bottomNav {
+  background: rgba(5, 5, 5, 0.95) !important;
+  border-top: 1px solid rgba(212, 175, 55, 0.15) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+}
+
+:global(body.premium-theme) .navItem {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+:global(body.premium-theme) .navItem span {
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 0.15em !important;
+  font-size: 0.5rem !important;
+  text-transform: uppercase !important;
+  font-weight: 400 !important;
+  margin-top: 2px;
+}
+
+:global(body.premium-theme) .navItem.active,
+:global(body.premium-theme) .navItem:hover {
+  color: #D4AF37 !important;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.2) !important;
+}
+
+:global(body.premium-theme) .navItem.active svg,
+:global(body.premium-theme) .navItem:hover svg {
+  stroke: #D4AF37 !important;
+  filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3)) !important;
+}
+
+:global(body.premium-theme) .cartBadge {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.9), rgba(163, 130, 236, 0.7)) !important;
+  color: #000 !important;
+  border: 1px solid #D4AF37 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+}

@@ -15,13 +15,25 @@ import * as metaPixel from '@/lib/metaPixel';
 import { useAuthToast } from '@/context/AuthToastContext';
 import { calculateBundleSavings } from '@/lib/bundleLogic';
 import { reserveInventory } from '@/lib/firebaseUtils';
+import PremiumCheckout from '@/components/checkout/PremiumCheckout';
 
 export default function CheckoutPage() {
   return (
     <Suspense fallback={<div style={{ padding: '100px', color: 'var(--color-text)', textAlign: 'center' }}>Loading Secure Gateway...</div>}>
-      <CheckoutEngine />
+      <CheckoutRouter />
     </Suspense>
   );
+}
+
+function CheckoutRouter() {
+  const searchParams = useSearchParams();
+  const isPremium = searchParams.get('premium') === 'true';
+
+  if (isPremium) {
+    return <PremiumCheckout />;
+  }
+
+  return <CheckoutEngine />;
 }
 
 function CheckoutEngine() {
@@ -254,18 +266,14 @@ function CheckoutEngine() {
         await reserveInventory(orderPayload.items);
       } catch (invErr: any) {
          console.error('Failed to reserve inventory:', invErr);
-         // If it's a Firebase permission error (because they didn't deploy the rules), just let them proceed to payment anyway.
-         // But if it's an actual stock error ("Insufficient stock for..."), we must block them.
          if (invErr.message && invErr.message.includes('Insufficient stock')) {
             alert(invErr.message);
             setIsSubmitting(false);
             return;
          }
-         // Otherwise, it's a permission error, so we ignore it and let them pay!
       }
       
       if (paymentMethod === 'razorpay_link') {
-         // Create Payment Link
          const res = await fetch('/api/razorpay/payment-link', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -277,16 +285,15 @@ function CheckoutEngine() {
          });
          const data = await res.json();
          if (data.shortUrl) {
-            window.location.href = data.shortUrl; // Redirect to Razorpay
+            window.location.href = data.shortUrl;
          } else {
             alert('Failed to generate payment link');
             setIsSubmitting(false);
          }
-         return; // Wait for redirect
+         return;
       }
       
       if (paymentMethod === 'razorpay_qr') {
-         // Create QR Code
          const res = await fetch('/api/razorpay/qr', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -305,12 +312,10 @@ function CheckoutEngine() {
             alert('Failed to generate QR code');
          }
          setIsSubmitting(false);
-         return; // Wait for user to scan
+         return;
       }
       
-      // COD Logic
       if (paymentMethod === 'cod') {
-          // Trigger order emails, sync
           await updateOrder(orderId, { status: 'processing' });
           fetch('/api/shiprocket/create-order', {
              method: 'POST',
@@ -456,7 +461,6 @@ function CheckoutEngine() {
       
       <div className={styles.container}>
         
-        {/* Left Form Wrapper */}
         <section className={styles.formSection}>
           {step === 'shipping' ? (
             <>
@@ -566,7 +570,7 @@ function CheckoutEngine() {
                           style={{ 
                             width: '100%', 
                             height: '100%',
-                            transform: 'scale(1.65)', // Crops the Razorpay borders perfectly!
+                            transform: 'scale(1.65)',
                             transformOrigin: 'center center',
                             maxWidth: 'none'
                           }}
@@ -591,7 +595,6 @@ function CheckoutEngine() {
           ) : null}
         </section>
 
-        {/* Right Summary Wrapper */}
         <aside className={`${styles.summarySection} ${step === 'shipping' ? styles.hideOnMobile : ''}`}>
           <div className={step === 'shipping' ? styles.hideOnMobile : ''}>
             <h2>Order Manifest {buyNowId && <span style={{ fontSize: '0.8rem', opacity: 0.5, marginLeft: '1rem' }}>(Direct Checkout)</span>}</h2>
@@ -705,7 +708,6 @@ function CheckoutEngine() {
 
       </div>
 
-      {/* COD Upsell Modal */}
       {showCodModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -763,7 +765,6 @@ function CheckoutEngine() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

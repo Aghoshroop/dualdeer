@@ -31,7 +31,7 @@ export default function ContactPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactSchema) }}
       />
-      <main style={{ paddingTop: '8rem', paddingBottom: '4rem', minHeight: '80vh', maxWidth: '800px', margin: '0 auto', padding: '8rem 2rem 4rem' }}>
+      <main style={{ paddingTop: '8rem', paddingBottom: '4rem', minHeight: '100vh', maxWidth: '800px', margin: '0 auto', padding: '8rem 2rem 4rem' }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', borderBottom: '2px solid var(--color-primary)', paddingBottom: '0.5rem', display: 'inline-block' }}>Contact DualDeer</h1>
         <p style={{ fontSize: '1.1rem', opacity: 0.8, marginBottom: '2rem', lineHeight: 1.6 }}>
           We are dedicated to providing you with the highest level of service. If you have any questions regarding our performance apparel, your order, or wholesale inquiries, please reach out.

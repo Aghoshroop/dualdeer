@@ -1,9 +1,11 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import { MessageSquare, X, Send, Sparkles } from 'lucide-react';
+import { MessageSquare, X, Send, Sparkles, Mic, Paperclip, Shirt, TestTube, TrendingUp, Package, Info, ArrowUp, RotateCcw } from 'lucide-react';
 import styles from './SupportAgent.module.css';
 import { getAIMemory, updateAIMemory } from '@/lib/firebaseUtils';
+import Link from 'next/link';
+import { AiDeerIcon } from './AiDeerIcon';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -17,6 +19,7 @@ export default function SupportAgent() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const [snapSide, setSnapSide] = useState<'left' | 'right'>('right');
   const wrapperControls = useAnimation();
@@ -25,7 +28,6 @@ export default function SupportAgent() {
   // 📜 INITIAL ENTRY & SCROLL LOGIC
   // ------------------------
   useEffect(() => {
-    // Initial entry animation
     wrapperControls.start({ y: 0, opacity: 1, transition: { duration: 0.5 } });
 
     let scrollTimeout: NodeJS.Timeout;
@@ -63,7 +65,7 @@ export default function SupportAgent() {
       } else {
         setMessages([{
           role: 'assistant',
-          content: "Welcome to DualDeer. What are you looking for today?"
+          content: "Welcome to the DualDeer Concierge. I am your personal AI assistant. How can I elevate your experience today?"
         }]);
       }
 
@@ -72,6 +74,16 @@ export default function SupportAgent() {
       }
     });
   }, []);
+
+  const clearChat = () => {
+    localStorage.removeItem('dualdeer_agent_memory');
+    localStorage.removeItem('dualdeer_session_memory');
+    localStorage.removeItem('dualdeer_cloud_context');
+    setMessages([{
+      role: 'assistant',
+      content: "Memory wiped. Let's start fresh. What can I help you with?"
+    }]);
+  };
 
   // ------------------------
   // 💾 SAVE CHAT MEMORY
@@ -87,12 +99,21 @@ export default function SupportAgent() {
   // 🛑 PREVENT BACKGROUND SCROLL
   // ------------------------
   useEffect(() => {
+    // FREEZE THE ENTIRE LANDING PAGE
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
     } else {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => { 
+      document.body.style.overflow = ''; 
+      document.documentElement.style.overflow = '';
+    };
   }, [isOpen]);
 
   const scrollToBottom = () => {
@@ -100,26 +121,31 @@ export default function SupportAgent() {
   };
 
   // ------------------------
-  // 🧹 CLEAR CHAT
-  // ------------------------
-  const clearChat = () => {
-    setMessages([{
-      role: 'assistant',
-      content: "Memory wiped. Let's start fresh. What can I help you with?"
-    }]);
-    localStorage.removeItem('dualdeer_agent_memory');
-    localStorage.removeItem('dualdeer_session_memory');
-  };
-
-  // ------------------------
   // 💡 SUGGESTED QUESTIONS
   // ------------------------
   const handleSuggestion = (question: string) => {
     setInput(question);
-    // Use setTimeout to allow state to update before sending
     setTimeout(() => {
         handleSend(undefined, question);
     }, 50);
+  };
+
+  // ------------------------
+  // ✏️ AUTO RESIZE TEXTAREA
+  // ------------------------
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
   };
 
   // ------------------------
@@ -129,14 +155,14 @@ export default function SupportAgent() {
     if (e) e.preventDefault();
 
     const textToSend = directInput !== undefined ? directInput : input;
-    const cleanedInput = textToSend.trim().toLowerCase();
+    const cleanedInput = textToSend.trim();
 
     if (!cleanedInput || isLoading) return;
 
-    // ❌ Prevent duplicate spam
     const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === 'user' && lastMsg.content === cleanedInput) {
-       setInput(''); // clear input if it was a duplicate from text box
+    if (lastMsg?.role === 'user' && lastMsg.content.toLowerCase() === cleanedInput.toLowerCase()) {
+       setInput(''); 
+       if (textareaRef.current) textareaRef.current.style.height = 'auto';
        return; 
     }
 
@@ -145,6 +171,7 @@ export default function SupportAgent() {
 
     setMessages(newHistory);
     setInput('');
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setIsLoading(true);
 
     try {
@@ -152,11 +179,9 @@ export default function SupportAgent() {
       const deviceId = localStorage.getItem('dualdeer_device_id') || 'guest';
       const userId = userName !== 'Guest' ? userName : deviceId;
 
-      // 🧠 Load session memory safely
       const sessionMemoryStr = localStorage.getItem('dualdeer_session_memory');
       const sessionMemory = sessionMemoryStr ? JSON.parse(sessionMemoryStr) : {};
 
-      // 🌐 Upload user intent
       updateAIMemory(userId, userName, `User intent: ${cleanedInput}`);
 
       const response = await fetch('/api/chat', {
@@ -177,7 +202,6 @@ export default function SupportAgent() {
       if (response.ok) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.reply, products: data.products }]);
 
-        // 🧠 SAFE MEMORY MERGE (CRITICAL)
         if (data.memory) {
           const existing = localStorage.getItem('dualdeer_session_memory');
           const prevMemory = existing ? JSON.parse(existing) : {};
@@ -206,13 +230,13 @@ export default function SupportAgent() {
     }
 
     setIsLoading(false);
+    setTimeout(() => textareaRef.current?.focus(), 100);
   };
 
   const suggestions = [
-    "What is a SpeedSuit?",
-    "Show me Mens gear",
+    "Explore SpeedSuit",
     "Track my order",
-    "Return policy"
+    "What makes DualDeer premium?"
   ];
 
   return (
@@ -237,17 +261,17 @@ export default function SupportAgent() {
       >
         <motion.button
           className={styles.fab}
-          onClick={() => setIsOpen(true)}
-          whileHover={{ scale: 1.05 }}
+          onClick={() => setIsOpen(!isOpen)}
+          whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           animate={{ 
-            opacity: isScrolling ? 0.5 : 1,
+            opacity: isScrolling ? 0.4 : 1,
             x: isScrolling ? (snapSide === 'right' ? 80 : -80) : 0
           }}
           transition={{ duration: 0.4, type: "spring", bounce: 0.2 }}
         >
           <div className={styles.fabGlow}></div>
-          <Sparkles className={styles.fabIcon} size={22} />
+          <AiDeerIcon className={styles.fabIcon} size={28} />
         </motion.button>
       </motion.div>
 
@@ -258,147 +282,169 @@ export default function SupportAgent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setIsOpen(false)}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            data-lenis-prevent="true"
           >
-            <motion.div
-              className={styles.chatWindow}
-              initial={{ y: '100%', scale: 0.9, opacity: 0 }}
-              animate={{ y: 0, scale: 1, opacity: 1 }}
-              exit={{ y: '100%', scale: 0.9, opacity: 0 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-            >
+            {/* GLOW BACKGROUND EFFECT */}
+            <div className={styles.glowBackground}></div>
 
-              {/* HEADER */}
-              <div className={styles.header}>
-                <div className={styles.headerInfo}>
-                <div className={styles.avatar}>
-                  <Sparkles size={20} />
-                  <div className={styles.onlineDot} />
-                </div>
-                <div>
-                  <h3 className={styles.headerTitle}>DualDeer Concierge</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                     <span className={styles.status}>Intelligence Active</span>
-                     <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Powered by AI</span>
+            <motion.div
+              className={styles.layoutWrapper}
+              initial={{ opacity: 0, scale: 0.98, filter: 'blur(5px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, scale: 0.98, filter: 'blur(5px)' }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
+              
+              {/* LEFT SIDEBAR */}
+              <div className={styles.sidebar}>
+                <div className={styles.sidebarHeader}>
+                  <div className={styles.logoArea}>
+                    <div className={styles.logoText}>DEER</div>
+                  </div>
+                  <div className={styles.statusPill}>
+                    <div className={styles.statusDot}></div>
+                    AI ACTIVE
                   </div>
                 </div>
-              </div>
-                <div className={styles.headerActions}>
-                   <button className={styles.clearBtn} onClick={clearChat} title="Reset Chat">
-                      Reset
-                   </button>
-                   <button className={styles.closeBtn} onClick={() => setIsOpen(false)}>
-                     <X size={20} />
-                   </button>
+
+                <div className={styles.navContainer}>
+                  <a href="#" onClick={(e)=>{ e.preventDefault(); textareaRef.current?.focus(); }} className={styles.navCard}><MessageSquare className={styles.navCardIcon} size={20}/> Chat with Deer</a>
+                  <Link href="/learn/size-guide" onClick={() => setIsOpen(false)} className={styles.navCard}><Shirt className={styles.navCardIcon} size={20}/> Fit Guide</Link>
+                  <Link href="/learn" onClick={() => setIsOpen(false)} className={styles.navCard}><TestTube className={styles.navCardIcon} size={20}/> Fabric Lab</Link>
+                  <Link href="/reaction-test" onClick={() => setIsOpen(false)} className={styles.navCard}><TrendingUp className={styles.navCardIcon} size={20}/> Performance Hub</Link>
+                  <Link href="/contact" onClick={() => setIsOpen(false)} className={styles.navCard}><Package className={styles.navCardIcon} size={20}/> Order Support</Link>
+                  <Link href="/about" onClick={() => setIsOpen(false)} className={styles.navCard}><Info className={styles.navCardIcon} size={20}/> About Deer</Link>
+                </div>
+
+                <div className={styles.featureCard}>
+                  <h4 className={styles.featureCardTitle}><Sparkles size={16} color="#7B2EFF" /> DEER AI</h4>
+                  <p className={styles.featureCardDesc}>Luxury activewear intelligence.<br/>Built for athletes.</p>
+                  <div className={styles.avatarsRow}>
+                    <div className={styles.miniAvatar}></div>
+                    <div className={styles.miniAvatar}></div>
+                    <div className={styles.miniAvatar}></div>
+                  </div>
+                  <div className={styles.slogan}>MOVE WITHOUT LIMITS.<br/>PERFORM.<br/>FOCUS.<br/>EVOLVE.</div>
                 </div>
               </div>
 
-               {/* MESSAGES */}
-              <div className={styles.messagesContainer}>
-                 <AnimatePresence>
-                   {messages.map((msg, i) => (
-                     <motion.div 
-                       key={i} 
-                       className={`${styles.messageWrapper} ${msg.role === 'user' ? styles.userWrapper : styles.assistantWrapper}`}
-                       initial={{ opacity: 0, y: 12, scale: 0.96 }}
-                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                       transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                     >
-                       {msg.role === 'assistant' && (
-                         <div className={styles.msgAvatar}>🦌</div>
-                       )}
-                       <div className={styles.messageContentBlock}>
-                         <div className={`${styles.messageBubble} ${msg.role === 'user' ? styles.userBubble : styles.assistantBubble}`}>
-                           {msg.content}
-                         </div>
-                         
-                         {msg.products && msg.products.length > 0 && (
-                           <motion.div 
-                             className={styles.productCarousel}
-                             initial={{ opacity: 0, x: 20 }}
-                             animate={{ opacity: 1, x: 0 }}
-                             transition={{ delay: 0.2, duration: 0.4 }}
-                           >
-                             {msg.products.map(p => (
-                                <a href={`/product/${p.slug || p.id}`} key={p.id} className={styles.productCard}>
-                                  <div className={styles.productImageWrapper}>
-                                      <img src={p.images?.[0] || p.image || '/placeholder-product.png'} alt={p.name} className={styles.productImage} />
-                                  </div>
-                                  <div className={styles.productInfo}>
-                                    <h4 className={styles.productTitle}>{p.name}</h4>
-                                    <p className={styles.productPrice}>₹{p.price}</p>
-                                    <button className={styles.viewBtn}>View details</button>
-                                  </div>
-                                </a>
-                             ))}
-                           </motion.div>
-                         )}
-                       </div>
-                     </motion.div>
-                   ))}
-                 </AnimatePresence>
-
-                {isLoading && (
-                  <motion.div 
-                    className={`${styles.messageWrapper} ${styles.assistantWrapper}`}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <div className={styles.msgAvatar}>🦌</div>
-                    <div className={styles.messageContentBlock}>
-                      <div className={`${styles.messageBubble} ${styles.assistantBubble} ${styles.typingBubble}`}>
-                        <span className={styles.dot}></span>
-                        <span className={styles.dot}></span>
-                        <span className={styles.dot}></span>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* QUICK SUGGESTIONS */}
-              {messages.length < 3 && !isLoading && (
-                <motion.div 
-                   className={styles.suggestionsContainer}
-                   initial={{ opacity: 0, y: 10 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   transition={{ delay: 0.5 }}
-                >
-                   {suggestions.map((sug, idx) => (
-                      <button 
-                         key={idx} 
-                         className={styles.suggestionChip}
-                         onClick={() => handleSuggestion(sug)}
-                      >
-                        {sug}
-                      </button>
-                   ))}
-                </motion.div>
-              )}
-
-              {/* INPUT */}
-              <form onSubmit={handleSend} className={styles.inputForm}>
-                <div className={styles.inputWrapper}>
-                  <input
-                    className={styles.inputField}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type a message..."
-                  />
-                  <button 
-                    className={`${styles.sendBtn} ${input.trim() ? styles.sendBtnActive : ''}`} 
-                    type="submit" 
-                    disabled={!input.trim() || isLoading}
-                    onMouseDown={(e) => e.preventDefault()}
-                  >
-                    <Send size={18} />
+              {/* MAIN CHAT */}
+              <div className={styles.mainChat}>
+                <div className={styles.mainHeader}>
+                  <button className={styles.wipeBtn} onClick={clearChat} title="Wipe Memory">
+                    <RotateCcw size={16} /> WIPE MEMORY
+                  </button>
+                  <button className={styles.closeBtn} onClick={() => setIsOpen(false)}>
+                    <X size={24} />
                   </button>
                 </div>
-              </form>
 
+                <div className={styles.messagesContainer}>
+                  
+                  {messages.length <= 1 && (
+                    <motion.div 
+                      className={styles.heroSection}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      <div className={styles.heroWelcome}>WELCOME,</div>
+                      <h1 className={styles.heroTitle}>I'M DEER.</h1>
+                      <p className={styles.heroSubtitle}>I know activewear.<br/>I know performance.<br/>I'm here to help.</p>
+                    </motion.div>
+                  )}
+
+                  <AnimatePresence>
+                    {messages.map((msg, i) => {
+                      if (i === 0 && msg.role === 'assistant' && msg.content.includes("Welcome to the DualDeer Concierge")) return null;
+                      
+                      return (
+                        <motion.div 
+                          key={i} 
+                          className={`${styles.messageWrapper} ${msg.role === 'user' ? styles.userWrapper : styles.assistantWrapper}`}
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                          <div className={styles.messageContentBlock}>
+                            <div className={`${styles.messageBubble} ${msg.role === 'user' ? styles.userBubble : styles.assistantBubble}`}>
+                              {msg.content}
+                            </div>
+                            
+                            {msg.products && msg.products.length > 0 && (
+                              <motion.div 
+                                className={styles.productCarousel}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                              >
+                                {msg.products.map(p => (
+                                  <a href={`/product/${p.slug || p.id}`} key={p.id} className={styles.productCard}>
+                                    <img src={p.images?.[0] || p.image || '/placeholder-product.png'} alt={p.name} className={styles.productImage} />
+                                    <div className={styles.productInfo}>
+                                      <h4 className={styles.productTitle}>{p.name}</h4>
+                                      <p className={styles.productPrice}>₹{p.price}</p>
+                                    </div>
+                                  </a>
+                                ))}
+                              </motion.div>
+                            )}
+
+                            <div className={styles.msgFooter}>
+                              {msg.role === 'assistant' && <AiDeerIcon size={12} className={styles.deerTinyIcon} />}
+                              {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+
+                  {isLoading && (
+                    <motion.div 
+                      className={`${styles.messageWrapper} ${styles.assistantWrapper}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <div className={styles.messageContentBlock}>
+                        <div className={styles.typingIndicator}>
+                          <AiDeerIcon size={16} className={styles.typingIcon} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* INPUT AREA */}
+                <div className={styles.inputContainer}>
+                  <form onSubmit={handleSend} style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <div className={styles.inputWrapper}>
+                      <button type="button" className={styles.sparkBtn}>
+                        <Sparkles size={20} />
+                      </button>
+
+                      <input
+                        className={styles.inputField}
+                        value={input}
+                        onChange={(e: any) => setInput(e.target.value)}
+                        placeholder="Ask Deer anything..."
+                      />
+
+                      <button 
+                        className={styles.sendBtn} 
+                        type="submit" 
+                        disabled={isLoading || !input.trim()}
+                      >
+                        <ArrowUp size={20} />
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+              </div>
             </motion.div>
           </motion.div>
         )}

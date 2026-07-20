@@ -10,6 +10,8 @@ import AnimatedCartButton from "../ui/AnimatedCartButton";
 import { useCurrency } from "@/context/CurrencyContext";
 import { onAuthStateChanged } from 'firebase/auth';
 import { ProductCardSkeleton } from '@/components/ui/Skeleton';
+import PremiumProductCard from '../product/PremiumProductCard';
+import ProductCard from '../product/ProductCard';
 
 interface Product {
   id: string;
@@ -21,6 +23,7 @@ interface Product {
   image: string;
   images?: string[];
   isNew?: boolean;
+  isPremium?: boolean;
   colors?: string[];
   isSoldOut?: boolean;
   stock?: number;
@@ -103,141 +106,21 @@ export default function ProductGrid({ title: fallbackTitle }: { title: string })
             <div className={styles.emptyGrid}>New collection arriving soon.</div>
           ) : (
             products.slice(0, 4).map((product, i) => (
-              <motion.div 
+              product.isPremium ? (
+                <PremiumProductCard 
+                  key={product.id}
+                  product={product}
+                  i={i}
+                  renderPrice={renderPrice}
+                />
+              ) : (
+              <ProductCard
                 key={product.id}
-                className={styles.card}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.05 }}
-              >
-                <Link href={`/product/${product.slug}`} className={styles.imageBox}>
-                  {/* Primary Image */}
-                  <img 
-                    src={product.image}
-                    alt={product.name}
-                    className={styles.primaryImage}
-                  />
-                  {/* Hover Image */}
-                  <img 
-                    src={(product.images && product.images.length > 1) ? product.images[1] : (product.images && product.images[0]) || product.image} 
-                    alt={`${product.name} alternate view`} 
-                    className={styles.hoverImage} 
-                    loading="lazy"
-                  />
-                  
-                  {/* Badge system */}
-                  <div className={styles.badgeContainer}>
-                     {product.mrp && product.mrp > product.price && (
-                       <span className={styles.saleBadge}>SALE</span>
-                     )}
-                     {product.isNew && (
-                       <span className={styles.newBadge}>NEW</span>
-                     )}
-                     {(product.name.toLowerCase().includes('greninja') || product.name.toLowerCase().includes('blue horizon')) && (
-                       <span style={{ padding: '4px 8px', background: 'var(--color-primary)', color: 'var(--color-background)', fontSize: '0.65rem', fontWeight: 700, borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                         Duo Pack Eligible
-                       </span>
-                     )}
-                  </div>
-
-                  {/* Overlays */}
-                  <div className={styles.quickActions}>
-                      <button className={styles.actionCircle} aria-label="Quick View"><Eye size={16} /></button>
-                      <button 
-                        className={styles.actionCircle} 
-                        aria-label="Add to Bag" 
-                        onClick={(e) => { 
-                          e.preventDefault();
-                          if (!currentUser) {
-                            sessionStorage.setItem('dualdeer_return_url', '/');
-                            router.push('/auth');
-                            return;
-                          }
-                          if (!product.isSoldOut && product.stock !== 0) {
-                            addToCart({ ...product, size: 'M', quantity: 1 }); 
-                          }
-                        }}
-                        style={{ opacity: ((product.isSoldOut || product.stock === 0) && currentUser) ? 0.5 : 1, cursor: ((product.isSoldOut || product.stock === 0) && currentUser) ? 'not-allowed' : 'pointer' }}
-                      ><ShoppingBag size={16} /></button>
-                  </div>
-                </Link>
-
-                <div className={styles.info}>
-                  <div className={styles.catRow}>
-                    <span className={styles.categoryName}>Dual Collection</span>
-                    <div className={styles.rating} style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                      <div style={{ display: 'flex', gap: '1px' }}>
-                        {[1, 2, 3, 4, 5].map(star => (
-                          <span 
-                            key={star} 
-                            className={styles.star}
-                            style={{ 
-                              opacity: star <= Math.round(product.rating || 5) ? 1 : 0.2,
-                              fontSize: '0.75rem'
-                            }}
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                      <span style={{ fontWeight: 800 }}>{(product.rating || 5.0).toFixed(1)}</span>
-                    </div>
-                  </div>
-                  <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none' }}>
-                    <h3 className={styles.name}>{product.name}</h3>
-                  </Link>
-                  <div className={styles.priceRow}>
-                    {product.mrp && product.price > 0 && product.mrp > product.price && (
-                      <span className={styles.mrp}>{renderPrice(product.mrp)}</span>
-                    )}
-                    <span className={styles.price}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</span>
-                  </div>
-
-                  {/* Color Swatches */}
-                  {product.colors && product.colors.length > 0 && (
-                    <div className={styles.colorSwatches}>
-                      {product.colors.map((color, idx) => (
-                        <div key={idx} className={styles.colorCircle} style={{ backgroundColor: color }} title={color} />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Optional Compact Action */}
-                  <div className={styles.cardActions}>
-                      <button
-                        className={styles.buyNowBtn}
-                        onClick={() => {
-                          if (!currentUser) {
-                            sessionStorage.setItem('dualdeer_return_url', '/');
-                            router.push('/auth');
-                            return;
-                          }
-                          if (!product.isSoldOut && product.stock !== 0) {
-                            router.push(`/checkout?buyNow=${product.id}&size=M&qty=1`);
-                          }
-                        }}
-                        disabled={(product.isSoldOut || product.stock === 0) && currentUser !== null}
-                        style={{ opacity: ((product.isSoldOut || product.stock === 0) && currentUser) ? 0.5 : 1, cursor: ((product.isSoldOut || product.stock === 0) && currentUser) ? 'not-allowed' : 'pointer' }}
-                      >
-                        {(product.isSoldOut || product.stock === 0) ? 'Stock Out' : (!currentUser ? 'Sign In to Buy' : 'Buy Now')}
-                      </button>
-                      <AnimatedCartButton
-                        size="small"
-                        onAdd={() => {
-                          if (!currentUser) {
-                            sessionStorage.setItem('dualdeer_return_url', '/');
-                            router.push('/auth');
-                            return;
-                          }
-                          addToCart({ ...product, size: 'M', quantity: 1 })
-                        }}
-                        label={(product.isSoldOut || product.stock === 0) ? 'X' : '+'}
-                        disabled={(product.isSoldOut || product.stock === 0) && currentUser !== null}
-                      />
-                  </div>
-                </div>
-              </motion.div>
+                product={product}
+                i={i}
+                renderPrice={renderPrice}
+              />
+              )
             ))
           )}
           </AnimatePresence>

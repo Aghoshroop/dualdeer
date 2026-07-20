@@ -430,14 +430,12 @@
   align-items: center;
   width: 100%;
   margin-bottom: 32px;
-  max-width: 1600px;
-  margin-left: auto;
-  margin-right: auto;
   padding: 16px 0;
   position: sticky;
   top: 50px;
   z-index: 50;
   background-color: var(--color-background);
+  box-shadow: -100vw 0 0 0 var(--color-background), 100vw 0 0 0 var(--color-background);
 }
 
 .collectionTitleBox {
@@ -506,6 +504,89 @@
 .galleryCard:hover {
   transform: translateY(-8px);
   box-shadow: 0 32px 64px rgba(18,18,18,0.1);
+}
+
+.premiumGalleryCard {
+  border: 1px solid rgba(212, 175, 55, 0.4) !important;
+  box-shadow: 0 10px 40px rgba(212, 175, 55, 0.15), inset 0 0 20px rgba(212, 175, 55, 0.05) !important;
+  background: linear-gradient(160deg, #050505, #111111) !important;
+  color: #fff !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.premiumGalleryCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.2), transparent);
+  transform: skewX(-25deg);
+  animation: eliteShimmerShop 7s infinite;
+  z-index: 4;
+  pointer-events: none;
+}
+
+@keyframes eliteShimmerShop {
+  0% { left: -150%; }
+  15% { left: 200%; }
+  100% { left: 200%; }
+}
+
+[data-theme='light'] .premiumGalleryCard {
+  background: linear-gradient(160deg, #fdfbf7, #f0e6cc) !important;
+  color: #121212 !important;
+  border: 1px solid rgba(212, 175, 55, 0.6) !important;
+  box-shadow: 0 10px 40px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(212, 175, 55, 0.1) !important;
+}
+
+.premiumGalleryCard:hover {
+  box-shadow: 0 16px 50px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.2) !important;
+  border-color: #D4AF37 !important;
+  transform: translateY(-10px) scale(1.02) !important;
+}
+
+.premiumGalleryCard .productName {
+  color: #D4AF37 !important;
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 0.05em !important;
+  text-shadow: 0 0 10px rgba(212,175,55,0.2) !important;
+}
+
+.premiumGalleryCard .productPrice,
+.premiumGalleryCard .currentPrice {
+  color: #fff !important;
+  text-shadow: 0 0 10px rgba(212,175,55,0.3) !important;
+}
+
+[data-theme='light'] .premiumGalleryCard .productPrice,
+[data-theme='light'] .premiumGalleryCard .currentPrice {
+  color: #000 !important;
+}
+
+.elitePremiumBadge {
+  position: absolute;
+  top: 16px;
+  left: -8px;
+  background: linear-gradient(90deg, #D4AF37, #F3E5AB, #D4AF37);
+  color: #000;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  padding: 6px 14px 6px 22px;
+  font-size: 0.7rem;
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  border-radius: 0 12px 12px 0;
+  letter-spacing: 2px;
+  z-index: 20;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 8px 50%);
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.galleryCard:hover .elitePremiumBadge {
+  transform: translateX(8px);
 }
 
 .premiumDiscountBadge {

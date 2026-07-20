@@ -1,0 +1,550 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@200;300;400;500;600&display=swap');
+
+/* --- 0. THE CANVAS --- */
+.premiumContainer {
+  width: 100%;
+  background-color: #000000; /* Pure Vantablack */
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  cursor: none; /* Custom cursor everywhere */
+}
+
+
+
+/* Atmospheric Noise - Thicker, more tactile */
+.premiumContainer::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: overlay;
+}
+
+/* Custom Cursor */
+.customCursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background-color: #D4AF37;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, background-color 0.3s;
+  mix-blend-mode: difference;
+}
+
+.customCursorRing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, border-color 0.3s, background-color 0.3s, mix-blend-mode 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- ZOOM LIGHTBOX --- */
+.zoomOverlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 100000;
+  cursor: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.zoomCursor {
+  position: absolute;
+  top: 0; left: 0;
+  width: 40px; height: 40px;
+  background: rgba(212, 175, 55, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 100001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  color: #fff;
+}
+
+.closeLightboxBtn {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 100002;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.closeLightboxBtn:hover {
+  opacity: 1;
+}
+
+.zoomedImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* --- 1. THE MONOLITH (HERO) --- */
+.heroSection {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.heroImageWrap {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  width: 60%;
+  height: 80%;
+  overflow: hidden;
+  filter: contrast(1.2) brightness(0.6) grayscale(30%);
+}
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.1);
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at center, transparent 20%, #000000 100%);
+  z-index: 2;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  mix-blend-mode: difference; /* Ultra premium contrast */
+}
+
+.heroTitle {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(4rem, 15vw, 15rem);
+  font-weight: 300;
+  line-height: 0.8;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: -5px;
+  white-space: nowrap;
+}
+
+.heroSubtitleWrap {
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.privateLabel {
+  font-size: 0.55rem;
+  letter-spacing: 0.8em;
+  text-transform: uppercase;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 0.8rem 2rem;
+  border-radius: 100px;
+}
+
+/* Scroll Line */
+.scrollIndicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 15vh;
+  width: 1px;
+  background: rgba(255,255,255,0.1);
+  z-index: 3;
+  overflow: hidden;
+}
+.scrollIndicatorInner {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 50%;
+  background: #fff;
+  animation: scrollElite 2s cubic-bezier(0.8, 0, 0.2, 1) infinite;
+}
+@keyframes scrollElite {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+
+/* --- 2. THE VAULT (HORIZONTAL GALLERY) --- */
+.vaultSection {
+  height: 300vh; /* Creates scrolling space for horizontal move */
+  position: relative;
+  background: #000;
+}
+
+.vaultSticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.vaultGallery {
+  display: flex;
+  gap: 10vw;
+  padding: 0 20vw; /* Start offset */
+}
+
+.vaultImageWrap {
+  width: 40vw;
+  height: 60vh;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.9);
+}
+
+.vaultImageWrap::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 1px solid rgba(255,255,255,0.05);
+  pointer-events: none;
+}
+
+.vaultImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);
+  transition: filter 0.8s ease, transform 0.8s ease;
+}
+
+.vaultImageWrap:hover .vaultImage {
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+
+.vaultCaption {
+  position: absolute;
+  bottom: 2rem;
+  left: -3rem;
+  transform: rotate(-90deg);
+  transform-origin: left bottom;
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: #D4AF37;
+  white-space: nowrap;
+}
+
+/* --- 3. THE ALLOCATION (COMMERCE) --- */
+.allocationSection {
+  padding: 15rem 10% 10rem 10%;
+  position: relative;
+  z-index: 10;
+  background: #020202;
+}
+
+.allocationGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8rem;
+  align-items: start;
+}
+
+.allocationVisual {
+  height: 100%;
+  position: relative;
+}
+
+.stickyVisual {
+  position: sticky;
+  top: 10vh;
+  height: 80vh;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.allocationImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.1) brightness(0.85);
+  position: absolute; /* Needed for popLayout AnimatePresence */
+  top: 0;
+  left: 0;
+}
+
+.allocationLore {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 5rem;
+}
+
+.loreTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 2.5rem;
+  line-height: 1.2;
+  font-weight: 300;
+  color: #fff;
+}
+
+.loreText {
+  font-size: 1rem;
+  line-height: 2;
+  color: rgba(255,255,255,0.5);
+  font-weight: 200;
+}
+
+.allocationAction {
+  padding: 4rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.priceBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.priceLabel {
+  font-size: 0.5rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #D4AF37;
+}
+.price {
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  font-weight: 400;
+  color: #fff;
+}
+
+/* Sizes */
+.sizeBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.sizeLabel {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  display: flex;
+  justify-content: space-between;
+}
+.sizeGuide {
+  color: #D4AF37;
+  cursor: none;
+}
+.sizeList {
+  display: flex;
+  gap: 2rem;
+}
+.sizeBtn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.3);
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  cursor: none;
+  transition: all 0.4s ease;
+  position: relative;
+}
+.sizeBtn::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0%;
+  height: 1px;
+  background: #D4AF37;
+  transition: width 0.4s ease;
+}
+.sizeBtn:hover {
+  color: #fff;
+}
+.sizeBtn.active {
+  color: #D4AF37;
+}
+.sizeBtn.active::after {
+  width: 100%;
+}
+
+/* Acquire Button */
+.acquireBtnWrap {
+  width: 100%;
+}
+.acquireBtn {
+  width: 100%;
+  padding: 2rem 0;
+  background: #fff;
+  color: #000;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: none;
+  transition: all 0.5s ease;
+}
+.acquireBtn:hover {
+  background: #D4AF37;
+  color: #fff;
+  letter-spacing: 0.6em;
+}
+
+/* --- 4. PRIVATE CLIENT SERVICES (ACCORDIONS) --- */
+.servicesSection {
+  padding: 0 10% 10rem 10%;
+  background: #020202;
+}
+
+.accordionItem {
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.accordionItem:last-child {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.accordionHeader {
+  width: 100%;
+  padding: 3rem 0;
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  cursor: none;
+}
+.accordionIcon {
+  font-family: 'Inter', sans-serif;
+  font-size: 2rem;
+  font-weight: 200;
+  color: #D4AF37;
+}
+.accordionContent {
+  overflow: hidden;
+  color: rgba(255,255,255,0.4);
+  font-size: 1.1rem;
+  line-height: 2;
+  font-weight: 200;
+}
+.accordionContentInner {
+  padding-bottom: 3rem;
+  max-width: 800px;
+}
+
+@media (max-width: 1024px) {
+  .heroTitle { font-size: 5rem; }
+  .vaultGallery { padding: 0 5vw; }
+  .vaultImageWrap { width: 70vw; height: 50vh; }
+  .allocationGrid { grid-template-columns: 1fr; gap: 5rem; }
+  .allocationAction { padding: 3rem; }
+  .price { font-size: 3rem; }
+}
+
+@media (max-width: 768px) {
+  .heroTitle { font-size: clamp(3rem, 10vw, 4rem); letter-spacing: -2px; }
+  .heroImageWrap { width: 100vw; height: 100vh; left: 0; top: 0; }
+  .vaultImageWrap { width: 85vw; height: 50vh; }
+  .allocationGrid { gap: 4rem; }
+  .allocationSection { padding: 8rem 5% 5rem 5%; }
+  .servicesSection { padding: 0 5% 5rem 5%; }
+  .allocationLore { order: 10; }
+}
+
+@media (max-width: 480px) {
+  /* Extreme Mobile Restructuring */
+  .eliteNav { padding: 0 1rem !important; height: 60px !important; }
+  .navReturnBtn span { display: none; } /* Hide the word "Return" on mobile */
+  .navLogoText { font-size: clamp(1.2rem, 6vw, 1.5rem) !important; letter-spacing: 0.15em !important; }
+  .navLogoSub { font-size: 0.45rem !important; letter-spacing: 0.2em !important; }
+
+  .heroTitle { font-size: clamp(2rem, 12vw, 3.5rem); letter-spacing: -1px; }
+  .heroSubtitleWrap { margin-top: 2rem; }
+  .privateLabel { font-size: clamp(0.45rem, 3vw, 0.55rem); padding: 0.6rem 1.2rem; }
+  
+  .vaultImageWrap { width: 90vw; height: 45vh; }
+  .vaultCaption { font-size: 0.8rem; bottom: 1rem; left: -2rem; }
+  
+  .allocationSection { padding: 4rem 5%; }
+  .allocationGrid { gap: 2.5rem; }
+  
+  /* Disable sticky visual on small screens, let it flow naturally */
+  .stickyVisual { height: 50vh; position: relative; top: 0; }
+  
+  .allocationLore { gap: 1.5rem; margin-bottom: 0; margin-top: 1.5rem; order: 10; }
+  .loreTitle { font-size: clamp(1.5rem, 8vw, 2rem); }
+  .loreText { font-size: 0.85rem; line-height: 1.8; }
+  
+  .allocationAction { padding: 1.5rem; gap: 2rem; }
+  
+  .price { font-size: clamp(2rem, 10vw, 3rem); }
+  .priceLabel { font-size: 0.45rem; }
+  
+  .sizeBlock { gap: 1.5rem; }
+  .sizeLabel { font-size: 0.5rem; }
+  .sizeList { flex-wrap: wrap; gap: 1rem; justify-content: flex-start; }
+  .sizeBtn { font-size: clamp(1rem, 6vw, 1.2rem); }
+  
+  .acquireBtn { padding: 1.2rem 0; font-size: 0.65rem; }
+  
+  .servicesSection { padding: 0 5% 4rem 5%; }
+  .accordionHeader { font-size: clamp(1.1rem, 6vw, 1.5rem); padding: 1.5rem 0; }
+  .accordionIcon { font-size: 1.2rem; }
+  .accordionContent { font-size: 0.85rem; }
+  .accordionContentInner { padding-bottom: 1.5rem; }
+}
+
+@media (max-width: 320px) {
+  /* Fits down to ~200px widths flawlessly */
+  .sizeList { justify-content: space-between; gap: 0.5rem; }
+  .sizeBtn { font-size: 0.9rem; }
+  .allocationAction { padding: 1rem; gap: 1.5rem; }
+  .loreTitle { font-size: 1.2rem; }
+}

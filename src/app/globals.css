@@ -275,3 +275,8 @@ button {
 .custom-logo-e {
   letter-spacing: normal;
 }
+
+/* Premium Theme Global Overrides */
+body.premium-theme #global-navbar {
+  display: none !important;
+}

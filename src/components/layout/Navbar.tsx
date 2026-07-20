@@ -255,6 +255,7 @@ export default function Navbar() {
   return (
     <>
       <motion.header 
+        id="global-navbar"
         className={styles.header} 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => { setIsHovered(false); setHoveredMenu(null); }}

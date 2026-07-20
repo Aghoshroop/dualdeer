@@ -15,12 +15,12 @@ export default function BottomNav() {
     setMounted(true);
   }, []);
 
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/checkout')) {
+  if (pathname?.startsWith('/admin')) {
     return null;
   }
 
   return (
-    <nav className={styles.bottomNav}>
+    <nav className={styles.bottomNav} data-pathname={pathname}>
       <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>
         <Home size={22} strokeWidth={pathname === '/' ? 2 : 1.5} />
         <span>Home</span>

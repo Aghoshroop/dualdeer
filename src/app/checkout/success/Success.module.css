@@ -293,3 +293,34 @@
     justify-content: center;
   }
 }
+
+@media (max-width: 480px) {
+  .title { font-size: clamp(1.2rem, 7vw, 1.8rem); letter-spacing: 2px; }
+  .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .hero { padding: 1.5rem 1rem; border-radius: 12px; }
+  .iconBox { width: 70px; height: 70px; margin-bottom: 1rem; }
+  .iconBox svg { width: 32px; height: 32px; }
+  .trackingBadge { padding: 0.6rem 1rem; font-size: 0.75rem; flex-direction: column; gap: 0.4rem; text-align: center; border-radius: 12px; width: 100%; }
+  .progressContainer { padding: 1.2rem; gap: 1.5rem; border-radius: 12px; }
+  .stepIcon { width: 36px; height: 36px; }
+  .stepLabel { font-size: 0.6rem; }
+  .orderSection { padding: 1.2rem; border-radius: 12px; }
+  .orderSection h3 { font-size: 0.9rem; margin-bottom: 1rem; }
+  .item { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+  .itemImage { width: 100%; height: auto; aspect-ratio: 3/4; }
+  .itemInfo { width: 100%; }
+  .priceInfo { margin-left: 0; text-align: left; margin-top: 0.5rem; }
+  .page { padding: 80px 4% 2rem 4%; }
+  .detailRow { flex-direction: column; gap: 0.3rem; align-items: flex-start; font-size: 0.8rem; }
+  .detailRow span:last-child { font-weight: 600; color: var(--color-primary); }
+  .primaryBtn, .secondaryBtn { padding: 1rem; font-size: 0.75rem; border-radius: 8px; }
+  .actions { gap: 1rem; }
+}
+
+@media (max-width: 320px) {
+  .progressContainer { grid-template-columns: 1fr; gap: 1rem; }
+  .container { gap: 1.5rem; }
+  .step { flex-direction: row; align-items: center; text-align: left; justify-content: flex-start; gap: 1rem; }
+  .itemImage { aspect-ratio: 1/1; }
+  .trackingBadge { word-break: break-all; }
+}

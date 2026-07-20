@@ -113,7 +113,8 @@ export default function AdminProductsPage() {
     images: [] as string[],
     stock: 0,
     colors: '',
-    isSoldOut: false
+    isSoldOut: false,
+    isPremium: false
   });
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -146,7 +147,7 @@ export default function AdminProductsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ name: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '', isSoldOut: false });
+    setFormData({ name: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '', isSoldOut: false, isPremium: false });
     setEditingId(null);
     setHasOfferPrice(true);
     setShowModal(true);
@@ -169,7 +170,8 @@ export default function AdminProductsPage() {
       images: product.images || [],
       stock: product.stock,
       colors: product.colors ? product.colors.join(', ') : '',
-      isSoldOut: product.isSoldOut || false
+      isSoldOut: product.isSoldOut || false,
+      isPremium: product.isPremium || false
     });
     setEditingId(product.id!);
     // If price equals MRP or price is 0, then there is no real offer price
@@ -642,6 +644,17 @@ export default function AdminProductsPage() {
                   style={{ width: 'auto' }}
                 />
                 <label htmlFor="isSoldOut" style={{ margin: 0, cursor: 'pointer' }}>Mark as Sold Out Manually</label>
+              </div>
+
+              <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input 
+                  type="checkbox" 
+                  id="isPremium"
+                  checked={formData.isPremium} 
+                  onChange={(e) => setFormData({...formData, isPremium: e.target.checked})}
+                  style={{ width: 'auto' }}
+                />
+                <label htmlFor="isPremium" style={{ margin: 0, cursor: 'pointer', color: '#ffb347', fontWeight: 'bold' }}>Mark as Premium (Luxurious Styling)</label>
               </div>
 
               <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

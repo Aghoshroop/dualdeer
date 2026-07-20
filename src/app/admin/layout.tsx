@@ -36,6 +36,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin/orders" className={styles.link} onClick={closeMenu}><Package size={20} /> Orders</Link>
             <Link href="/admin/products" className={styles.link} onClick={closeMenu}><ShoppingBag size={20} /> Products</Link>
             <Link href="/admin/upcoming-products" className={styles.link} onClick={closeMenu}><Rocket size={20} /> Upcoming Products</Link>
+            <Link href="/admin/notified-products" className={styles.link} onClick={closeMenu}><Bell size={20} /> Notified Products</Link>
 
             <Link href="/admin/categories" className={styles.link} onClick={closeMenu}><Tags size={20} /> Categories</Link>
             <Link href="/admin/coupons" className={styles.link} onClick={closeMenu}><Ticket size={20} /> Coupons</Link>
@@ -44,7 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin/banners" className={styles.link} onClick={closeMenu}><LayoutDashboard size={20} /> Hero Slider</Link>
             <Link href="/admin/videos" className={styles.link} onClick={closeMenu}><Video size={20} /> Videos</Link>
             <Link href="/admin/users" className={styles.link} onClick={closeMenu}><Users size={20} /> Users</Link>
-            <Link href="/admin/notifications" className={styles.link} onClick={closeMenu}><Bell size={20} /> Notifications</Link>
+            <Link href="/admin/notifications" className={styles.link} onClick={closeMenu}><Bell size={20} /> App Notifications</Link>
             <Link href="/admin/reaction-test" className={styles.link} onClick={closeMenu}><Zap size={20} /> Reaction Test</Link>
             <Link href="/admin/settings" className={styles.link} onClick={closeMenu}><Settings size={20} /> Settings</Link>
           </nav>

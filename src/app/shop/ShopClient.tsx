@@ -11,6 +11,8 @@ import { ShoppingBag, Heart, Check, LayoutGrid, Square, SlidersHorizontal, X, Ch
 import React from 'react';
 import WishlistButton from '@/components/ui/WishlistButton';
 import Breadcrumb from '@/components/ui/Breadcrumb';
+import PremiumProductCard from '@/components/product/PremiumProductCard';
+import SharedProductCard from '@/components/product/ProductCard';
 
 // UI Interaction Sound Generator (No external assets required)
 const playInteractionSound = (type: 'hover' | 'click' | 'ring') => {
@@ -458,6 +460,7 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
 
 function ProductCard({ product, i, styles, wishlist, toggleWishlist, playInteractionSound, renderPrice }: any) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const router = useRouter();
   
   // Build images array safely
   const images = (product.images && product.images.length > 0)
@@ -479,96 +482,25 @@ function ProductCard({ product, i, styles, wishlist, toggleWishlist, playInterac
     setTouchStart(null);
   };
 
+  if (product.isPremium) {
+    return (
+      <PremiumProductCard 
+        product={product}
+        i={i}
+        wishlist={wishlist}
+        toggleWishlist={toggleWishlist}
+        renderPrice={renderPrice}
+      />
+    );
+  }
+
   return (
-    <motion.div 
-      className={styles.galleryCard}
-      initial={{ opacity: 0, y: 25 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "50px" }}
-      transition={{ delay: (i % 12) * 0.08, duration: 0.4, ease: "easeOut" }}
-      onMouseEnter={() => {
-        playInteractionSound('hover');
-        if (images.length > 1) setActiveImageIndex(1);
-      }}
-      onMouseLeave={() => setActiveImageIndex(0)}
-    >
-      <div 
-        className={styles.imageContainer} 
-        onTouchStart={handleTouchStart} 
-        onTouchEnd={handleTouchEnd}
-      >
-        {/* Top Left: Discount Badge */}
-        {product.mrp && product.mrp > product.price && (
-          <div className={styles.premiumDiscountBadge}>
-            -{Math.round(((product.mrp - product.price) / product.mrp) * 100)}%
-          </div>
-        )}
-
-        {/* Wishlist Icon */}
-        <WishlistButton 
-          productId={product.id} 
-          className={styles.premiumWishlistBtn} 
-        />
-
-        <Link href={`/product/${product.slug}`}>
-          {images.map((img: string, idx: number) => (
-            <img 
-              key={idx}
-              src={img} 
-              alt={`${product.name} - view ${idx + 1}`} 
-              className={styles.carouselImg}
-              style={{
-                opacity: idx === activeImageIndex ? 1 : 0,
-                position: idx === 0 ? 'relative' : 'absolute',
-                zIndex: idx === activeImageIndex ? 2 : 1
-              }}
-            />
-          ))}
-        </Link>
-        
-        {/* Dynamic Carousel Dots */}
-        {images.length > 1 && (
-          <div className={styles.carouselDots}>
-            {images.map((_img: string, idx: number) => (
-              <span 
-                key={idx}
-                className={`${styles.dot} ${idx === activeImageIndex ? styles.activeDot : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setActiveImageIndex(idx);
-                }}
-              ></span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className={styles.productMeta}>
-        <div className={styles.productHeader}>
-          <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', flex: 1, paddingRight: '12px' }}>
-            <h3 className={styles.productName}>{product.name}</h3>
-          </Link>
-          <div className={styles.ratingRow}>
-            <span className={styles.starIcon}>★</span>
-            <span className={styles.ratingNumber}>{product.rating ? product.rating.toFixed(1) : "5.0"}</span>
-          </div>
-        </div>
-        
-        <Link href={`/product/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}>
-          <p className={styles.fitText}>{product.subcategory || "Regular Fit"}</p>
-          <p className={styles.colorText}>{product.category ? product.category.toUpperCase() : "FOR MEN"}</p>
-          
-          <div className={styles.divider}></div>
-
-          <div className={styles.productPrice}>
-            <span className={styles.currentPrice}>{renderPrice(product.price === 0 && product.mrp ? product.mrp : product.price)}</span>
-            {product.mrp && product.price > 0 && product.mrp > product.price && (
-              <span className={styles.originalPrice}>{renderPrice(product.mrp)}</span>
-            )}
-          </div>
-        </Link>
-      </div>
-    </motion.div>
+    <SharedProductCard 
+      product={product} 
+      i={i} 
+      wishlist={wishlist} 
+      toggleWishlist={toggleWishlist} 
+      renderPrice={renderPrice} 
+    />
   );
 }

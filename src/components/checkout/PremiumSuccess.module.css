@@ -1,0 +1,274 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@200;300;400;500;600&display=swap');
+
+/* Animations */
+@keyframes subtleFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes slowGlow {
+  0% { text-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+  50% { text-shadow: 0 0 25px rgba(212, 175, 55, 0.6); }
+  100% { text-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+}
+
+.vaultContainer {
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #030303;
+  background-image: 
+    radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+    url('https://www.transparenttextures.com/patterns/stardust.png');
+  color: #EAEAEA;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow-x: hidden;
+  padding: 4rem 2rem;
+}
+
+.vaultHeader {
+  text-align: center;
+  margin-bottom: 4rem;
+  z-index: 10;
+}
+
+.sealContainer {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 2rem auto;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(212, 175, 55, 0.05);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.scanLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(212, 175, 55, 0.8), transparent);
+  animation: scanline 2.5s infinite linear;
+  opacity: 0.5;
+}
+
+.title {
+  font-family: 'Cinzel', serif;
+  font-size: 2.5rem;
+  color: #D4AF37;
+  letter-spacing: 0.3em;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  animation: slowGlow 4s infinite ease-in-out;
+}
+
+.subtitle {
+  font-size: 0.75rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  width: 100%;
+  max-width: 1100px;
+  z-index: 10;
+}
+
+@media (max-width: 900px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.letterSection {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  padding: 3rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.letterText {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #CCC;
+  margin-bottom: 1.5rem;
+  font-weight: 300;
+}
+
+.letterSignature {
+  margin-top: auto;
+  font-family: 'Cinzel', serif;
+  color: #D4AF37;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.dossierSection {
+  background: rgba(5, 5, 5, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  padding: 3rem;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dossierHeader {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  color: #D4AF37;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dataRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+}
+
+.dataLabel {
+  color: #888;
+  letter-spacing: 0.05em;
+}
+
+.dataValue {
+  color: #FFF;
+  font-weight: 500;
+  font-family: monospace;
+  letter-spacing: 0.1em;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.itemImage {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  filter: grayscale(80%) contrast(120%);
+  opacity: 0.8;
+}
+
+.itemDetails {
+  flex: 1;
+}
+
+.itemName {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  color: #FFF;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.3rem;
+}
+
+.itemMeta {
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.actions {
+  margin-top: 4rem;
+  display: flex;
+  gap: 2rem;
+  z-index: 10;
+}
+
+.primaryBtn {
+  background: transparent;
+  color: #D4AF37;
+  border: 1px solid #D4AF37;
+  padding: 12px 30px;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: none;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.primaryBtn:hover {
+  background: rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+@media (max-width: 768px) {
+  .vaultContainer { padding: 3rem 1.5rem; }
+  .title { font-size: clamp(1.5rem, 6vw, 2.5rem); letter-spacing: 0.2em; }
+  .subtitle { font-size: 0.65rem; letter-spacing: 0.3em; }
+  .letterSection, .dossierSection { padding: 2rem; }
+}
+
+@media (max-width: 480px) {
+  .vaultContainer { padding: 2rem 5%; }
+  .sealContainer { width: 60px; height: 60px; margin-bottom: 1.5rem; }
+  .sealContainer svg { width: 30px; height: 30px; }
+  .title { font-size: clamp(1.2rem, 7vw, 1.8rem); letter-spacing: 0.15em; }
+  .subtitle { font-size: 0.55rem; letter-spacing: 0.2em; word-break: break-all; line-height: 1.5; }
+  
+  .letterSection, .dossierSection { padding: 1.5rem; border-radius: 6px; }
+  .letterText { font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; }
+  .letterSignature { font-size: 1rem; padding-top: 1.5rem; }
+  
+  .dossierHeader { font-size: 0.75rem; margin-bottom: 1.5rem; }
+  .dataRow { flex-direction: column; align-items: flex-start; gap: 0.4rem; padding: 0.8rem 0; font-size: 0.8rem; }
+  
+  .itemRow { flex-direction: column; align-items: flex-start; gap: 0.8rem; padding: 1rem 0; }
+  .itemImage { width: 100%; height: auto; aspect-ratio: 3/4; }
+  .itemDetails { width: 100%; }
+  .itemName { font-size: 0.9rem; }
+  .itemMeta { font-size: 0.65rem; }
+  
+  .actions { flex-direction: column; width: 100%; gap: 1rem; margin-top: 2rem; }
+  .primaryBtn { width: 100%; padding: 12px 1rem; font-size: 0.7rem; }
+}
+
+@media (max-width: 320px) {
+  .vaultContainer { padding: 1.5rem 4%; }
+  .title { font-size: 1.1rem; }
+  .letterSection, .dossierSection { padding: 1.2rem; }
+  .letterText { font-size: 0.85rem; }
+  .dataRow { font-size: 0.75rem; }
+  .itemImage { aspect-ratio: 1/1; }
+}

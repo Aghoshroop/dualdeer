@@ -2,12 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Product, getReviews, Review, addReview, checkInWishlist, addToWishlist, removeFromWishlist, updateReview, deleteReview } from '@/lib/firebaseUtils';
+import { Product, getReviews, Review, addReview, checkInWishlist, addToWishlist, removeFromWishlist, updateReview, deleteReview, addProductNotification, checkIfAlreadyNotified } from '@/lib/firebaseUtils';
 import { useAuthToast } from '@/context/AuthToastContext';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '@/context/CartContext';
-import { Heart, CheckCircle, ChevronDown, Star, ChevronLeft, X, Share2, ImagePlus, Edit2, Trash2, User, ArrowRight, ShieldCheck, Award, Gem, Users, Quote } from 'lucide-react';
+import { Heart, CheckCircle, ChevronDown, Star, ChevronLeft, X, Share2, ImagePlus, Edit2, Trash2, User, ArrowRight, ShieldCheck, Award, Gem, Users, Quote, Bell } from 'lucide-react';
 import RelatedProducts from '@/components/sections/RelatedProducts';
 import Link from 'next/link';
 import styles from './ProductDetails.module.css';
@@ -66,6 +66,12 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [wishlistRecordId, setWishlistRecordId] = useState<string | null>(null);
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+
+  const [showNotifyForm, setShowNotifyForm] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState('');
+  const [isNotifying, setIsNotifying] = useState(false);
+  const [notifySuccess, setNotifySuccess] = useState(false);
+
   useEffect(() => {
     if (product?.id) {
       metaPixel.event('ViewContent', {
@@ -233,6 +239,39 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
         alert("Could not delete review: " + err.message);
       }
     }
+  };
+
+  const handleNotifySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product?.id) return;
+    setIsNotifying(true);
+    try {
+      const emailToUse = currentUser?.email || notifyEmail;
+      if (!emailToUse) {
+        alert("Please provide an email address.");
+        setIsNotifying(false);
+        return;
+      }
+
+      const alreadyNotified = await checkIfAlreadyNotified(product.id, emailToUse);
+      if (alreadyNotified) {
+        setNotifySuccess(true);
+        setShowNotifyForm(false);
+        showAuthToast("You're already on the waitlist for this product!");
+        setIsNotifying(false);
+        return;
+      }
+
+      const userId = currentUser?.uid || 'guest';
+      await addProductNotification(product.id, userId, emailToUse);
+      setNotifySuccess(true);
+      setShowNotifyForm(false);
+      showAuthToast("You will be notified when this is back in stock!");
+    } catch (err: any) {
+      console.error(err);
+      alert("Failed to submit request.");
+    }
+    setIsNotifying(false);
   };
 
   const startEditReview = (rev: Review) => {
@@ -579,60 +618,123 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
           </div>
 
           <div className={styles.actionsBox}>
-            {/* ROW 1: Quantity + Add to Bag */}
-            <div className={styles.actionRowPrimary}>
-              <QuantitySelector
-                value={quantity > maxAddable && maxAddable > 0 ? maxAddable : quantity}
-                min={1}
-                max={maxAddable > 0 ? maxAddable : 1}
-                onChange={setQuantity}
-              />
-              <div style={{ flex: 1, pointerEvents: !canPerformAction && currentUser ? 'none' : 'auto', opacity: !canPerformAction && currentUser ? 0.5 : 1 }}>
-                <AnimatedCartButton
-                  onAdd={() => {
-                    if (!currentUser) {
-                      sessionStorage.setItem('dualdeer_return_url', window.location.pathname);
-                      router.push('/auth');
-                      return;
-                    }
-                    if (product && canPerformAction) {
-                      addToCart({
-                        id: product.id as string,
-                        name: product.name,
-                        price: product.price,
-                        mrp: product.mrp,
-                        image: product.image,
-                        size: selectedSize,
-                        color: selectedColor || undefined,
-                        quantity: Math.min(quantity, maxAddable)
-                      });
-                    }
-                  }}
-                  label={!currentUser ? "Sign In to Buy" : isRestocking ? `RESTOCKING ${formattedTime}` : isOutOfStock ? "Sold Out" : isMaxInCart ? "Max in Cart" : "Add To Bag"}
-                />
+            {isOutOfStock ? (
+              <div className={styles.notifySection} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(255, 255, 255, 0.02)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                {notifySuccess ? (
+                  <div style={{ textAlign: 'center', color: '#10b981', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle size={32} />
+                    <h3 style={{ margin: 0, fontSize: '1.2rem' }}>You're on the list!</h3>
+                    <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>We'll email you the moment {product.name} is restocked.</p>
+                  </div>
+                ) : showNotifyForm ? (
+                  <form onSubmit={handleNotifySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Get Restock Alerts</h3>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Don't miss out next time. Enter your email below.</p>
+                    <input 
+                      type="email" 
+                      required 
+                      placeholder="Enter your email address" 
+                      value={notifyEmail}
+                      onChange={e => setNotifyEmail(e.target.value)}
+                      style={{ padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.4)', color: '#fff', fontSize: '1rem' }}
+                    />
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button 
+                        type="submit" 
+                        disabled={isNotifying}
+                        className={styles.buyNowBtn} 
+                        style={{ flex: 1, padding: '12px' }}
+                      >
+                        {isNotifying ? 'Submitting...' : 'Notify Me'}
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => setShowNotifyForm(false)}
+                        style={{ padding: '12px 20px', borderRadius: '12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#ff4444' }}>Currently Unavailable</h3>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>This product is sold out globally.</p>
+                    <button 
+                      onClick={(e) => {
+                        if (currentUser?.email) {
+                          handleNotifySubmit(e as any);
+                        } else {
+                          setShowNotifyForm(true);
+                        }
+                      }}
+                      disabled={isNotifying}
+                      className={styles.buyNowBtn}
+                      style={{ background: 'var(--color-primary)', color: 'var(--color-background)', border: 'none' }}
+                    >
+                      <Bell size={18} style={{ marginRight: '8px', display: 'inline' }} /> {isNotifying ? 'Registering...' : 'Notify Me When Available'}
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
+            ) : (
+              <>
+                {/* ROW 1: Quantity + Add to Bag */}
+                <div className={styles.actionRowPrimary}>
+                  <QuantitySelector
+                    value={quantity > maxAddable && maxAddable > 0 ? maxAddable : quantity}
+                    min={1}
+                    max={maxAddable > 0 ? maxAddable : 1}
+                    onChange={setQuantity}
+                  />
+                  <div style={{ flex: 1, pointerEvents: !canPerformAction && currentUser ? 'none' : 'auto', opacity: !canPerformAction && currentUser ? 0.5 : 1 }}>
+                    <AnimatedCartButton
+                      onAdd={() => {
+                        if (!currentUser) {
+                          sessionStorage.setItem('dualdeer_return_url', window.location.pathname);
+                          router.push('/auth');
+                          return;
+                        }
+                        if (product && canPerformAction) {
+                          addToCart({
+                            id: product.id as string,
+                            name: product.name,
+                            price: product.price,
+                            mrp: product.mrp,
+                            image: product.image,
+                            size: selectedSize,
+                            color: selectedColor || undefined,
+                            quantity: Math.min(quantity, maxAddable)
+                          });
+                        }
+                      }}
+                      label={!currentUser ? "Sign In to Buy" : isRestocking ? `RESTOCKING ${formattedTime}` : isMaxInCart ? "Max in Cart" : "Add To Bag"}
+                    />
+                  </div>
+                </div>
 
-            {/* ROW 2: Buy Now */}
-            <div className={styles.actionRowSecondary}>
-              <button 
-                className={styles.buyNowBtn}
-                disabled={!canPerformAction && currentUser !== null}
-                style={{ opacity: !canPerformAction && currentUser ? 0.5 : 1, cursor: (!canPerformAction && currentUser) ? 'not-allowed' : 'pointer' }}
-                onClick={() => {
-                  if (!currentUser) {
-                    sessionStorage.setItem('dualdeer_return_url', window.location.pathname);
-                    router.push('/auth');
-                    return;
-                  }
-                  if(product && canPerformAction) {
-                    router.push(`/checkout?product=${product.slug || ''}&id=${product.id}&size=${encodeURIComponent(selectedSize)}&qty=${Math.min(quantity, maxAddable)}`);
-                  }
-                }}
-              >
-                {!currentUser ? "Sign In to Checkout" : !canPerformAction ? (isRestocking ? `WAIT ${formattedTime}` : isOutOfStock ? 'Unavailable' : 'Limit Reached') : 'Buy Now'}
-              </button>
-            </div>
+                {/* ROW 2: Buy Now */}
+                <div className={styles.actionRowSecondary}>
+                  <button 
+                    className={styles.buyNowBtn}
+                    disabled={!canPerformAction && currentUser !== null}
+                    style={{ opacity: !canPerformAction && currentUser ? 0.5 : 1, cursor: (!canPerformAction && currentUser) ? 'not-allowed' : 'pointer' }}
+                    onClick={() => {
+                      if (!currentUser) {
+                        sessionStorage.setItem('dualdeer_return_url', window.location.pathname);
+                        router.push('/auth');
+                        return;
+                      }
+                      if(product && canPerformAction) {
+                        router.push(`/checkout?product=${product.slug || ''}&id=${product.id}&size=${encodeURIComponent(selectedSize)}&qty=${Math.min(quantity, maxAddable)}`);
+                      }
+                    }}
+                  >
+                    {!currentUser ? "Sign In to Checkout" : !canPerformAction ? (isRestocking ? `WAIT ${formattedTime}` : 'Limit Reached') : 'Buy Now'}
+                  </button>
+                </div>
+              </>
+            )}
 
             {/* ROW 3: Wishlist & Share */}
             <div className={styles.actionIconGroup}>

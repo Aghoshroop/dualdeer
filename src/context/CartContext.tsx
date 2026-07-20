@@ -12,6 +12,7 @@ export interface CartItem {
   size: string;
   color?: string; // Optional for now
   quantity: number;
+  isPremium?: boolean;
 }
 
 interface CartContextType {
@@ -24,6 +25,8 @@ interface CartContextType {
   cartTotal: number;
   bundleSavings: number;
   appliedBundles: string[];
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -31,6 +34,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Load from LocalStorage on mount
   useEffect(() => {
@@ -107,7 +111,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cart]);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal, bundleSavings, appliedBundles }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal, bundleSavings, appliedBundles, isCartOpen, setIsCartOpen }}>
       {children}
     </CartContext.Provider>
   );

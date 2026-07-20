@@ -20,15 +20,15 @@ import { AuthToastProvider } from "@/context/AuthToastContext";
 import MaintenanceWrapper from "@/components/layout/MaintenanceWrapper";
 
 export const metadata: Metadata = {
-  title: "DualDeer SpeedSuits India | Premium Compression & Gym Wear",
-  description: "Shop premium SpeedSuits in India by DualDeer. High-performance compression wear engineered for gym, running, and elite training.",keywords: [
-    "DualDeer", "SpeedSuit", "DualDeer SpeedSuits", "premium activewear", "luxury athleisure", "menswear", "gym wear",
-    "high-performance sportswear", "aesthetic fitness apparel", "luxury workout clothes",
-    "street-ready activewear", "men's gym clothing", "premium fitness gear", "lifestyle apparel",
+  title: "Best Gym Wear & Premium Activewear in Kolkata | DualDeer Elite",
+  description: "Shop the best gym wear and premium activewear in Kolkata. DualDeer's Elite Collection features the world's best fabrics and high-performance SpeedSuits.",
+  keywords: [
+    "best activewear", "best gym wears", "best fabrics", "DualDeer", "SpeedSuit", "DualDeer SpeedSuits", 
+    "premium activewear kolkata", "luxury athleisure kolkata", "best gym clothes in kolkata", "mens gym wear kolkata",
+    "high-performance sportswear", "elite activewear collection", "luxury workout clothes",
+    "street-ready activewear", "premium fitness gear", "lifestyle apparel",
     "workout gear", "elevated athleisure", "bodybuilding apparel", "sports fashion", "urban activewear","speedsuits india",
-"buy speedsuit india",
-"compression wear india",
-"gym compression suit india"
+    "buy speedsuit india", "compression wear india", "gym compression suit india"
   ],
   authors: [{ name: "DualDeer Team" }],
   creator: "DualDeer Official",
@@ -42,10 +42,10 @@ export const metadata: Metadata = {
   },
   openGraph: {
 
-    title: "DualDeer SpeedSuits | Premium Activewear for Performance",
-    description: "Discover DualDeer SpeedSuits — premium high-performance activewear engineered for athletes.",
+    title: "Best Gym Wear & Premium Activewear in Kolkata | DualDeer",
+    description: "Discover DualDeer's Elite Collection — the absolute best activewear featuring world-class fabrics engineered for peak performance.",
     url: "https://dualdeer.com",
-    siteName: "DualDeer",
+    siteName: "DualDeer Elite Activewear",
     images: [
       {
         url: "https://images.unsplash.com/photo-1550639525-c97d455acf70?q=80&w=1200&auto=format&fit=crop", // Dynamic luxury activewear cover
@@ -105,8 +105,14 @@ export default function RootLayout({
         "https://instagram.com/dualdeerofficial",
         "https://twitter.com/dualdeerofficial"
       ],
-      "description": "DualDeer is India's premier luxury athleisure and high-performance activewear brand, renowned for its signature SpeedSuit collection.",
-      "knowsAbout": ["Premium Activewear", "SpeedSuits", "Compression Wear", "Gym Clothing", "Athleisure"]
+      "description": "DualDeer is Kolkata's premier luxury athleisure and high-performance activewear brand, renowned for its Elite collection and signature SpeedSuits built from the world's best fabrics.",
+      "knowsAbout": ["Premium Activewear", "SpeedSuits", "Compression Wear", "Best Gym Wear in Kolkata", "Luxury Athleisure"],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Kolkata",
+        "addressRegion": "West Bengal",
+        "addressCountry": "IN"
+      }
     },
     {
       "@context": "https://schema.org",
@@ -128,6 +134,8 @@ export default function RootLayout({
       "priceRange": "$$$",
       "address": {
         "@type": "PostalAddress",
+        "addressLocality": "Kolkata",
+        "addressRegion": "West Bengal",
         "addressCountry": "IN"
       }
     },
@@ -156,7 +164,15 @@ export default function RootLayout({
           "name": "Where is DualDeer located?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "DualDeer is designed globally and based in India, delivering premium activewear and athleisure across the country."
+            "text": "DualDeer is designed globally and based in Kolkata, West Bengal, delivering premium activewear and athleisure across India."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the best activewear brand in Kolkata?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "DualDeer is widely considered the best activewear brand in Kolkata, offering an Elite collection built from the best fabrics for peak physical performance and unmatched style."
           }
         }
       ]

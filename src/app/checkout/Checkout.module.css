@@ -495,3 +495,25 @@
     margin-top: 1.5rem;
   }
 }
+
+@media (max-width: 480px) {
+  .title { font-size: clamp(1.2rem, 7vw, 1.75rem); }
+  .page { padding: 20px 0 0 0; }
+  .formSection { padding: 1.5rem 5%; }
+  .summarySection { padding: 1.5rem 5%; }
+  .itemImageWrapper { width: 50px; height: 50px; }
+  .itemName, .itemPrice { font-size: clamp(0.75rem, 5vw, 0.9rem); }
+  .totalRow span:last-child { font-size: clamp(1.1rem, 7vw, 1.5rem); }
+  .submitBtn { padding: 1rem; font-size: 0.9rem; }
+  .couponInputWrapper { flex-direction: column; }
+  .paymentOption { padding: 1rem; gap: 0.8rem; flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 320px) {
+  .headerContainer { flex-direction: column; align-items: flex-start; }
+  .item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .summaryRow { flex-direction: column; gap: 0.3rem; }
+  .totalRow { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+  .input { font-size: 0.85rem; padding: 20px 10px 6px 10px; }
+  .formGroup label { font-size: 0.65rem; }
+}

@@ -35,6 +35,7 @@ export interface Product {
   stock: number;
   isSeasonal?: boolean;
   isNew?: boolean;
+  isPremium?: boolean;
   colors?: string[];
   status?: 'active' | 'deleted';
   createdAt?: Timestamp;
@@ -335,6 +336,45 @@ export const restoreProduct = async (id: string, data?: Product) => {
 };
 
 // ========================
+// Product Notifications
+// ========================
+export const addProductNotification = async (productId: string, userId: string, email: string) => {
+  return addDocument('product_notifications', {
+    productId,
+    userId,
+    email,
+    status: 'waiting',
+    createdAt: Timestamp.now()
+  });
+};
+
+export const getProductNotifications = async (): Promise<ProductNotification[]> => {
+  try {
+    const q = query(collection(db, 'product_notifications'), orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProductNotification));
+  } catch(e) {
+    console.error("Error fetching product notifications", e);
+    return [];
+  }
+};
+
+export const checkIfAlreadyNotified = async (productId: string, email: string): Promise<boolean> => {
+  try {
+    const q = query(
+      collection(db, 'product_notifications'), 
+      where('productId', '==', productId),
+      where('email', '==', email)
+    );
+    const snap = await getDocs(q);
+    return !snap.empty;
+  } catch(e) {
+    console.error("Error checking notification status", e);
+    return false;
+  }
+};
+
+// ========================
 // Reviews
 // ========================
 export const getReviews = async (productId: string): Promise<Review[]> => {
@@ -350,6 +390,16 @@ export const getReviews = async (productId: string): Promise<Review[]> => {
   }
 };
 
+export const getAllSiteReviews = async (): Promise<Review[]> => {
+  try {
+    const q = query(collection(db, 'reviews'), orderBy('date', 'desc'), limit(15));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Review));
+  } catch(e) {
+    console.error("Error fetching all reviews", e);
+    return [];
+  }
+};
 export const addReview = async (review: Omit<Review, 'id' | 'date'>) => {
   const docRef = await addDoc(collection(db, 'reviews'), {
     ...review,
@@ -1414,5 +1464,49 @@ export const markNotificationsAsSent = async (notificationIds: string[]): Promis
     await Promise.all(promises);
   } catch (error) {
     console.error('Failed to mark notifications as sent:', error);
+  }
+};
+
+// ========================
+// Chat Sessions
+// ========================
+export interface ChatSession {
+  id?: string;
+  userId: string;
+  title: string;
+  messages: any[];
+  updatedAt: Timestamp;
+}
+
+export const saveChatSession = async (chatId: string, userId: string, title: string, messages: any[]) => {
+  try {
+    const docRef = doc(db, 'chat_sessions', chatId);
+    await setDoc(docRef, {
+      userId,
+      title,
+      messages,
+      updatedAt: Timestamp.now()
+    }, { merge: true });
+  } catch (error) {
+    console.error("Error saving chat session", error);
+  }
+};
+
+export const getChatSessions = async (userId: string): Promise<ChatSession[]> => {
+  try {
+    const q = query(
+      collection(db, 'chat_sessions'),
+      where('userId', '==', userId)
+    );
+    const snap = await getDocs(q);
+    const sessions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatSession));
+    return sessions.sort((a, b) => {
+      const timeA = a.updatedAt ? a.updatedAt.toMillis() : 0;
+      const timeB = b.updatedAt ? b.updatedAt.toMillis() : 0;
+      return timeB - timeA;
+    });
+  } catch (error) {
+    console.error("Error fetching chat sessions", error);
+    return [];
   }
 };
