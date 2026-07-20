@@ -71,7 +71,7 @@ export default function TestimonialSlider() {
           // Merge live reviews with default ones, keeping live first
           // Map live reviews to match UI object structure
           const formattedLive = liveReviews.map(r => ({
-            id: r.id,
+            id: r.id || `live-${Math.random().toString(36).substring(2, 9)}`,
             userName: r.userName,
             location: "Verified Buyer",
             text: r.text,
