@@ -130,7 +130,7 @@ export default function SeasonalShowcaseSlider({ title: fallbackTitle = "Seasona
                 <h2 className={styles.title}>{activeProduct.name}</h2>
                 <div className={styles.price}>{renderPrice(activeProduct.price)}</div>
                 <Link 
-                  href={`/product/${activeProduct.slug || activeProduct.id.replace('-dup', '')}`} 
+                  href={`/product/${activeProduct.slug}`} 
                   className={styles.shopButton}
                   style={activeProduct.isSoldOut || activeProduct.stock === 0 ? { pointerEvents: 'none', opacity: 0.5 } : {}}
                 >

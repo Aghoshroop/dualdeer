@@ -124,7 +124,7 @@ export default function OrderDetailsModal({ order, user, onClose }: OrderDetails
             <div className={styles.itemList}>
               {order.items.map((item, idx) => (
                 <div key={idx} className={styles.itemCard}>
-                  <Link href={`/product/${item.productId}`} style={{ display: 'block', textDecoration: 'none' }}>
+                  <Link href={`/product/${item.slug || item.productId}`} style={{ display: 'block', textDecoration: 'none' }}>
                     {item.image ? (
                       <img src={item.image} alt={item.name} className={styles.itemImage} />
                     ) : (
@@ -132,7 +132,7 @@ export default function OrderDetailsModal({ order, user, onClose }: OrderDetails
                     )}
                   </Link>
                   <div className={styles.itemDetails}>
-                    <Link href={`/product/${item.productId}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+                    <Link href={`/product/${item.slug || item.productId}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
                       <h5 className={styles.itemName} style={{ cursor: 'pointer' }}>{item.name}</h5>
                       <p className={styles.itemMeta}>Qty: {item.quantity} {item.size ? `• Size: ${item.size}` : ''}</p>
                       <div className={styles.itemPrice}>{renderPrice(item.pricePaid)}</div>

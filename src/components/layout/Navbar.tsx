@@ -366,7 +366,7 @@ export default function Navbar() {
                             <div className={styles.marqueeTrack}>
                               {[...displayResults, ...displayResults].map((product, idx) => (
                                 <Link 
-                                  href={`/product/${product.slug || product.id}`} 
+                                  href={`/product/${product.slug}`} 
                                   key={`${product.id}-${idx}`} 
                                   className={styles.marqueeResultCard}
                                   onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
@@ -386,7 +386,7 @@ export default function Navbar() {
                           <div className={styles.overlayResultsGrid}>
                             {displayResults.map(product => (
                               <Link 
-                                href={`/product/${product.slug || product.id}`} 
+                                href={`/product/${product.slug}`} 
                                 key={product.id} 
                                 className={styles.overlayResultCard}
                                 onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}

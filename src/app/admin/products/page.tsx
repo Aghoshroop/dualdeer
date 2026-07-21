@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Search, RotateCcw, AlertTriangle, ArchiveRestore } from 'lucide-react';
 import styles from './ProductsPage.module.css';
-import { getProducts, getDeletedProducts, addProduct, updateProduct, deleteProduct, restoreProduct, hardDeleteProduct, Product, getContentBlock, updateContentBlock, getCategories } from '@/lib/firebaseUtils';
+import { getProducts, getDeletedProducts, addProduct, updateProduct, deleteProduct, restoreProduct, hardDeleteProduct, Product, getContentBlock, updateContentBlock, getCategories, generateSlug, getUniqueSlug } from '@/lib/firebaseUtils';
 import { uploadImageToImgBB } from '@/lib/uploadUtils';
 
 function CustomDropdown({ options, value, onChange, placeholder, disabled = false }: { options: string[], value: string, onChange: (val: string) => void, placeholder: string, disabled?: boolean }) {
@@ -99,6 +99,7 @@ export default function AdminProductsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
+    slug: '',
     description: '',
     sizes: '',
     sizeUnits: {} as Record<string, number>,
@@ -147,7 +148,7 @@ export default function AdminProductsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ name: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '', isSoldOut: false, isPremium: false });
+    setFormData({ name: '', slug: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '', isSoldOut: false, isPremium: false });
     setEditingId(null);
     setHasOfferPrice(true);
     setShowModal(true);
@@ -156,6 +157,7 @@ export default function AdminProductsPage() {
   const openEditModal = (product: Product) => {
     setFormData({
       name: product.name,
+      slug: (product.slug === product.id ? '' : product.slug) || '',
       description: product.description || '',
       sizes: product.sizes ? product.sizes.join(', ') : '',
       sizeUnits: product.sizeUnits || {},
@@ -286,19 +288,15 @@ export default function AdminProductsPage() {
     let updated = 0;
     try {
       for (const p of products) {
-        if (!p.slug) {
-          const generatedSlug = p.name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-            
-          // Add random string for uniqueness
-          const finalSlug = `${generatedSlug}-${Math.random().toString(36).substring(2, 7)}`;
-          
+        if (!p.slug || p.slug === p.id) {
+          const baseSlug = generateSlug(p.name);
+          const finalSlug = await getUniqueSlug(baseSlug, p.id);
+          console.log(`Migrating product ${p.name} (ID: ${p.id}) to slug: ${finalSlug}`);
           await updateProduct(p.id!, { slug: finalSlug });
           updated++;
         }
       }
+      console.log(`Migrated ${updated} products.`);
       alert(`Migration complete! Updated ${updated} products.`);
       loadProducts();
     } catch (err) {
@@ -521,6 +519,19 @@ export default function AdminProductsPage() {
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   required
                 />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>URL Slug (Optional)</label>
+                <input 
+                  type="text" 
+                  value={formData.slug} 
+                  onChange={(e) => setFormData({...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '-')})}
+                  placeholder={formData.name ? generateSlug(formData.name) : "e.g. titan-weave"}
+                />
+                <span style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '4px', display: 'block' }}>
+                  Preview: https://www.dualdeer.com/product/{formData.slug || (formData.name ? generateSlug(formData.name) : '...')}
+                </span>
               </div>
 
               <div className={styles.formGroup}>

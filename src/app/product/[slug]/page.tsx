@@ -56,15 +56,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   
   let product = await getProductBySlug(slug);
-  let isRedirectingId = false;
+  
+  if (product && product.slug && product.slug !== slug) {
+    permanentRedirect(`/product/${product.slug}`);
+  }
 
   if (!product) {
     product = await getProduct(slug);
-    if (product) {
-      if (product.slug && product.slug !== slug) {
-        permanentRedirect(`/product/${product.slug}`);
-      }
-      // If we found it by ID but it has no slug, we just render it with ID for backward compatibility until migrated.
+    if (product && product.slug && product.slug !== slug) {
+      permanentRedirect(`/product/${product.slug}`);
     }
   }
 

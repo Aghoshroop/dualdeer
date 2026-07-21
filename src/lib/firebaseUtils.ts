@@ -19,6 +19,7 @@ export interface ContentBlock {
 export interface Product {
   id?: string;
   slug?: string;
+  pastSlugs?: string[];
   name: string;
   description?: string;
   sizes?: string[];
@@ -134,6 +135,7 @@ export interface WithdrawalRequest {
 
 export interface OrderItem {
   productId: string;
+  slug?: string;
   name: string;
   mrp: number;
   pricePaid: number;
@@ -313,15 +315,74 @@ export const getProductBySlug = async (slug: string): Promise<Product | null> =>
     if (!snap.empty) {
       return { id: snap.docs[0].id, ...snap.docs[0].data() } as Product;
     }
+    
+    // Fallback: Check past slugs for backward compatibility
+    const qPast = query(collection(db, 'products'), where('pastSlugs', 'array-contains', slug), limit(1));
+    const snapPast = await getDocs(qPast);
+    if (!snapPast.empty) {
+      return { id: snapPast.docs[0].id, ...snapPast.docs[0].data() } as Product;
+    }
   } catch(e) {
     console.error("Error fetching single product by slug", e);
   }
   return null;
 };
 
+export const generateSlug = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
 
-export const addProduct = (data: Omit<Product, 'id'>) => addDocument('products', { ...data, status: 'active' });
-export const updateProduct = (id: string, data: Partial<Product>) => updateDocument('products', id, data);
+export const getUniqueSlug = async (baseSlug: string, excludeId?: string): Promise<string> => {
+  let uniqueSlug = baseSlug;
+  let counter = 2;
+  let isUnique = false;
+
+  while (!isUnique) {
+    const q = query(collection(db, 'products'), where('slug', '==', uniqueSlug), limit(1));
+    const snap = await getDocs(q);
+    
+    if (snap.empty || (excludeId && snap.docs[0].id === excludeId)) {
+      isUnique = true;
+    } else {
+      uniqueSlug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+  }
+  return uniqueSlug;
+};
+
+
+export const addProduct = async (data: Omit<Product, 'id'>) => {
+  let finalSlug = data.slug;
+  if (!finalSlug) {
+    const baseSlug = generateSlug(data.name);
+    finalSlug = await getUniqueSlug(baseSlug);
+  }
+  return addDocument('products', { ...data, slug: finalSlug, status: 'active' });
+};
+
+export const updateProduct = async (id: string, data: Partial<Product>) => {
+  let finalSlug = data.slug;
+  if (data.name && !finalSlug) {
+    const baseSlug = generateSlug(data.name);
+    finalSlug = await getUniqueSlug(baseSlug, id);
+    data.slug = finalSlug;
+  }
+  
+  const currentProduct = await getProduct(id);
+  if (currentProduct && data.slug && currentProduct.slug !== data.slug) {
+    const pastSlugs = currentProduct.pastSlugs || [];
+    if (currentProduct.slug && currentProduct.slug !== id && !pastSlugs.includes(currentProduct.slug)) {
+      pastSlugs.push(currentProduct.slug);
+    }
+    data.pastSlugs = pastSlugs;
+  }
+  
+  return updateDocument('products', id, data);
+};
 
 // Soft delete
 export const deleteProduct = async (id: string) => {
