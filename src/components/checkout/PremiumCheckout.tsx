@@ -351,19 +351,7 @@ export default function PremiumCheckout() {
          {paymentMethod === 'razorpay_link' && <ShieldAlert size={16} color="#D4AF37" />}
       </div>
 
-      <div 
-         className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
-         onClick={() => setPaymentMethod('cod')}
-      >
-         <div className={styles.payInfo}>
-           <div className={styles.payIcon}><Banknote size={24} /></div>
-           <div>
-             <h4 className={styles.payTitle}>Physical Tender (COD)</h4>
-             <p className={styles.paySubtitle}>Cash on Delivery</p>
-           </div>
-         </div>
-         {paymentMethod === 'cod' && <ShieldAlert size={16} color="#D4AF37" />}
-      </div>
+
     </div>
   );
 
@@ -428,7 +416,7 @@ export default function PremiumCheckout() {
         
         <div style={{ gridColumn: '1 / -1', marginBottom: '1rem' }}>
           <button 
-            onClick={() => router.push('/shop')} 
+            onClick={() => router.back()} 
             style={{ 
               background: 'transparent', 
               border: '1px solid rgba(212,175,55,0.3)', 
@@ -492,6 +480,35 @@ export default function PremiumCheckout() {
                     <label className={styles.inputLabel}>Postal Code</label>
                     <input type="text" required className={styles.inputField} placeholder="Sector code" value={formData.zip} onChange={e => setFormData({...formData, zip: e.target.value})} />
                   </div>
+                  {/* COUPON SECTION */}
+                  <div style={{ gridColumn: '1 / -1', marginTop: '0.5rem' }}>
+                    <div className={styles.couponSection}>
+                      <div className={styles.couponInputWrapper}>
+                        <input 
+                          type="text" 
+                          placeholder="Access Code" 
+                          value={couponCode} 
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          className={styles.couponInput}
+                          disabled={!!appliedCoupon || couponLoading}
+                        />
+                        <button 
+                          type="button"
+                          onClick={handleApplyCoupon}
+                          disabled={!couponCode || couponLoading || !!appliedCoupon}
+                          className={styles.couponBtn}
+                        >
+                          {couponLoading ? 'Verifying...' : appliedCoupon ? 'Applied' : 'Apply'}
+                        </button>
+                      </div>
+                      {couponError && <p className={styles.couponError}>{couponError}</p>}
+                      {appliedCoupon && (
+                        <p className={styles.couponSuccess}>
+                          Code '{appliedCoupon.code}' active. -{formatPrice(discountAmountCapped)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </form>
 
               </motion.section>
@@ -513,33 +530,7 @@ export default function PremiumCheckout() {
                 
                 {paymentMethodsBlock}
 
-                {/* COUPON SECTION */}
-                <div className={styles.couponSection}>
-                  <div className={styles.couponInputWrapper}>
-                    <input 
-                      type="text" 
-                      placeholder="Access Code" 
-                      value={couponCode} 
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      className={styles.couponInput}
-                      disabled={!!appliedCoupon || couponLoading}
-                    />
-                    <button 
-                      type="button"
-                      onClick={handleApplyCoupon}
-                      disabled={!couponCode || couponLoading || !!appliedCoupon}
-                      className={styles.couponBtn}
-                    >
-                      {couponLoading ? 'Verifying...' : appliedCoupon ? 'Applied' : 'Apply'}
-                    </button>
-                  </div>
-                  {couponError && <p className={styles.couponError}>{couponError}</p>}
-                  {appliedCoupon && (
-                    <p className={styles.couponSuccess}>
-                      Code '{appliedCoupon.code}' active. -{formatPrice(discountAmountCapped)}
-                    </p>
-                  )}
-                </div>
+
               </motion.section>
             )}
 

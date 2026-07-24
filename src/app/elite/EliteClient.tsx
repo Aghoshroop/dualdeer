@@ -231,7 +231,7 @@ function EliteEngine({ initialProducts, initialHeroSettings, initialSplashSettin
               loop
               playsInline
               className={styles.heroImage} 
-              style={{ y: yParallax, scale: 1.05 }}
+              style={{ y: isMobile ? 0 : yParallax, scale: 1.05 }}
             />
           ) : (
             <motion.img 
@@ -241,7 +241,7 @@ function EliteEngine({ initialProducts, initialHeroSettings, initialSplashSettin
               initial={{ scale: 1.1 }}
               animate={{ scale: 1 }}
               transition={{ duration: 15, ease: 'easeOut' }}
-              style={{ y: yParallax }}
+              style={{ y: isMobile ? 0 : yParallax }}
             />
           )}
           <div className={styles.heroGradient} />

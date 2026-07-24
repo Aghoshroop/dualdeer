@@ -20,7 +20,7 @@ export default function FeaturedProducts() {
 
   useEffect(() => {
     getProducts().then(prods => {
-      const coreProducts = prods.filter(p => !p.isSeasonal && (!p.category || !p.category.toUpperCase().includes('SEASONAL')));
+      const coreProducts = prods.filter(p => !p.isPremium && !p.isSeasonal && (!p.category || !p.category.toUpperCase().includes('SEASONAL')));
       setProducts(coreProducts.slice(0, 4));
       setLoading(false);
     });

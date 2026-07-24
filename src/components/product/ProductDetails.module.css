@@ -4,6 +4,7 @@
   margin: 0 auto;
   color: var(--color-text);
   font-family: var(--font-inter), sans-serif;
+  position: relative;
 }
 
 .backBtn {
@@ -2683,4 +2684,58 @@
 
 .socialProofToast strong {
   font-weight: 700;
+}
+
+.mobileTopBar {
+  margin-bottom: 2rem;
+}
+
+.mobileFomoBanner {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .breadcrumbWrapper {
+    display: none !important;
+  }
+
+  .quickRating {
+    display: none !important;
+  }
+
+  .desktopFomo {
+    display: none !important;
+  }
+
+  .mobileTopBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    z-index: 20;
+  }
+
+  .mobileFomoBanner {
+    display: flex;
+    background: rgba(var(--background-rgb), 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(var(--foreground-rgb), 0.1);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.55rem;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    color: var(--color-text);
+    font-weight: 500;
+  }
+  
+  .mobileFomoBanner strong {
+    font-weight: 800;
+  }
 }

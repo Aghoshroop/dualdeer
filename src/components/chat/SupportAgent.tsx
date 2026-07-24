@@ -11,6 +11,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   products?: any[];
+  timestamp?: string;
 }
 
 export default function SupportAgent() {
@@ -65,7 +66,8 @@ export default function SupportAgent() {
       } else {
         setMessages([{
           role: 'assistant',
-          content: "Welcome to the DualDeer Concierge. I am your personal AI assistant. How can I elevate your experience today?"
+          content: "Welcome to the DualDeer Concierge. I am your personal AI assistant. How can I elevate your experience today?",
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }]);
       }
 
@@ -81,7 +83,8 @@ export default function SupportAgent() {
     localStorage.removeItem('dualdeer_cloud_context');
     setMessages([{
       role: 'assistant',
-      content: "Memory wiped. Let's start fresh. What can I help you with?"
+      content: "Memory wiped. Let's start fresh. What can I help you with?",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }]);
   };
 
@@ -166,7 +169,7 @@ export default function SupportAgent() {
        return; 
     }
 
-    const userMessage: Message = { role: 'user', content: textToSend };
+    const userMessage: Message = { role: 'user', content: textToSend, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
     const newHistory = [...messages, userMessage];
 
     setMessages(newHistory);
@@ -200,7 +203,7 @@ export default function SupportAgent() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.reply, products: data.products }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: data.reply, products: data.products, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
 
         if (data.memory) {
           const existing = localStorage.getItem('dualdeer_session_memory');
@@ -218,14 +221,16 @@ export default function SupportAgent() {
       } else {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: data.error || 'Connection issue.'
+          content: data.error || 'Connection issue.',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }]);
       }
 
     } catch (error) {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'System temporarily unavailable.'
+        content: 'System temporarily unavailable.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     }
 
@@ -332,16 +337,24 @@ export default function SupportAgent() {
                 <div className={styles.messagesContainer}>
                   
                   {messages.length <= 1 && (
-                    <motion.div 
-                      className={styles.heroSection}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    >
-                      <div className={styles.heroWelcome}>WELCOME,</div>
-                      <h1 className={styles.heroTitle}>I'M DEER.</h1>
-                      <p className={styles.heroSubtitle}>I know activewear.<br/>I know performance.<br/>I'm here to help.</p>
-                    </motion.div>
+                      <motion.div 
+                        className={styles.heroSection}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <div className={styles.heroWelcome}>WELCOME,</div>
+                        <h1 className={styles.heroTitle}>
+                          <span className={styles.heroTitleWhite}>I'M</span> <span className={styles.heroTitleGradient}>DEER.</span>
+                        </h1>
+                        <div className={styles.heroGraphic}>
+                          <div className={styles.crosshair}>
+                            <div className={styles.crosshairCenter}></div>
+                          </div>
+                          <div className={styles.graphicLine}></div>
+                        </div>
+                        <p className={styles.heroSubtitle}>I know activewear.<br/>I know performance.<br/>I'm here to help.</p>
+                      </motion.div>
                   )}
 
                   <AnimatePresence>
@@ -356,10 +369,16 @@ export default function SupportAgent() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                         >
-                          <div className={styles.messageContentBlock}>
-                            <div className={`${styles.messageBubble} ${msg.role === 'user' ? styles.userBubble : styles.assistantBubble}`}>
-                              {msg.content}
-                            </div>
+                          <div className={styles.messageRow}>
+                            {msg.role === 'assistant' && (
+                              <div className={styles.assistantAvatar}>
+                                <AiDeerIcon size={20} className={styles.avatarIcon} />
+                              </div>
+                            )}
+                            <div className={styles.messageContentBlock}>
+                              <div className={`${styles.messageBubble} ${msg.role === 'user' ? styles.userBubble : styles.assistantBubble}`}>
+                                {msg.content}
+                              </div>
                             
                             {msg.products && msg.products.length > 0 && (
                               <motion.div 
@@ -381,27 +400,33 @@ export default function SupportAgent() {
                             )}
 
                             <div className={styles.msgFooter}>
-                              {msg.role === 'assistant' && <AiDeerIcon size={12} className={styles.deerTinyIcon} />}
-                              {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {msg.role === 'assistant' && <div className={styles.purpleDot}></div>}
+                              {msg.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
                           </div>
+                        </div>
                         </motion.div>
                       );
                     })}
                   </AnimatePresence>
 
                   {isLoading && (
-                    <motion.div 
-                      className={`${styles.messageWrapper} ${styles.assistantWrapper}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <div className={styles.messageContentBlock}>
-                        <div className={styles.typingIndicator}>
-                          <AiDeerIcon size={16} className={styles.typingIcon} />
+                      <motion.div 
+                        className={`${styles.messageWrapper} ${styles.assistantWrapper}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        <div className={styles.messageRow}>
+                          <div className={styles.assistantAvatar}>
+                            <AiDeerIcon size={20} className={styles.avatarIcon} />
+                          </div>
+                          <div className={styles.messageContentBlock}>
+                            <div className={styles.typingIndicator}>
+                              <AiDeerIcon size={16} className={styles.typingIcon} />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
+                      </motion.div>
                   )}
 
                   <div ref={messagesEndRef} />
@@ -414,6 +439,7 @@ export default function SupportAgent() {
                       <button type="button" className={styles.sparkBtn}>
                         <Sparkles size={20} />
                       </button>
+                      <div className={styles.inputDivider}></div>
 
                       <input
                         className={styles.inputField}

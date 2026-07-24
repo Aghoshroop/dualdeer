@@ -22,7 +22,9 @@
   width: 100%;
   height: 100%;
   background: radial-gradient(circle at 10% 20%, rgba(123, 46, 255, 0.04) 0%, transparent 40%),
-              radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.03) 0%, transparent 40%);
+              radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.03) 0%, transparent 40%),
+              radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 24px 24px;
   pointer-events: none;
   z-index: 0;
 }
@@ -220,6 +222,9 @@
   position: absolute;
   top: 0;
   z-index: 10;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(4, 4, 4, 0.8);
+  backdrop-filter: blur(10px);
 }
 
 .wipeBtn {
@@ -294,7 +299,7 @@
 }
 
 .heroWelcome {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #B7B7B7;
   letter-spacing: 4px;
   margin-bottom: 8px;
@@ -305,11 +310,68 @@
   font-size: 5rem;
   font-weight: 700;
   line-height: 1;
-  margin: 0 0 24px 0;
-  letter-spacing: -1px;
-  background: linear-gradient(135deg, #FFFFFF 0%, #B7B7B7 50%, #7B2EFF 100%);
+  margin: 0 0 16px 0;
+  font-family: 'Oswald', 'Bebas Neue', 'Impact', sans-serif;
+  text-transform: uppercase;
+  display: flex;
+  gap: 12px;
+}
+
+.heroTitleWhite {
+  color: #FFFFFF;
+}
+
+.heroTitleGradient {
+  background: linear-gradient(135deg, #A855F7 0%, #7B2EFF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.heroGraphic {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.crosshair {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(123, 46, 255, 0.6);
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: -16px;
+  z-index: 2;
+}
+.crosshair::before {
+  content: '';
+  position: absolute;
+  width: 48px;
+  height: 1px;
+  background: rgba(123, 46, 255, 0.8);
+}
+.crosshair::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 48px;
+  background: rgba(123, 46, 255, 0.8);
+}
+.crosshairCenter {
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #7B2EFF;
+  z-index: 3;
+}
+.graphicLine {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(123, 46, 255, 0.6) 0%, rgba(123, 46, 255, 0.1) 80%, transparent 100%);
+  width: 120px;
+  margin-left: 16px;
 }
 
 .heroSubtitle {
@@ -335,6 +397,32 @@
   justify-content: flex-start;
 }
 
+.messageRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  width: 100%;
+}
+.userWrapper .messageRow {
+  flex-direction: row-reverse;
+}
+
+.assistantAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 24px;
+}
+.avatarIcon {
+  color: #7B2EFF;
+}
+
 .messageContentBlock {
   display: flex;
   flex-direction: column;
@@ -356,33 +444,34 @@
 }
 
 .assistantBubble {
-  background: #111111;
+  background: #0D0D0D;
   color: #FFFFFF;
-  border-radius: 28px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.04);
-  border-bottom-left-radius: 8px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .userBubble {
   background: transparent;
   color: #FFFFFF;
-  border-radius: 28px;
+  border-radius: 16px;
   border: 1px solid rgba(123, 46, 255, 0.4);
-  border-bottom-right-radius: 8px;
 }
 
 .msgFooter {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 0.75rem;
   color: #B7B7B7;
   margin-top: 4px;
 }
 
-.deerTinyIcon {
-  color: #7B2EFF;
+.purpleDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7B2EFF;
 }
 
 /* ------------------------
@@ -416,10 +505,12 @@
 .inputContainer {
   position: absolute;
   bottom: 40px;
+  left: 0;
   width: 100%;
   display: flex;
   justify-content: center;
   padding: 0 24px;
+  box-sizing: border-box;
   pointer-events: none;
 }
 
@@ -427,17 +518,26 @@
   width: 75%;
   max-width: 800px;
   height: 74px;
-  background: #0B0B0B;
-  border: 1px solid rgba(123, 46, 255, 0.3);
-  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.8);
+  border: 1px solid rgba(123, 46, 255, 0.4);
+  border-radius: 36px;
   display: flex;
   align-items: center;
   padding: 0 12px 0 24px;
+  box-sizing: border-box;
   pointer-events: auto;
   box-shadow: 0 20px 40px rgba(0,0,0,0.8);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.inputDivider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 16px;
 }
 
 .inputWrapper::before {
@@ -481,10 +581,16 @@
   padding: 0 16px;
   outline: none;
   font-family: inherit;
+  min-width: 0;
 }
 
 .inputField::placeholder {
   color: rgba(255,255,255,0.2);
+}
+
+@keyframes activeAiGlow {
+  0% { box-shadow: 0 0 10px rgba(123, 46, 255, 0.4), 0 0 20px rgba(123, 46, 255, 0.2); }
+  100% { box-shadow: 0 0 20px rgba(123, 46, 255, 0.8), 0 0 40px rgba(168, 85, 247, 0.6); }
 }
 
 .sendBtn {
@@ -500,6 +606,7 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 4px 15px rgba(123, 46, 255, 0.3);
+  flex-shrink: 0;
 }
 
 .sendBtn:disabled {
@@ -509,10 +616,14 @@
   cursor: not-allowed;
 }
 
+.sendBtn:not(:disabled) {
+  animation: activeAiGlow 2s infinite alternate ease-in-out;
+  background: linear-gradient(135deg, #A855F7 0%, #7B2EFF 100%);
+}
+
 .sendBtn:not(:disabled):hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(123, 46, 255, 0.5);
-  background: #A855F7;
+  background: linear-gradient(135deg, #B774F8 0%, #8D49FF 100%);
 }
 
 /* ------------------------
@@ -665,19 +776,59 @@
     font-size: 24px;
   }
   .messageBubble {
-    font-size: 0.75rem; /* Even smaller */
-    padding: 10px 14px;
+    font-size: 0.85rem;
+    padding: 12px 16px;
+  }
+  .assistantAvatar {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 20px;
   }
   .inputField {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
   .heroTitle {
-    font-size: 2.2rem;
+    font-size: 3rem;
   }
   .heroSubtitle {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+  }
+  .inputContainer {
+    bottom: 40px;
+    padding: 0 16px;
+    box-sizing: border-box;
   }
   .inputWrapper {
-    height: 50px;
+    height: 60px;
+    padding: 0 8px 0 20px;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .inputDivider {
+    margin: 0 12px;
+  }
+  .sendBtn {
+    width: 44px;
+    height: 44px;
+  }
+  .sparkBtn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .mainHeader {
+    padding: 12px 20px;
+    gap: 12px;
+  }
+  .wipeBtn {
+    height: 36px;
+    padding: 0 12px;
+    font-size: 0.65rem;
+  }
+  .closeBtn {
+    width: 36px;
+    height: 36px;
+  }
+  .messagesContainer {
+    padding: 80px 20px 130px 20px;
   }
 }

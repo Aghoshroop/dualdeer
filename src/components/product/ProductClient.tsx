@@ -61,7 +61,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   const [isZoomed, setIsZoomed] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   
-  const [activeAccordion, setActiveAccordion] = useState<string | null>('details');
+  const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastData, setToastData] = useState<{name: string, location: string} | null>(null);
 
@@ -426,13 +426,38 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
   return (
     <>
       <div className={styles.pageContainer}>
-        <button 
-          onClick={() => router.back()} 
-          className={styles.backBtn}
-          aria-label="Go back"
-        >
-          <ChevronLeft size={20} /> Back to Collection
-        </button>
+        <div className={styles.mobileTopBar}>
+          <button 
+            onClick={() => router.back()} 
+            className={styles.backBtn}
+            aria-label="Go back"
+            style={{ marginBottom: 0 }}
+          >
+            <ChevronLeft size={20} /> Back to Collection
+          </button>
+          {/* MOBILE FOMO BANNER OVERLAY */}
+          {!isRestocking && displayStock > 0 && displayStock < 1000 && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={styles.mobileFomoBanner}
+            >
+              <div className={styles.pulseIcon} style={{ fontSize: '0.8rem' }}>⚡</div>
+              <p style={{ margin: 0 }}>High Demand: <strong>{totalBought.toLocaleString()}</strong> bought recently</p>
+            </motion.div>
+          )}
+          {isRestocking && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={styles.mobileFomoBanner}
+              style={{ background: 'rgba(255, 51, 51, 0.2)', border: '1px solid #ff3333' }}
+            >
+              <div className={styles.pulseIcon} style={{ fontSize: '0.8rem' }}>⏳</div>
+              <p style={{ margin: 0 }}>SOLD OUT - Restocks in {formattedTime}</p>
+            </motion.div>
+          )}
+        </div>
 
       <AnimatePresence>
         {isZoomed && (
@@ -567,12 +592,14 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
         </div>
 
         <div className={styles.productInfo}>
-          <Breadcrumb items={[
-            { label: 'Home', href: '/' },
-            { label: 'Shop', href: '/shop' },
-            { label: product.category || 'Category', href: `/shop?category=${encodeURIComponent(product.category || '')}` },
-            { label: product.name }
-          ]} />
+          <div className={styles.breadcrumbWrapper}>
+            <Breadcrumb items={[
+              { label: 'Home', href: '/' },
+              { label: 'Shop', href: '/shop' },
+              { label: product.category || 'Category', href: `/shop?category=${encodeURIComponent(product.category || '')}` },
+              { label: product.name }
+            ]} />
+          </div>
 
           <div className={styles.titleHeader}>
             <div className={styles.productBadges}>
@@ -603,33 +630,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
             </p>
           </div>
 
-          <div className={styles.accordionsWrapper} style={{ marginTop: '-0.5rem', marginBottom: '1rem', borderTop: 'none' }}>
-            {[
-              { id: 'details', title: 'Product Details & Specs', content: product.description || "Elite performance wear crafted for maximum aerodynamic efficiency." },
-            ].map(acc => (
-              <div key={acc.id} className={styles.accordionItem}>
-                <button 
-                  className={styles.accordionHeader} 
-                  onClick={() => setActiveAccordion(activeAccordion === acc.id ? null : acc.id)}
-                >
-                  {acc.title}
-                  <ChevronDown size={18} style={{ transform: activeAccordion === acc.id ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }} />
-                </button>
-                <AnimatePresence>
-                  {activeAccordion === acc.id && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className={styles.accordionContent}
-                    >
-                      <div className={styles.accordionText}>{acc.content}</div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
-          </div>
+
 
           <div className={styles.quickRating}>
             <div className={styles.starsRow}>
@@ -651,7 +652,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
-              className={styles.fomoBanner}
+              className={`${styles.fomoBanner} ${styles.desktopFomo}`}
             >
               <div className={styles.pulseIcon}>⚡</div>
               <p>High Demand: <strong>{totalBought.toLocaleString()}</strong> bought this from all over india. Buy fast!</p>
@@ -662,7 +663,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className={styles.fomoBanner}
+              className={`${styles.fomoBanner} ${styles.desktopFomo}`}
               style={{ background: 'rgba(255, 51, 51, 0.1)', borderLeft: '4px solid #ff3333' }}
             >
               <div className={styles.pulseIcon}>⏳</div>
@@ -908,6 +909,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
 
           <div className={styles.accordionsWrapper}>
             {[
+              { id: 'details', title: 'Product Details & Specs', content: product.description || "Elite performance wear crafted for maximum aerodynamic efficiency." },
               { id: 'materials', title: 'Materials & Care', content: "Made from 88% Premium Polyester and 12% Spandex. Machine wash cold, tumble dry low. Do not bleach or iron." },
               { id: 'shipping', title: 'Shipping & Returns', content: "Free shipping across India on all orders. 7-day hassle-free returns with doorstep pickup." }
             ].map(acc => (
@@ -938,6 +940,7 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
       </section>
 
       <BrandProductDetails product={product} />
+      <RelatedProducts category={product.category} excludeId={product.id!} />
       <RelatedGuides category={product.category} name={product.name} />
 
       <section className={styles.tabsSection}>
@@ -1274,7 +1277,6 @@ export default function ProductClient({ initialProduct, initialReviews }: Produc
         </div>
       </section>
 
-      <RelatedProducts category={product.category} excludeId={product.id!} />
 
       {/* Lightbox Modal */}
       {lightboxIndex !== null && reviewsWithImages[lightboxIndex] && (

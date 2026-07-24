@@ -43,6 +43,7 @@ function CheckoutEngine() {
   const { currency, formatPrice, conversionRate, countryCode, renderPrice } = useCurrency();
   const { showAuthToast } = useAuthToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const hasPremiumItem = cart.some(item => item.isPremium);
   const [step, setStep] = useState<'shipping' | 'payment' | 'qr-payment'>('shipping');
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'razorpay_qr' | 'razorpay_link'>(currency === 'USD' ? 'razorpay_link' : 'razorpay_qr');
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -414,7 +415,7 @@ function CheckoutEngine() {
          )}
       </div>
 
-      {total >= 1500 ? (
+      {hasPremiumItem ? null : total >= 1500 ? (
         <div 
            className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
            onClick={() => setPaymentMethod('cod')}

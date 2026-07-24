@@ -278,8 +278,12 @@ export default function Navbar() {
     }
   };
 
-  // Elite full-screen custom navigation applied to Elite, Product Details, and Checkout flows
-  const isPremiumRoute = pathname === '/elite' || pathname.startsWith('/product/') || pathname.startsWith('/checkout');
+  if (pathname.startsWith('/checkout')) {
+    return null;
+  }
+
+  // Elite full-screen custom navigation restricted to the Elite page itself
+  const isPremiumRoute = pathname === '/elite';
 
   if (isPremiumRoute) {
     return (

@@ -574,6 +574,11 @@
 }
 
 @media (max-width: 768px) {
+  .heroImage {
+    object-position: center center;
+    top: -5%;
+    height: 110%;
+  }
   .gallerySection {
     padding: 40px 5%;
   }

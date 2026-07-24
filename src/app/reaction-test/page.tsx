@@ -159,9 +159,9 @@ export default function ReactionTestV2() {
     <div className={styles.container}>
       <div className={styles.navBarSpacer} />
       
-      <Link href="/" className={styles.backBtn}>
+      <button onClick={() => router.back()} className={styles.backBtn} style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted, #aaa)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'inherit', textDecoration: 'none', position: 'absolute', top: '1.5rem', left: '1.5rem', zIndex: 100, fontSize: '0.9rem', letterSpacing: '2px' }}>
         <ChevronLeft size={20} /> EXIT
-      </Link>
+      </button>
 
       <div className={styles.content}>
         <AnimatePresence mode="wait">
