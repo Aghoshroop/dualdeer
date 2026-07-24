@@ -156,10 +156,12 @@ export default function Navbar() {
 
       // Smart sticky logic: hide on scroll down, show on scroll up
       const previous = scrollY.getPrevious();
-      if (latest > previous && latest > 150) {
-        setIsNavHidden(true); // scrolling down
-      } else if (latest < previous) {
-        setIsNavHidden(false); // scrolling up
+      if (previous !== undefined) {
+        if (latest > previous && latest > 150) {
+          setIsNavHidden(true); // scrolling down
+        } else if (latest < previous) {
+          setIsNavHidden(false); // scrolling up
+        }
       }
     });
   }, [scrollY, dockEnd]);
