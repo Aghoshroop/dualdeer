@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { useState, useEffect, Suspense, useRef, Fragment } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -88,10 +88,10 @@ function LuxuryCard({ product, indexStr, isEven, router, formatPrice }: any) {
             >
               <h4 className={styles.specHeader}>{product.attributes[0]}</h4>
               {product.attributes.slice(1).map((attr: string, idx: number) => (
-                <React.Fragment key={idx}>
+                <Fragment key={idx}>
                   {idx > 0 && <div className={styles.hairlineDivider}></div>}
                   <p className={idx === 0 ? styles.specText : styles.specHighlight}>{attr}</p>
-                </React.Fragment>
+                </Fragment>
               ))}
               {product.sizes && product.sizes.length > 0 && (
                 <>
