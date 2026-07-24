@@ -205,6 +205,7 @@ export default function Footer() {
                 <Link href="/policies/terms" className={styles.linkItem}>TERMS OF SERVICE</Link>
                 <Link href="/contact" className={styles.linkItem}>CONTACT SUPPORT</Link>
                 <Link href="/learn" className={styles.linkItem}>KNOWLEDGE CENTER</Link>
+                <Link href="/leadership" className={styles.linkItem}>LEADERSHIP</Link>
               </div>
             </motion.div>
           </div>

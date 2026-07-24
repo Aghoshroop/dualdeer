@@ -18,12 +18,53 @@ export default function AboutPage() {
     "mainEntity": {
       "@type": "Organization",
       "name": "DualDeer",
-      "founder": {
-        "@type": "Person",
-        "name": "The DualDeer Team"
-      },
+      "url": "https://dualdeer.com",
       "slogan": "The vanguard of human performance.",
-      "description": "DualDeer is an elite sportswear and athleisure brand based in India, specializing in high-performance kinetic fabrics."
+      "description": "DualDeer is an elite sportswear and athleisure brand based in India, specializing in high-performance kinetic fabrics.",
+      "location": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Kolkata",
+          "addressRegion": "West Bengal",
+          "addressCountry": "IN"
+        }
+      },
+      "founder": [
+        {
+          "@type": "Person",
+          "name": "Deer",
+          "jobTitle": "Founder & Creative Architect",
+          "description": "National medalist, state record holder, and an ultra-premium level athlete. The mastermind behind DualDeer's website and brand operations.",
+          "homeLocation": {
+            "@type": "Place",
+            "name": "Kolkata, India"
+          }
+        }
+      ],
+      "employee": [
+        {
+          "@type": "Person",
+          "name": "Aritra Sharma",
+          "jobTitle": "Head of Operations & Lead Video Editor",
+          "description": "The top manager after the brand owner. The most devoted employee leading brand video editing and social media research.",
+          "homeLocation": { "@type": "Place", "name": "Kolkata, India" }
+        },
+        {
+          "@type": "Person",
+          "name": "Abir Dey",
+          "jobTitle": "Lead Brand Model & Fitness Ambassador",
+          "description": "Fitness model and lead brand ambassador who spearheads lead generation and brand representation.",
+          "homeLocation": { "@type": "Place", "name": "Kolkata, India" }
+        },
+        {
+          "@type": "Person",
+          "name": "Ayushman Haldar",
+          "jobTitle": "Head of Marketing & Social Media",
+          "description": "Marketing strategist and social media manager driving DualDeer's digital presence.",
+          "homeLocation": { "@type": "Place", "name": "Kolkata, India" }
+        }
+      ]
     }
   };
 
@@ -53,6 +94,56 @@ export default function AboutPage() {
             </React.Fragment>
           ]}
         />
+        {/* EXECUTIVE TEAM SECTION */}
+        <section style={{ maxWidth: '1200px', margin: '6rem auto 4rem', padding: '0 2rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1rem', color: 'var(--color-text)' }}>The Visionaries Behind DualDeer</h2>
+            <p style={{ fontSize: '1.1rem', color: 'var(--color-text)', opacity: 0.8, maxWidth: '600px', margin: '0 auto' }}>Meet the elite team of athletes, creatives, and strategists from Kolkata, India, driving the vanguard of human performance.</p>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+            {/* Deer */}
+            <Link href="/leadership/deer" style={{ textDecoration: 'none' }}>
+              <div style={{ background: 'rgba(var(--foreground-rgb), 0.02)', padding: '2.5rem 2rem', borderRadius: '24px', border: '1px solid rgba(var(--foreground-rgb), 0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', color: 'var(--color-text)', height: '100%', transition: 'transform 0.3s' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', color: '#fff', fontWeight: 800 }}>D</div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.5rem' }}>Deer</h3>
+                <p style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 1rem' }}>Founder & Creative Architect</p>
+                <p style={{ fontSize: '0.95rem', opacity: 0.8, lineHeight: 1.6 }}>National medalist, state record holder, and ultra-premium level athlete. The mastermind behind DualDeer, managing every aspect of the brand and website from Kolkata.</p>
+              </div>
+            </Link>
+            
+            {/* Aritra */}
+            <Link href="/leadership/aritra-sharma" style={{ textDecoration: 'none' }}>
+              <div style={{ background: 'rgba(var(--foreground-rgb), 0.02)', padding: '2.5rem 2rem', borderRadius: '24px', border: '1px solid rgba(var(--foreground-rgb), 0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', color: 'var(--color-text)', height: '100%', transition: 'transform 0.3s' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(var(--foreground-rgb), 0.1)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', color: 'var(--color-text)', fontWeight: 800 }}>AS</div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.5rem' }}>Aritra Sharma</h3>
+                <p style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 1rem' }}>Head of Operations & Lead Editor</p>
+                <p style={{ fontSize: '0.95rem', opacity: 0.8, lineHeight: 1.6 }}>The top manager and most devoted employee. Video editing is his passion, leading all brand video production and deep social media research.</p>
+              </div>
+            </Link>
+            
+            {/* Abir */}
+            <Link href="/leadership/abir-dey" style={{ textDecoration: 'none' }}>
+              <div style={{ background: 'rgba(var(--foreground-rgb), 0.02)', padding: '2.5rem 2rem', borderRadius: '24px', border: '1px solid rgba(var(--foreground-rgb), 0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', color: 'var(--color-text)', height: '100%', transition: 'transform 0.3s' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(var(--foreground-rgb), 0.1)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', color: 'var(--color-text)', fontWeight: 800 }}>AD</div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.5rem' }}>Abir Dey</h3>
+                <p style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 1rem' }}>Lead Brand Model</p>
+                <p style={{ fontSize: '0.95rem', opacity: 0.8, lineHeight: 1.6 }}>An elite fitness model representing the brand's aesthetic. He spearheads on-camera campaigns and actively drives critical lead generation.</p>
+              </div>
+            </Link>
+            
+            {/* Ayushman */}
+            <Link href="/leadership/ayushman-haldar" style={{ textDecoration: 'none' }}>
+              <div style={{ background: 'rgba(var(--foreground-rgb), 0.02)', padding: '2.5rem 2rem', borderRadius: '24px', border: '1px solid rgba(var(--foreground-rgb), 0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', color: 'var(--color-text)', height: '100%', transition: 'transform 0.3s' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(var(--foreground-rgb), 0.1)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', color: 'var(--color-text)', fontWeight: 800 }}>AH</div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.5rem' }}>Ayushman Haldar</h3>
+                <p style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 1rem' }}>Head of Marketing & Social</p>
+                <p style={{ fontSize: '0.95rem', opacity: 0.8, lineHeight: 1.6 }}>The marketing brain. He consistently thinks outside the box to manage and grow DualDeer's social media presence across all digital platforms.</p>
+              </div>
+            </Link>
+          </div>
+        </section>
+
         <div style={{ maxWidth: '800px', margin: '4rem auto 0', padding: '0 2rem', textAlign: 'center', color: 'var(--color-text)' }}>
           <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Best SpeedSuits in India</h2>
           <p style={{ fontSize: '1.1rem', opacity: 0.8, lineHeight: 1.6 }}>

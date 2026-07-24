@@ -120,7 +120,25 @@ export default async function LearnArticlePage({ params }: { params: Promise<{ s
         <header className={styles.header}>
           <h1 className={styles.title}>{guide.title}</h1>
           <div className={styles.articleMeta}>
-            <span>By <strong>{guide.author}</strong></span>
+            <span>By <strong>
+              {guide.author === 'Deer' ? <Link href="/leadership/deer" style={{color:'inherit'}}>{guide.author}</Link> : 
+               guide.author === 'Aritra Sharma' ? <Link href="/leadership/aritra-sharma" style={{color:'inherit'}}>{guide.author}</Link> :
+               guide.author === 'Abir Dey' ? <Link href="/leadership/abir-dey" style={{color:'inherit'}}>{guide.author}</Link> :
+               guide.author === 'Ayushman Haldar' ? <Link href="/leadership/ayushman-haldar" style={{color:'inherit'}}>{guide.author}</Link> :
+               guide.author}
+            </strong></span>
+            {guide.reviewer && (
+              <>
+                <span>&bull;</span>
+                <span>Reviewed by <strong>
+                  {guide.reviewer === 'Deer' ? <Link href="/leadership/deer" style={{color:'inherit'}}>{guide.reviewer}</Link> : 
+                   guide.reviewer === 'Aritra Sharma' ? <Link href="/leadership/aritra-sharma" style={{color:'inherit'}}>{guide.reviewer}</Link> :
+                   guide.reviewer === 'Abir Dey' ? <Link href="/leadership/abir-dey" style={{color:'inherit'}}>{guide.reviewer}</Link> :
+                   guide.reviewer === 'Ayushman Haldar' ? <Link href="/leadership/ayushman-haldar" style={{color:'inherit'}}>{guide.reviewer}</Link> :
+                   guide.reviewer}
+                </strong></span>
+              </>
+            )}
             <span>&bull;</span>
             <span>{new Date(guide.lastUpdated).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
             <span>&bull;</span>

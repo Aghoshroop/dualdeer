@@ -12,11 +12,12 @@ interface BrandIntroBlockProps {
   paragraphs: React.ReactNode[];
   image: string;
   reverse?: boolean;
+  children?: React.ReactNode;
 }
 
 const luxuryEase = [0.76, 0, 0.24, 1] as const;
 
-export default function BrandIntroBlock({ h1, h2, h3, paragraphs, image, reverse = false }: BrandIntroBlockProps) {
+export default function BrandIntroBlock({ h1, h2, h3, paragraphs, image, reverse = false, children }: BrandIntroBlockProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -91,6 +92,7 @@ export default function BrandIntroBlock({ h1, h2, h3, paragraphs, image, reverse
                   {content}
                 </motion.p>
               ))}
+              {children && <div style={{ marginTop: '3rem' }}>{children}</div>}
             </div>
             
             {paragraphs.length > 1 && (

@@ -11,6 +11,7 @@ const Cinematic3DSection = dynamic(() => import("@/components/sections/Cinematic
 const FeaturedProducts = dynamic(() => import("@/components/sections/FeaturedProducts"), { ssr: true });
 const BrandStory = dynamic(() => import("@/components/sections/BrandStory"), { ssr: true });
 const UpcomingProducts = dynamic(() => import("@/components/sections/UpcomingProducts"), { ssr: true });
+const LeadershipSection = dynamic(() => import("@/components/sections/LeadershipSection"), { ssr: true });
 const TestimonialSlider = dynamic(() => import("@/components/sections/TestimonialSlider"), { ssr: true });
 const BrandIntroBlock = dynamic(() => import("@/components/sections/BrandIntroBlock"), { ssr: true });
 const BrandFaqBlock = dynamic(() => import("@/components/sections/BrandFaqBlock"), { ssr: true });
@@ -78,7 +79,9 @@ export default function Home() {
               Furthermore, our overarching brand philosophy operates under the core belief that authentic performance wear should never compromise on visual design. A sophisticated luxury training wardrobe is an essential investment in your enduring personal goals and long-term physical well-being. We invite you to experience the transformative power of elite athleisure that responds intuitively to your intense movement, rigid structural support requirements, and critical breathability needs. Elevate your daily routine with unparalleled pieces that inspire unwavering confidence, foster immense physical resilience, and make you look as exceptionally powerful as you feel. Let DualDeer be the cornerstone for those who simply refuse to ever settle for the ordinary.
             </React.Fragment>
           ]}
-        />
+        >
+          <LeadershipSection />
+        </BrandIntroBlock>
       </div>
       
       <BrandFaqBlock />

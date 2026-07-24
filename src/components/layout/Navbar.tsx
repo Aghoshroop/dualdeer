@@ -198,6 +198,17 @@ export default function Navbar() {
   const normalizeText = (text?: string) => text ? text.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
   const normalizedQuery = normalizeText(searchQuery);
 
+  const EXECUTIVES = [
+    { slug: 'deer', name: 'Deer', role: 'Founder & Creative Architect', image: 'https://dualdeer.com/deer-founder-dualdeer.webp' },
+    { slug: 'aritra-sharma', name: 'Aritra Sharma', role: 'Head of Operations', image: 'https://dualdeer.com/aritra-sharma-dualdeer.webp' },
+    { slug: 'abir-dey', name: 'Abir Dey', role: 'Lead Brand Model', image: 'https://dualdeer.com/abir-dey-brand-model.webp' },
+    { slug: 'ayushman-haldar', name: 'Ayushman Haldar', role: 'Head of Marketing', image: 'https://dualdeer.com/ayushman-haldar-marketing.webp' },
+  ];
+
+  const leadershipResults = searchQuery.trim() === '' 
+    ? []
+    : EXECUTIVES.filter(exec => normalizeText(exec.name).includes(normalizedQuery));
+
   const displayResults = searchQuery.trim() === '' 
     ? allProducts.slice(0, 6) 
     : allProducts.filter(p => {
@@ -351,10 +362,34 @@ export default function Navbar() {
                       {searchQuery.trim() === '' ? 'Recommended For You' : 'Instant Results'}
                     </div>
                     
-                    {displayResults.length === 0 ? (
+                    {leadershipResults.length > 0 && (
+                      <div className={styles.overlayResultsGrid} style={{ marginBottom: '2rem' }}>
+                        {leadershipResults.map(exec => (
+                          <Link 
+                            href={`/leadership/${exec.slug}`}
+                            key={exec.slug}
+                            className={styles.overlayResultItem}
+                            onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
+                          >
+                            <div className={styles.resultItemImage} style={{ borderRadius: '50%' }}>
+                              {/* Placeholder initials for local rendering if image doesn't exist yet */}
+                              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(var(--foreground-rgb), 0.1)', color: 'var(--color-text)', fontSize: '1.2rem', fontWeight: 800 }}>
+                                {exec.name.substring(0, 2).toUpperCase()}
+                              </div>
+                            </div>
+                            <div className={styles.resultItemInfo}>
+                              <h4>{exec.name}</h4>
+                              <span style={{ color: 'var(--color-primary)' }}>{exec.role}</span>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+
+                    {displayResults.length === 0 && leadershipResults.length === 0 ? (
                       <div className={styles.overlayNoResults}>
-                        No products found for "{searchQuery}"
-                        <span className={styles.overlayDidYouMean}>Try searching for "speedsuit", "jacket", or "performance"</span>
+                        No results found for "{searchQuery}"
+                        <span className={styles.overlayDidYouMean}>Try searching for "speedsuit", "jacket", or a team member</span>
                       </div>
                     ) : searchQuery.trim() === '' ? (
                       <div className={styles.marqueeWrapper}>
