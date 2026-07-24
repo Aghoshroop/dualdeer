@@ -566,32 +566,118 @@
 /* FAB */
 .fabWrapper {
   position: fixed;
-  bottom: 40px;
+  bottom: 80px; /* Sits comfortably above the Live Traffic badge (which is at 20px) */
   right: 40px;
-  z-index: 10005;
+  z-index: 9998;
   touch-action: none;
 }
 .fab {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #0B0B0B;
-  color: #7B2EFF;
-  border: 1px solid rgba(123, 46, 255, 0.3);
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   transition: all 0.4s;
+  position: relative;
+  z-index: 1;
 }
+
+/* The actual dark button background */
+.fab::before {
+  content: '';
+  position: absolute;
+  inset: 2px; /* Leaves a 2px gap for the spinning border */
+  background: #050505;
+  border-radius: 50%;
+  z-index: -1;
+  animation: aiPulse 2s infinite alternate;
+}
+
+/* The spinning AI aura gradient */
+.fabGlow {
+  position: absolute;
+  inset: -2px; /* Bleeds out to create the glowing border */
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #7B2EFF,
+    #D4AF37,
+    #7B2EFF,
+    #00F0FF,
+    #7B2EFF
+  );
+  z-index: -2;
+  filter: blur(8px);
+  animation: aiSpin 3s linear infinite;
+  opacity: 0.85;
+  transition: all 0.4s ease;
+}
+
+.fab:hover .fabGlow {
+  filter: blur(14px);
+  opacity: 1;
+  inset: -4px;
+}
+
 .fab:hover {
   transform: scale(1.08) translateY(-4px);
-  border-color: #7B2EFF;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(123, 46, 255, 0.2);
+}
+
+@keyframes aiSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes aiPulse {
+  0% { box-shadow: inset 0 0 10px rgba(123, 46, 255, 0.1); }
+  100% { box-shadow: inset 0 0 25px rgba(123, 46, 255, 0.6); }
+}
+
+.deerEmoji {
+  font-size: 30px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -2px;
 }
 
 @media (max-width: 1024px) {
   .sidebar { display: none; }
   .inputWrapper { width: 90%; }
+}
+
+@media (max-width: 768px) {
+  .fabWrapper {
+    bottom: 115px; /* Sits perfectly above the Live Traffic badge (which is at 85px + ~26px height) */
+    right: 12px;
+  }
+  .fab {
+    width: 50px;
+    height: 50px;
+  }
+  .deerEmoji {
+    font-size: 24px;
+  }
+  .messageBubble {
+    font-size: 0.75rem; /* Even smaller */
+    padding: 10px 14px;
+  }
+  .inputField {
+    font-size: 0.8rem;
+  }
+  .heroTitle {
+    font-size: 2.2rem;
+  }
+  .heroSubtitle {
+    font-size: 0.8rem;
+  }
+  .inputWrapper {
+    height: 50px;
+  }
 }

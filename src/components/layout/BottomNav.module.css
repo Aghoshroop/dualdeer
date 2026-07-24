@@ -1,28 +1,73 @@
-.bottomNav {
-  display: none; /* Hidden on desktop */
+.bottomNavContainer {
+  display: none;
 }
 
 @media (max-width: 768px) {
-  .bottomNav {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+  .bottomNavContainer {
+    display: block;
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 60px;
-    background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--color-border);
+    height: 90px; 
     z-index: 1000;
-    padding-bottom: env(safe-area-inset-bottom, 0px); /* iPhone notch buffer */
+    pointer-events: none;
   }
 
-  [data-theme='light'] .bottomNav {
-    background: var(--color-border);
-    border-top: 1px solid rgba(var(--background-rgb), 0.1);
+  .navCurveBg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    display: flex;
+    pointer-events: auto;
+    z-index: 0;
+    align-items: flex-end;
+  }
+
+  .navCurveLeft,
+  .navCurveRight {
+    flex: 1;
+    background: var(--color-background);
+    position: relative;
+    height: 65px;
+  }
+
+  .navCurveLeft {
+    border-top-left-radius: 20px;
+    border-top: 1.5px solid rgba(196, 115, 255, 1);
+    box-shadow: 0 -2px 6px rgba(196, 115, 255, 0.4), inset 0 1px 4px rgba(196, 115, 255, 0.1);
+    margin-right: -1px; 
+  }
+  
+  .navCurveRight {
+    border-top-right-radius: 20px;
+    border-top: 1.5px solid rgba(196, 115, 255, 1);
+    box-shadow: 0 -2px 6px rgba(196, 115, 255, 0.4), inset 0 1px 4px rgba(196, 115, 255, 0.1);
+    margin-left: -1px; 
+  }
+
+  .navCurveCenter {
+    width: 160px;
+    height: 90px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .navItemsRow {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center; 
+    pointer-events: auto;
+    z-index: 1;
+    padding: 0 10px;
   }
 
   .navItem {
@@ -30,100 +75,214 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: var(--color-text-muted);
     text-decoration: none;
-    font-family: var(--font-inter), sans-serif;
-    gap: 4px;
     flex: 1;
     position: relative;
-    transition: color 0.3s ease;
+    height: 100%;
   }
 
-  .navItem span {
-    font-size: 0.6rem;
-    font-weight: 500;
+  .iconCircle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    
+    /* Clean, transparent base with a tiny soft bottom glow */
+    background: radial-gradient(circle at 50% 100%, rgba(196, 115, 255, 0.1) 0%, transparent 40%);
+    
+    /* Extremely faint border */
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    
+    /* Sharp, crisp bottom highlight */
+    box-shadow: 
+      inset 0 -1px 0px rgba(255, 255, 255, 0.5),
+      0 1px 4px rgba(196, 115, 255, 0.15);
+      
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 4px;
+    transition: all 0.3s ease;
   }
 
-  .navItem.active {
-    color: var(--color-primary);
+  .iconSVG {
+    color: var(--color-text-muted);
+    transition: all 0.3s ease;
   }
 
-  .cartTab {
+  .iconLabel {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-weight: 300;
+  }
+
+  .navItem.active .iconCircle {
+    background: radial-gradient(circle at 50% 100%, rgba(196, 115, 255, 0.2) 0%, transparent 50%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      inset 0 -1px 1px rgba(255, 255, 255, 0.8),
+      0 2px 6px rgba(196, 115, 255, 0.3);
+    transform: translateY(-2px); 
+  }
+
+  .navItem.active .iconSVG {
+    color: var(--color-text);
+    filter: drop-shadow(0 0 4px rgba(196, 115, 255, 0.4));
+  }
+
+  .navItem.active .iconLabel {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  /* --- CENTER ELITE BUTTON --- */
+  .navItemCenter {
+    flex: 0 0 90px;
+    height: 100%;
+    position: relative;
+    text-decoration: none;
+  }
+
+  .eliteFabGlowEffect {
+    position: absolute;
+    top: -38px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196, 115, 255, 0.8) 0%, rgba(196, 115, 255, 0.3) 50%, transparent 70%);
+    z-index: 2;
+    pointer-events: none;
+    filter: blur(8px);
+  }
+
+  .svgFill {
+    fill: var(--color-background);
+  }
+
+  .eliteFabGoldRing {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    z-index: 3;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.9);
+  }
+
+  /* The outer magical ring */
+  .eliteFabGoldRing::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    padding: 1.5px;
+    background: linear-gradient(180deg, rgba(255, 240, 255, 1) 0%, rgba(196, 115, 255, 0.8) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    box-shadow: 0 0 10px rgba(196, 115, 255, 0.8);
+  }
+
+  .eliteFabInnerDark {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: transparent; /* NOT BLACK - allows magical aura to shine through the gap! */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
   }
-
-  .cartBadge {
+  
+  /* The thick inner gold ring */
+  .eliteFabInnerDark::before {
+    content: '';
     position: absolute;
-    top: -5px;
-    right: 50%;
-    transform: translateX(18px);
-    background: #ff4b4b;
-    color: var(--color-text);
-    font-size: 0.55rem;
-    font-weight: 800;
-    border-radius: 10px;
-    padding: 2px 5px;
-    min-width: 16px;
-    text-align: center;
-    border: 2px solid #141414;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    border-radius: 50%;
+    padding: 2px;
+    background: linear-gradient(180deg, #fff2cc 0%, #d4af37 20%, #664d00 80%, #332700 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 0;
   }
   
-  [data-theme='light'] .cartBadge {
-    border-color: var(--color-text);
+  /* The dark center */
+  .eliteFabInnerDark::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #2a2536 0%, #09060d 100%);
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1);
+    z-index: 1;
   }
-}
 
-/* Extreme downscaling below 250px */
-@media (max-width: 250px) {
-  .bottomNav {
-    height: 50px;
+  .eliteCrown {
+    color: #d4af37;
+    filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.6));
+    position: relative;
+    z-index: 2; /* Sit on top of the ::after pseudo-element */
   }
-  .navItem span {
+
+  .eliteLabelContainer {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .eliteLabelText {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #d4af37;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .eliteLabelGlowLine {
+    width: 12px;
+    height: 1px;
+    background: #d4af37;
+    box-shadow: 0 0 6px 1px rgba(212, 175, 55, 0.8);
+    border-radius: 2px;
+  }
+
+  /* --- CART BADGE --- */
+  .cartBadge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    background: #ff4b4b;
+    color: #fff;
     font-size: 0.5rem;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    z-index: 10;
   }
 }
 
-/* --- HIDE ON NORMAL CHECKOUT --- */
-:global(body:not(.premium-theme)) .bottomNav[data-pathname^="/checkout"] {
+:global(body:not(.premium-theme)) .bottomNavContainer[data-pathname^="/checkout"] {
   display: none !important;
-}
-
-/* --- PREMIUM LUXURIOUS NAV THEME --- */
-:global(body.premium-theme) .bottomNav {
-  background: rgba(5, 5, 5, 0.95) !important;
-  border-top: 1px solid rgba(212, 175, 55, 0.15) !important;
-  backdrop-filter: blur(25px) !important;
-  -webkit-backdrop-filter: blur(25px) !important;
-}
-
-:global(body.premium-theme) .navItem {
-  color: rgba(255, 255, 255, 0.3) !important;
-}
-
-:global(body.premium-theme) .navItem span {
-  font-family: 'Cinzel', serif !important;
-  letter-spacing: 0.15em !important;
-  font-size: 0.5rem !important;
-  text-transform: uppercase !important;
-  font-weight: 400 !important;
-  margin-top: 2px;
-}
-
-:global(body.premium-theme) .navItem.active,
-:global(body.premium-theme) .navItem:hover {
-  color: #D4AF37 !important;
-  text-shadow: 0 0 10px rgba(212, 175, 55, 0.2) !important;
-}
-
-:global(body.premium-theme) .navItem.active svg,
-:global(body.premium-theme) .navItem:hover svg {
-  stroke: #D4AF37 !important;
-  filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3)) !important;
-}
-
-:global(body.premium-theme) .cartBadge {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.9), rgba(163, 130, 236, 0.7)) !important;
-  color: #000 !important;
-  border: 1px solid #D4AF37 !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
 }

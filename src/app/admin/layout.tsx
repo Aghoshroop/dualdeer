@@ -43,6 +43,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin/affiliates" className={styles.link} onClick={closeMenu}><Handshake size={20} /> Affiliates</Link>
             <Link href="/admin/content" className={styles.link} onClick={closeMenu}><FileText size={20} /> Site Content</Link>
             <Link href="/admin/banners" className={styles.link} onClick={closeMenu}><LayoutDashboard size={20} /> Hero Slider</Link>
+            <Link href="/admin/elite-hero" className={styles.link} onClick={closeMenu}><Rocket size={20} /> Elite Hero</Link>
+            <Link href="/admin/elite-splash" className={styles.link} onClick={closeMenu}><Video size={20} /> Elite Splash</Link>
             <Link href="/admin/videos" className={styles.link} onClick={closeMenu}><Video size={20} /> Videos</Link>
             <Link href="/admin/users" className={styles.link} onClick={closeMenu}><Users size={20} /> Users</Link>
             <Link href="/admin/notifications" className={styles.link} onClick={closeMenu}><Bell size={20} /> App Notifications</Link>

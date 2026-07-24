@@ -1174,6 +1174,27 @@
     margin-bottom: 24px;
     width: 100%;
     box-sizing: border-box;
+
+    /* Proportionately scaled down Premium text/buttons for 2-column grid */
+    --mobile-premium-title-size: 0.9rem;
+    --mobile-premium-feature-size: 0.5rem;
+    --mobile-premium-feature-icon: 8px;
+    --mobile-premium-price-size: 16px;
+    --mobile-premium-btn-w: auto;
+    --mobile-premium-btn-h: 24px;
+    --mobile-premium-btn-inner-h: 22px;
+    --mobile-premium-btn-text: 0.55rem;
+    --mobile-premium-btn-icon: 8px;
+
+    /* Proportionately scaled down standard text/buttons for 2-column grid */
+    --mobile-card-title-size: 0.75rem;
+    --mobile-card-feature-size: 0.5rem;
+    --mobile-card-feature-icon: 8px;
+    --mobile-card-price-size: 14px;
+    --mobile-card-btn-w: auto;
+    --mobile-card-btn-h: 22px;
+    --mobile-card-btn-text: 0.5rem;
+    --mobile-card-btn-icon: 8px;
   }
   
   .productWrapper {
@@ -1184,8 +1205,8 @@
   .galleryGrid.grid-1 {
     grid-template-columns: 1fr;
     gap: 16px !important;
-    --mobile-card-height: 380px;
-    --mobile-image-height: 240px;
+    --mobile-card-height: 440px;
+    --mobile-image-height: 300px;
     --mobile-premium-card-height: 520px;
     --mobile-premium-image-height: 380px;
 

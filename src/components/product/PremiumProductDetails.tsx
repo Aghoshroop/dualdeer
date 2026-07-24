@@ -188,7 +188,7 @@ export default function PremiumProductDetails({ product, reviews = [] }: Premium
         }}>
         <button 
           className={styles.navReturnBtn}
-          onClick={() => router.push('/shop')} 
+          onClick={() => router.back()} 
           style={{ 
             background: 'transparent', 
             border: 'none', 

@@ -244,20 +244,8 @@ export default function SupportAgent() {
       {/* FAB WRAPPER */}
       <motion.div
         className={styles.fabWrapper}
-        drag
-        dragMomentum={false}
         animate={wrapperControls}
         initial={{ y: 100, opacity: 0 }}
-        onDragEnd={(e, info) => {
-          if (typeof window !== 'undefined') {
-            const isLeft = info.point.x < window.innerWidth / 2;
-            setSnapSide(isLeft ? 'left' : 'right');
-            wrapperControls.start({
-              x: isLeft ? 64 - window.innerWidth : 0,
-              transition: { type: 'spring', stiffness: 300, damping: 25 }
-            });
-          }
-        }}
       >
         <motion.button
           className={styles.fab}
@@ -265,13 +253,14 @@ export default function SupportAgent() {
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           animate={{ 
-            opacity: isScrolling ? 0.4 : 1,
-            x: isScrolling ? (snapSide === 'right' ? 80 : -80) : 0
+            opacity: isScrolling ? 0 : 1,
+            x: isScrolling ? (snapSide === 'right' ? 150 : -150) : 0,
+            scale: isScrolling ? 0.8 : 1
           }}
           transition={{ duration: 0.4, type: "spring", bounce: 0.2 }}
         >
           <div className={styles.fabGlow}></div>
-          <AiDeerIcon className={styles.fabIcon} size={28} />
+          <span className={styles.deerEmoji}>🦌</span>
         </motion.button>
       </motion.div>
 

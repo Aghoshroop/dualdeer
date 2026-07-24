@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Heart, Star, ArrowRight, Activity, User, Leaf, Venus, Mars, Baby, Users, Shirt, Tag, Crown, Droplets, Wind } from 'lucide-react';
+import { Heart, Star, ArrowRight, Activity, User, Leaf, Venus, Mars, Baby, Users, Shirt, Tag, Crown, Droplets, Wind, ShoppingCart, Check } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
+import { auth } from '@/lib/firebase';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
@@ -47,6 +49,25 @@ export default function ProductCard({
   renderPrice
 }: ProductCardProps) {
   const router = useRouter();
+  const { addToCart } = useCart();
+  const [isAdding, setIsAdding] = useState(false);
+  
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!auth.currentUser) {
+      sessionStorage.setItem('dualdeer_return_url', window.location.pathname);
+      router.push('/auth');
+      return;
+    }
+    if (!product.isSoldOut && product.stock !== 0) {
+      setIsAdding(true);
+      addToCart({ id: product.id, name: product.name, price: product.price, mrp: product.mrp, image: product.image, size: 'M', quantity: 1 });
+      setTimeout(() => {
+        setIsAdding(false);
+      }, 1500);
+    }
+  };
   
   const images = (product.images && product.images.length > 0)
     ? (product.images.includes(product.image) ? product.images : [product.image, ...product.images])
@@ -102,7 +123,6 @@ export default function ProductCard({
           <div className={styles.headerRow}>
             <div className={styles.titleArea}>
               <h3 className={styles.title}>{product.name?.toUpperCase() || ''}</h3>
-              <span className={styles.mobileSubtitle}>{getCategoryInfo(product.category).label}</span>
             </div>
           </div>
 
@@ -141,9 +161,18 @@ export default function ProductCard({
               <span className={styles.price}>{renderPrice(product.price)}</span>
               <span className={styles.mobileTaxLabel}>Inclusive of all taxes</span>
             </div>
-            <button className={styles.actionButton} aria-label="View Product Details">
-              <span>VIEW DETAILS</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            <button 
+              className={`${styles.actionButton} ${isAdding ? styles.addingToCart : ''}`} 
+              aria-label="Add to Cart" 
+              onClick={handleAddToCart}
+              disabled={isAdding}
+            >
+              <span>{isAdding ? 'ADDED' : 'ADD TO CART'}</span>
+              {isAdding ? (
+                <Check size={14} strokeWidth={2.5} />
+              ) : (
+                <ShoppingCart size={14} strokeWidth={2.5} />
+              )}
             </button>
           </div>
         </div>

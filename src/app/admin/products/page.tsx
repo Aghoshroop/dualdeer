@@ -115,9 +115,11 @@ export default function AdminProductsPage() {
     stock: 0,
     colors: '',
     isSoldOut: false,
-    isPremium: false
+    isPremium: false,
+    videoUrl: ''
   });
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState<number | null>(null);
 
   useEffect(() => {
     loadProducts();
@@ -148,7 +150,7 @@ export default function AdminProductsPage() {
   };
 
   const openAddModal = () => {
-    setFormData({ name: '', slug: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '', isSoldOut: false, isPremium: false });
+    setFormData({ name: '', slug: '', description: '', sizes: '', sizeUnits: {}, category: '', subcategory: '', price: 0, mrp: 0, priceUSD: 0, mrpUSD: 0, rating: 5, image: '', images: [], stock: 0, colors: '', isSoldOut: false, isPremium: false, videoUrl: '' });
     setEditingId(null);
     setHasOfferPrice(true);
     setShowModal(true);
@@ -173,7 +175,8 @@ export default function AdminProductsPage() {
       stock: product.stock,
       colors: product.colors ? product.colors.join(', ') : '',
       isSoldOut: product.isSoldOut || false,
-      isPremium: product.isPremium || false
+      isPremium: product.isPremium || false,
+      videoUrl: product.videoUrl || ''
     });
     setEditingId(product.id!);
     // If price equals MRP or price is 0, then there is no real offer price
@@ -223,8 +226,8 @@ export default function AdminProductsPage() {
     const files = Array.from(e.target.files);
     const currentCount = formData.images?.length || 0;
     
-    if (currentCount + files.length > 5) {
-      alert(`Capacity reached: You can only upload a maximum of 5 images per product. You are trying to add ${currentCount + files.length}.`);
+    if (currentCount + files.length > 9) {
+      alert(`Capacity reached: You can only upload a maximum of 9 images per product. You are trying to add ${currentCount + files.length}.`);
       return;
     }
 
@@ -244,6 +247,64 @@ export default function AdminProductsPage() {
       alert("Image upload failed. Please try again.");
     }
     setUploadingImage(false);
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    
+    setUploadingVideo(0);
+    
+    try {
+      const signRes = await fetch('/api/cloudinary/sign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paramsToSign: { folder: 'dualdeer_videos' } })
+      });
+      
+      if (!signRes.ok) throw new Error("Failed to get upload signature");
+      const { timestamp, signature } = await signRes.json();
+      
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+      uploadData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
+      uploadData.append('timestamp', timestamp.toString());
+      uploadData.append('signature', signature);
+      uploadData.append('folder', 'dualdeer_videos');
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`);
+      
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          setUploadingVideo(progress);
+        }
+      };
+      
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          const secure_url = response.secure_url;
+          setFormData(prev => ({ ...prev, videoUrl: secure_url }));
+        } else {
+          console.error("Cloudinary Error:", xhr.responseText);
+          alert("Video upload failed");
+        }
+        setUploadingVideo(null);
+      };
+      
+      xhr.onerror = () => {
+        alert("Video upload failed");
+        setUploadingVideo(null);
+      };
+      
+      xhr.send(uploadData);
+    } catch (error) {
+      console.error(error);
+      alert("Error uploading video");
+      setUploadingVideo(null);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -740,18 +801,18 @@ export default function AdminProductsPage() {
             </div>
 
             <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
-              <label>Product Gallery (Max 5 Images)</label>
+              <label>Product Gallery (Max 9 Images)</label>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <input 
                   type="file" 
                   multiple
                   accept="image/*"
                   onChange={handleImageUpload}
-                  disabled={uploadingImage || (formData.images && formData.images.length >= 5)}
+                  disabled={uploadingImage || (formData.images && formData.images.length >= 9)}
                   style={{ flex: 1 }}
                 />
                 {uploadingImage && <span style={{ fontSize: '0.9rem', color: 'var(--color-primary)' }}>Uploading...</span>}
-                {(formData.images && formData.images.length >= 5) && <span style={{ fontSize: '0.8rem', color: '#ff3333' }}>Limit Reached (5/5)</span>}
+                {(formData.images && formData.images.length >= 9) && <span style={{ fontSize: '0.8rem', color: '#ff3333' }}>Limit Reached (9/9)</span>}
               </div>
               <input 
                 type="url" 
@@ -778,6 +839,39 @@ export default function AdminProductsPage() {
                    <img src={formData.image} alt="Preview" style={{ height: '80px', width: '80px', borderRadius: '8px', objectFit: 'cover' }} />
                 )}
               </div>
+            </div>
+
+            <div className={styles.formGroup} style={{ marginTop: '1rem', background: 'rgba(var(--foreground-rgb), 0.02)', padding: '1rem', borderRadius: '8px' }}>
+              <label>Product Video (Max 1 Video)</label>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '0.5rem' }}>
+                <input 
+                  type="file" 
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  disabled={uploadingVideo !== null}
+                  style={{ flex: 1 }}
+                />
+                {uploadingVideo !== null && <span style={{ fontSize: '0.9rem', color: 'var(--color-primary)' }}>Uploading... {uploadingVideo}%</span>}
+              </div>
+              <input 
+                type="url" 
+                value={formData.videoUrl || ''} 
+                onChange={(e) => setFormData({...formData, videoUrl: e.target.value})}
+                placeholder="Cloudinary secure_url..."
+                style={{ marginTop: '0.5rem' }}
+              />
+              {formData.videoUrl && (
+                <div style={{ marginTop: '1rem', position: 'relative', width: 'fit-content' }}>
+                  <video src={formData.videoUrl} autoPlay loop muted playsInline style={{ height: '120px', borderRadius: '8px', border: '1px solid var(--color-border)' }} />
+                  <button 
+                     type="button"
+                     onClick={() => setFormData(prev => ({ ...prev, videoUrl: '' }))}
+                     style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ff3333', color: 'var(--color-text)', border: 'none', borderRadius: '50%', width: '22px', height: '22px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className={styles.modalActions}>

@@ -65,7 +65,7 @@ export default function PremiumProductCard({
     >
       <div className={styles.imageSection}>
         {/* RIBBON */}
-        <div className={styles.ribbon}>
+        <div className={`${styles.ribbon} ${i % 2 !== 0 ? styles.ribbonRight : ''}`}>
           <img src="/logo.png" alt="DualDeer Logo" className={styles.ribbonIcon} style={{ objectFit: 'contain' }} />
           <span className={styles.ribbonText}>ELITE<span className={styles.desktopOnly}><br/>SERIES</span></span>
         </div>
@@ -85,11 +85,10 @@ export default function PremiumProductCard({
           </div>
         </div>
 
-
         
         {toggleWishlist && (
           <button 
-            className={styles.wishlistBtn}
+            className={`${styles.wishlistBtn} ${i % 2 !== 0 ? styles.wishlistBtnLeft : ''}`}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();

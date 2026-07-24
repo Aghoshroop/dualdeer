@@ -219,6 +219,8 @@ function ShopEngine({ initialProducts, initialCategories, initialHeroUrl, initia
 
   // Process live products
   const displayProducts = initialProducts.filter((p: any) => {
+    if (p.isPremium) return false;
+    
     if (activeCategory) {
       if (activeCategory === 'SIZES') {
         if (activeSubcategory) {

@@ -33,11 +33,13 @@ export interface Product {
   rating?: number;
   image: string;
   images?: string[];
+  videoUrl?: string;
   stock: number;
   isSeasonal?: boolean;
   isNew?: boolean;
   isPremium?: boolean;
   colors?: string[];
+  attributes?: string[];
   status?: 'active' | 'deleted';
   createdAt?: Timestamp;
   isSoldOut?: boolean;
@@ -95,6 +97,24 @@ export interface Banner {
   deleted?: boolean;
   deletedAt?: Timestamp;
   createdAt?: Timestamp;
+}
+
+export interface EliteHeroSettings {
+  mediaType: 'image' | 'video';
+  desktopMediaUrl: string;
+  mobileMediaUrl?: string;
+  title?: string;
+  subtitle?: string;
+  updatedAt?: Timestamp;
+}
+
+export interface EliteSplashSettings {
+  isActive: boolean;
+  mediaType: 'image' | 'video';
+  mediaUrl: string;
+  text: string;
+  duration: number; // in milliseconds
+  updatedAt?: Timestamp;
 }
 
 export interface Coupon {
@@ -489,9 +509,61 @@ export const deleteCategory = (id: string) => deleteDocument('categories', id);
 // Banners
 // ========================
 export const getBanners = () => getCollectionData<Banner>('banners');
-export const addBanner = (data: Omit<Banner, 'id'>) => addDocument('banners', data);
+export const addBanner = (data: Partial<Banner>) => addDocument('banners', { ...data, createdAt: Timestamp.now() });
 export const updateBanner = (id: string, data: Partial<Banner>) => updateDocument('banners', id, data);
 export const deleteBanner = (id: string) => deleteDocument('banners', id);
+
+// Elite Hero Settings
+export const getEliteHeroSettings = async (): Promise<EliteHeroSettings | null> => {
+  try {
+    const docSnap = await getDoc(doc(db, 'settings', 'eliteHero'));
+    if (docSnap.exists()) {
+      return docSnap.data() as EliteHeroSettings;
+    }
+    return null;
+  } catch (e) {
+    console.error("Error fetching Elite Hero Settings:", e);
+    return null;
+  }
+};
+
+export const updateEliteHeroSettings = async (data: Partial<EliteHeroSettings>): Promise<void> => {
+  try {
+    await setDoc(doc(db, 'settings', 'eliteHero'), {
+      ...data,
+      updatedAt: Timestamp.now()
+    }, { merge: true });
+  } catch (e) {
+    console.error("Error updating Elite Hero Settings:", e);
+    throw e;
+  }
+};
+
+// Elite Splash Settings
+export const getEliteSplashSettings = async (): Promise<EliteSplashSettings | null> => {
+  try {
+    const docSnap = await getDoc(doc(db, 'settings', 'eliteSplash'));
+    if (docSnap.exists()) {
+      return docSnap.data() as EliteSplashSettings;
+    }
+    return null;
+  } catch (e) {
+    console.error("Error fetching Elite Splash Settings:", e);
+    return null;
+  }
+};
+
+export const updateEliteSplashSettings = async (data: Partial<EliteSplashSettings>): Promise<void> => {
+  try {
+    await setDoc(doc(db, 'settings', 'eliteSplash'), {
+      ...data,
+      updatedAt: Timestamp.now()
+    }, { merge: true });
+  } catch (e) {
+    console.error("Error updating Elite Splash Settings:", e);
+    throw e;
+  }
+};
 
 // ========================
 // Coupons

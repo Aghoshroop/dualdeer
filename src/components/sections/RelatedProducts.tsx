@@ -37,7 +37,7 @@ export default function RelatedProducts({ category, excludeId }: RelatedProducts
     
     getProducts().then(prods => {
       // Find products matching the same category, excluding the current product itself
-      const related = prods.filter(p => p.category === category && p.id !== excludeId);
+      const related = prods.filter(p => p.category === category && p.id !== excludeId && !p.isPremium);
       setProducts(related.slice(0, 4));
       setLoading(false);
     });

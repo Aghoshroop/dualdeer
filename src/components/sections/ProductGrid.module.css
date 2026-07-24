@@ -456,31 +456,48 @@
     display: grid !important; 
     grid-template-columns: 1fr !important; /* Stack products vertically on mobile */
     gap: 3rem !important; 
-    
-    /* Scale up Premium text/buttons for massive card */
-    --mobile-premium-title-size: 1.8rem;
-    --mobile-premium-feature-size: 0.95rem;
-    --mobile-premium-feature-icon: 16px;
-    --mobile-premium-price-size: 36px;
-    --mobile-premium-btn-w: 105px;
-    --mobile-premium-btn-h: 42px;
-    --mobile-premium-btn-inner-h: 40px;
-    --mobile-premium-btn-text: 0.95rem;
-    --mobile-premium-btn-icon: 14px;
-
-    /* Scale up standard text/buttons for larger card */
-    --mobile-card-title-size: 1.35rem;
-    --mobile-card-feature-size: 0.8rem;
-    --mobile-card-feature-icon: 14px;
-    --mobile-card-price-size: 28px;
-    --mobile-card-btn-w: 80px;
-    --mobile-card-btn-h: 34px;
-    --mobile-card-btn-text: 0.75rem;
-    --mobile-card-btn-icon: 12px;
+    /* Proportionately scaled down Premium text/buttons */
+    --mobile-premium-title-size: 1rem;
+    --mobile-premium-feature-size: 0.6rem;
+    --mobile-premium-feature-icon: 10px;
+    --mobile-premium-price-size: 20px;
+    --mobile-premium-btn-w: 65px;
+    --mobile-premium-btn-h: 26px;
+    --mobile-premium-btn-inner-h: 24px;
+    --mobile-premium-btn-text: 0.6rem;
+    --mobile-premium-btn-icon: 9px;
   }
   .twoItemGrid .card, .singleItemGrid .card { 
     width: 100% !important; 
     max-width: 100% !important; 
+  }
+  .twoItemGrid {
+    /* Proportionately scaled down Premium text/buttons for 2-column grid */
+    --mobile-premium-title-size: 0.9rem;
+    --mobile-premium-feature-size: 0.5rem;
+    --mobile-premium-feature-icon: 8px;
+    --mobile-premium-price-size: 16px;
+    --mobile-premium-btn-w: auto;
+    --mobile-premium-btn-h: 24px;
+    --mobile-premium-btn-inner-h: 22px;
+    --mobile-premium-btn-text: 0.55rem;
+    --mobile-premium-btn-icon: 8px;
+
+    /* Proportionately scaled down standard text/buttons for 2-column grid */
+    --mobile-card-title-size: 0.75rem;
+    --mobile-card-feature-size: 0.5rem;
+    --mobile-card-feature-icon: 8px;
+    --mobile-card-price-size: 14px;
+    --mobile-card-btn-w: 32px;
+    --mobile-card-btn-min-w: 32px;
+    --mobile-card-btn-padding: 0;
+    --mobile-card-btn-h: 32px;
+    --mobile-card-btn-text-display: none;
+    --mobile-card-btn-icon: 15px;
+    --mobile-card-btn-border: none;
+    --mobile-card-btn-bg: rgba(163, 130, 236, 0.15);
+    --mobile-card-btn-radius: 50%;
+    --mobile-card-btn-color: #a984f3;
   }
   .title { font-size: 2.2rem; line-height: 1.2; }
   .section { padding: 5rem 1.5rem; }
@@ -493,31 +510,22 @@
 @media (max-width: 480px) {
   .grid { 
     gap: 2.5rem !important; 
-    --mobile-card-height: 380px;      /* Standard card gets bigger */
-    --mobile-image-height: 240px;
+    --mobile-card-height: 440px;      /* Standard card gets bigger */
+    --mobile-image-height: 300px;
     --mobile-premium-card-height: 520px; /* Premium card stays massive */
     --mobile-premium-image-height: 380px;
     
-    /* Scale up Premium text/buttons for massive card */
-    --mobile-premium-title-size: 1.8rem;
-    --mobile-premium-feature-size: 0.95rem;
-    --mobile-premium-feature-icon: 16px;
-    --mobile-premium-price-size: 36px;
-    --mobile-premium-btn-w: 105px;
-    --mobile-premium-btn-h: 42px;
-    --mobile-premium-btn-inner-h: 40px;
-    --mobile-premium-btn-text: 0.95rem;
-    --mobile-premium-btn-icon: 14px;
+    /* Proportionately scaled down Premium text/buttons */
+    --mobile-premium-title-size: 1rem;
+    --mobile-premium-feature-size: 0.6rem;
+    --mobile-premium-feature-icon: 10px;
+    --mobile-premium-price-size: 20px;
+    --mobile-premium-btn-w: 65px;
+    --mobile-premium-btn-h: 26px;
+    --mobile-premium-btn-inner-h: 24px;
+    --mobile-premium-btn-text: 0.6rem;
+    --mobile-premium-btn-icon: 9px;
 
-    /* Scale up standard text/buttons for larger card */
-    --mobile-card-title-size: 1.35rem;
-    --mobile-card-feature-size: 0.8rem;
-    --mobile-card-feature-icon: 14px;
-    --mobile-card-price-size: 28px;
-    --mobile-card-btn-w: 80px;
-    --mobile-card-btn-h: 34px;
-    --mobile-card-btn-text: 0.75rem;
-    --mobile-card-btn-icon: 12px;
   }
   .title { margin-bottom: 1rem; }
   .name { line-height: 1; }
@@ -543,10 +551,11 @@
     display: none;
   }
   
-  .horizontalScrollMobile .card {
-    min-width: 60vw !important;
+  .horizontalScrollMobile > * {
+    min-width: clamp(150px, 45vw, 180px) !important;
+    width: clamp(150px, 45vw, 180px) !important;
     scroll-snap-align: start;
-    flex-shrink: 0;
+    flex: 0 0 auto !important;
   }
 }
 

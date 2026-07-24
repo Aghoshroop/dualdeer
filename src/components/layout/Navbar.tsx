@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingBag, User, X, Sun, Moon, Menu, Bell, ChevronRight } from 'lucide-react';
+import { Search, ShoppingBag, User, X, Sun, Moon, Menu, Bell, ChevronRight, Crown, Grid } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import LiveTrafficBadge from '../ui/LiveTrafficBadge';
@@ -12,6 +12,8 @@ import { useCurrency } from '@/context/CurrencyContext';
 import styles from './Navbar.module.css';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import EliteMobileNav from './EliteMobileNav';
+import EliteDesktopNav from './EliteDesktopNav';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 
 
@@ -62,10 +64,8 @@ export default function Navbar() {
     import('@/lib/firebaseUtils').then(({ getProducts, getCategories }) => {
       getProducts().then(prods => {
         setAllProducts(prods);
-      }).catch(err => console.error(err));
-      
-      getCategories().then(cats => {
-        const uniqueCats = cats.filter(c => c.status === 'active').map(c => c.name);
+        const uniqueCats = Array.from(new Set(prods.filter(p => p.category).map(p => p.category.toUpperCase())));
+        console.log("Navbar derived live categories:", uniqueCats);
         setLiveCategories(uniqueCats);
       }).catch(err => console.error(err));
       
@@ -144,6 +144,7 @@ export default function Navbar() {
   const logoScaleMobile = useTransform(scrollY, [0, dockStart, dockEnd], [isMicro ? 1.2 : 1.5, isMicro ? 1.2 : 1.5, 1]);
   
   const [isDocked, setIsDocked] = useState(false);
+  const [isNavHidden, setIsNavHidden] = useState(false); // Smart sticky state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -152,6 +153,14 @@ export default function Navbar() {
     return scrollY.on("change", (latest) => {
       if (latest > dockEnd) setIsDocked(true);
       else setIsDocked(false);
+
+      // Smart sticky logic: hide on scroll down, show on scroll up
+      const previous = scrollY.getPrevious();
+      if (latest > previous && latest > 150) {
+        setIsNavHidden(true); // scrolling down
+      } else if (latest < previous) {
+        setIsNavHidden(false); // scrolling up
+      }
     });
   }, [scrollY, dockEnd]);
 
@@ -247,9 +256,272 @@ export default function Navbar() {
     navState = (isHovered || isMobile) ? "expandedScrolled" : "compact";
   }
 
-  // This check is AFTER all hooks — safe per Rules of Hooks.
   if (!mounted) {
     return null;
+  }
+
+  const handleNotifClick = () => {
+    setIsNotifOpen(!isNotifOpen);
+    if (!isNotifOpen) {
+      setUnreadNotifCount(0); 
+      const allKnownIds = notifications.map(n => n.id).filter(id => !!id);
+      const stored = localStorage.getItem('dualdeer_read_notif_ids');
+      const readIds: string[] = stored ? JSON.parse(stored) : [];
+      const combinedReads = Array.from(new Set([...readIds, ...allKnownIds]));
+      localStorage.setItem('dualdeer_read_notif_ids', JSON.stringify(combinedReads));
+      
+      if (currentUser) {
+        markMessagesAsRead(currentUser.uid, 'user');
+      }
+    }
+  };
+
+  // Elite full-screen custom navigation applied to Elite, Product Details, and Checkout flows
+  const isPremiumRoute = pathname === '/elite' || pathname.startsWith('/product/') || pathname.startsWith('/checkout');
+
+  if (isPremiumRoute) {
+    return (
+      <>
+        <motion.div
+          style={{ position: 'sticky', top: 0, zIndex: 10000 }}
+          animate={{ y: isNavHidden ? '-100%' : '0%' }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {isMobile ? (
+            <EliteMobileNav onSearchClick={() => setIsSearchOpen(true)} />
+          ) : (
+            <EliteDesktopNav 
+              onSearchClick={() => setIsSearchOpen(true)}
+              theme={theme || 'dark'}
+              onThemeToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              unreadNotifCount={unreadNotifCount}
+              onNotifClick={handleNotifClick}
+              cartCount={cartCount}
+            />
+          )}
+        </motion.div>
+        <div ref={searchRef} style={{ position: 'relative', zIndex: 99999 }}>
+          <AnimatePresence>
+            {isSearchOpen && (
+              <motion.div 
+                className={styles.searchOverlay}
+                initial={{ opacity: 0, filter: 'blur(20px)', scale: 1.05 }}
+                animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+                exit={{ opacity: 0, filter: 'blur(20px)', scale: 0.95 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <button 
+                  onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }} 
+                  className={styles.closeOverlayBtn}
+                  aria-label="Close search"
+                >
+                  <X size={36} strokeWidth={1} />
+                </button>
+
+                <div className={styles.searchOverlayContent}>
+                  <motion.div 
+                    className={styles.hugeSearchBox}
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
+                  >
+                    <Search size={40} strokeWidth={1.5} className={styles.hugeSearchIcon} />
+                    <input 
+                      type="text" 
+                      placeholder="What are you looking for?" 
+                      autoFocus 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </motion.div>
+
+                  <motion.div 
+                    className={styles.overlayResultsContainer}
+                    initial={{ y: 40, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+                  >
+                    <div className={styles.overlaySectionTitle}>
+                      {searchQuery.trim() === '' ? 'Recommended For You' : 'Instant Results'}
+                    </div>
+                    
+                    {displayResults.length === 0 ? (
+                      <div className={styles.overlayNoResults}>
+                        No products found for "{searchQuery}"
+                        <span className={styles.overlayDidYouMean}>Try searching for "speedsuit", "jacket", or "performance"</span>
+                      </div>
+                    ) : searchQuery.trim() === '' ? (
+                      <div className={styles.marqueeWrapper}>
+                        <div className={styles.marqueeTrack}>
+                          {[...displayResults, ...displayResults].map((product, idx) => (
+                            <Link 
+                              href={`/product/${product.slug}`} 
+                              key={`${product.id}-${idx}`} 
+                              className={styles.marqueeResultCard}
+                              onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
+                            >
+                              <div className={styles.marqueeResultImage}>
+                                <img src={product.image} alt={product.name} />
+                              </div>
+                              <div className={styles.marqueeResultInfo}>
+                                <h4>{product.name}</h4>
+                                <span>{renderPrice(product.price)}</span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className={styles.overlayResultsGrid}>
+                        {displayResults.map(product => (
+                          <Link 
+                            href={`/product/${product.slug}`} 
+                            key={product.id} 
+                            className={styles.overlayResultCard}
+                            onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
+                          >
+                            <div className={styles.overlayResultImage}>
+                              <img src={product.image} alt={product.name} />
+                            </div>
+                            <div className={styles.overlayResultInfo}>
+                              <h4>{product.name}</h4>
+                              <span>{renderPrice(product.price)}</span>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Render Notification Overlay */}
+        <div ref={notifRef} style={{ position: 'relative', zIndex: 99999 }}>
+          <AnimatePresence>
+            {isNotifOpen && (
+              <motion.div 
+                className={styles.searchOverlay}
+                initial={{ opacity: 0, filter: 'blur(20px)', scale: 1.05 }}
+                animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+                exit={{ opacity: 0, filter: 'blur(20px)', scale: 0.95 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <button 
+                  onClick={() => setIsNotifOpen(false)} 
+                  className={styles.closeOverlayBtn}
+                  aria-label="Close notifications"
+                >
+                  <X size={36} strokeWidth={1} />
+                </button>
+
+                <div className={styles.searchOverlayContent}>
+                  <motion.div 
+                    className={styles.hugeSearchBox}
+                    style={{ borderBottom: 'none', paddingBottom: 0 }}
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
+                  >
+                    <Bell size={40} strokeWidth={1.5} className={styles.hugeSearchIcon} />
+                    <h2 className={styles.notificationOverlayTitle}>NOTIFICATIONS</h2>
+                  </motion.div>
+
+                  <motion.div 
+                    className={styles.overlayResultsContainer}
+                    initial={{ y: 40, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+                  >
+                    {notifications.length === 0 && chatMessages.filter(m => m.sender === 'admin').length === 0 ? (
+                      <div className={styles.overlayNoResults}>
+                        You're all caught up!
+                        <span className={styles.overlayDidYouMean}>No active system alerts or messages at this time</span>
+                      </div>
+                    ) : (
+                      <div className={styles.notificationGridList}>
+                        {chatMessages.filter(m => m.sender === 'admin').map((msg) => (
+                          <div key={msg.id} className={styles.notificationOverlayItem}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span className={styles.notificationOverlayItemTitle}>Message from Admin</span>
+                              {!msg.readByUser && <span className={styles.newBadgeOverlay}>NEW</span>}
+                            </div>
+                            <span className={styles.notificationOverlayItemMessage}>{msg.text}</span>
+                            {msg.createdAt && <span className={styles.notificationOverlayItemTime}>{new Date((msg.createdAt as any).toMillis ? (msg.createdAt as any).toMillis() : msg.createdAt).toLocaleDateString()}</span>}
+                            
+                            {/* Reply Section */}
+                            <div className={styles.replySection}>
+                              <textarea 
+                                className={styles.replyInput}
+                                placeholder="Type a reply..."
+                                value={replyText[msg.id!] || ''}
+                                rows={1}
+                                onChange={(e) => {
+                                  setReplyText({...replyText, [msg.id!]: e.target.value});
+                                  e.target.style.height = 'auto';
+                                  e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                                }}
+                                onKeyDown={async (e) => {
+                                  if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    if (replyText[msg.id!]?.trim() && currentUser) {
+                                      await sendChatMessage(currentUser.uid, replyText[msg.id!], 'user');
+                                      setReplyText({...replyText, [msg.id!]: ''});
+                                      e.currentTarget.style.height = 'auto';
+                                    }
+                                  }
+                                }}
+                              />
+                              <button 
+                                className={styles.replyBtn}
+                                onClick={async () => {
+                                  if (replyText[msg.id!]?.trim() && currentUser) {
+                                    await sendChatMessage(currentUser.uid, replyText[msg.id!], 'user');
+                                    setReplyText({...replyText, [msg.id!]: ''});
+                                  }
+                                }}
+                              >
+                                Reply
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+
+                        {notifications.map((notif) => {
+                          const NotificationContent = () => (
+                            <>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <span className={styles.notificationOverlayItemTitle}>{notif.title}</span>
+                                  {notif.id && unreadNotifIds.includes(notif.id) && <span className={styles.newBadgeOverlay}>NEW</span>}
+                                </div>
+                              <span className={styles.notificationOverlayItemMessage}>{notif.message}</span>
+                              {notif.createdAt && <span className={styles.notificationOverlayItemTime}>{new Date((notif.createdAt as any).toMillis ? (notif.createdAt as any).toMillis() : notif.createdAt).toLocaleDateString()}</span>}
+                            </>
+                          );
+
+                          return notif.url ? (
+                            <Link href={notif.url} key={notif.id} className={styles.notificationOverlayItem} onClick={() => setIsNotifOpen(false)}>
+                              <NotificationContent />
+                            </Link>
+                          ) : (
+                            <div key={notif.id} className={styles.notificationOverlayItem}>
+                              <NotificationContent />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </>
+    );
   }
 
   return (
@@ -280,8 +552,44 @@ export default function Navbar() {
 
         <motion.div className={styles.mainNav} variants={mainNavVariants} transition={{ type: "spring", stiffness: 400, damping: 35 }}>
           <motion.div className={styles.leftLinks} variants={linksVariants} transition={{ type: "spring", stiffness: 400, damping: 35 }}>
+            <div 
+              className={styles.navItem} 
+              onMouseEnter={() => setHoveredMenu('collection')}
+              style={{ position: 'relative' }}
+            >
+              <Link href="/shop" className={styles.link}>
+                <Grid size={14} style={{ marginRight: '6px' }} />
+                COLLECTION
+              </Link>
+
+              <AnimatePresence>
+                {hoveredMenu === 'collection' && liveCategories.length > 0 && (
+                  <motion.div
+                    className={styles.dropdownWrapper}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className={styles.dropdownContent}>
+                      <Link href={`/shop`} className={styles.dropdownItem} style={{ fontWeight: 700, borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem', marginBottom: '0.2rem' }}>
+                        ALL COLLECTIONS
+                      </Link>
+                      {liveCategories.map((cat, idx) => (
+                        <Link key={idx} href={`/shop?category=${encodeURIComponent(cat)}`} className={styles.dropdownItem}>
+                          {cat}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <div className={styles.navItem}>
-              <Link href="/shop" className={styles.link}>COLLECTION</Link>
+              <Link href="/elite" className={styles.exclusiveLink}>
+                <Crown size={14} style={{ marginRight: '6px' }} />
+                EXCLUSIVE
+              </Link>
             </div>
           </motion.div>
 
@@ -425,23 +733,7 @@ export default function Navbar() {
               <button 
                 aria-label="Notifications" 
                 className={styles.iconBtn} 
-                onClick={() => {
-                   setIsNotifOpen(!isNotifOpen);
-                    if (!isNotifOpen) {
-                     setUnreadNotifCount(0); 
-                     const allKnownIds = notifications.map(n => n.id).filter(id => !!id);
-                     const stored = localStorage.getItem('dualdeer_read_notif_ids');
-                     const readIds: string[] = stored ? JSON.parse(stored) : [];
-                     const combinedReads = Array.from(new Set([...readIds, ...allKnownIds]));
-                     localStorage.setItem('dualdeer_read_notif_ids', JSON.stringify(combinedReads));
-                     
-                     // Mark chats as read
-                     if (currentUser) {
-                       markMessagesAsRead(currentUser.uid, 'user');
-                     }
-                   }
-
-                }}
+                onClick={handleNotifClick}
                 style={{ position: 'relative' }}
               >
                 <Bell size={20} strokeWidth={1.5} />
@@ -589,6 +881,9 @@ export default function Navbar() {
             </button>
           </motion.div>
         </motion.div>
+
+        {/* Old Collection Mega Menu removed as it was centered globally */}
+
       </motion.header>
 
       {/* Global Storefront Traffic Badge */}
@@ -619,6 +914,7 @@ export default function Navbar() {
               <div className={styles.drawerContent}>
                 <nav className={styles.drawerNav}>
                    <Link href="/shop" onClick={() => setIsDrawerOpen(false)}>COLLECTION</Link>
+                   <Link href="/elite" onClick={() => setIsDrawerOpen(false)} className={styles.exclusiveLink} style={{ padding: 0 }}>EXCLUSIVE</Link>
                    {liveCategories.map((cat, i) => (
                       <Link key={i} href="/shop" onClick={() => setIsDrawerOpen(false)} style={{ textTransform: 'uppercase' }}>
                         {cat}
